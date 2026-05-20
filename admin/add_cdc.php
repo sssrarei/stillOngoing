@@ -7,13 +7,14 @@ $success = "";
 $error = "";
 
 // Add CDC
+// Add CDC
 if (isset($_POST['add_cdc'])) {
-    $cdc_name = trim($_POST['cdc_name']);
-    $barangay = trim($_POST['barangay']);
-    $address = trim($_POST['address']);
+    $cdc_name = isset($_POST['cdc_name']) ? trim($_POST['cdc_name']) : "";
+    $barangay = isset($_POST['barangay']) ? trim($_POST['barangay']) : "";
+    $address = isset($_POST['address']) ? trim($_POST['address']) : "";
 
-    if ($cdc_name == "" || $barangay == "" || $address == "") {
-        $error = "Please fill in all required fields.";
+    if ($cdc_name == "") {
+        $error = "Please enter CDC name.";
     } else {
         $check_stmt = $conn->prepare("SELECT cdc_id FROM cdc WHERE cdc_name = ?");
         $check_stmt->bind_param("s", $cdc_name);
@@ -169,13 +170,12 @@ if ($summary_result && $summary_result->num_rows > 0) {
 
                 <div class="form-group">
                     <label for="barangay">Barangay</label>
-                    <input 
-                        type="text" 
-                        id="barangay"
-                        name="barangay" 
-                        required 
-                        value="<?php echo isset($_POST['barangay']) ? htmlspecialchars($_POST['barangay']) : ''; ?>"
-                    >
+                <input 
+                    type="text" 
+                    id="barangay"
+                    name="barangay" 
+                    value="<?php echo isset($_POST['barangay']) ? htmlspecialchars($_POST['barangay']) : ''; ?>"
+                >
                 </div>
 
                 <div class="form-group">
@@ -184,7 +184,6 @@ if ($summary_result && $summary_result->num_rows > 0) {
                         type="text" 
                         id="address"
                         name="address" 
-                        required 
                         value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>"
                     >
                 </div>
@@ -218,8 +217,8 @@ if ($summary_result && $summary_result->num_rows > 0) {
                         <?php while ($row = $cdc_result->fetch_assoc()) { ?>
                             <tr>
                                 <td class="cdc-name"><?php echo htmlspecialchars($row['cdc_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['barangay']); ?></td>
-                                <td><?php echo htmlspecialchars($row['address']); ?></td>
+                                <td><?php echo !empty($row['barangay']) ? htmlspecialchars($row['barangay']) : 'N/A'; ?></td>
+                                <td><?php echo !empty($row['address']) ? htmlspecialchars($row['address']) : 'N/A'; ?></td>
                                 <td class="child-count"><?php echo (int)$row['total_children']; ?></td>
                             </tr>
                         <?php } ?>
