@@ -24,12 +24,15 @@ if(isset($_POST['register'])){
     } elseif($password != $confirm_password){
         $error = "Password and Confirm Password do not match.";
     } else {
-        // Check email
+
+        // Check if email already exists in users table
         $check_email = $conn->query("SELECT * FROM users WHERE email = '$email'");
+
         if($check_email && $check_email->num_rows > 0){
             $error = "Email already exists.";
         } else {
-            // Check access code
+
+            // Check if access code exists
             $child_query = $conn->query("SELECT * FROM children WHERE access_code = '$access_code'");
 
             if(!$child_query || $child_query->num_rows == 0){
@@ -38,31 +41,58 @@ if(isset($_POST['register'])){
                 $child = $child_query->fetch_assoc();
                 $child_id = $child['child_id'];
 
-                // Check if child already linked
+                // Check if child is already linked to a guardian
                 $check_link = $conn->query("SELECT * FROM parent_child_links WHERE child_id = '$child_id'");
 
                 if($check_link && $check_link->num_rows > 0){
                     $error = "This child is already linked to a guardian.";
                 } else {
-                    // Create guardian user account
-                    $user_sql = "INSERT INTO users (role_id, first_name, last_name, email, password)
-                                 VALUES (3, '$first_name', '$last_name', '$email', '$password')";
 
-                    if($conn->query($user_sql)){
-                        $parent_id = $conn->insert_id;
+                    // Start transaction to prevent incomplete guardian registration
+$conn->begin_transaction();
 
-                        // Link guardian to child
-                        $link_sql = "INSERT INTO parent_child_links (parent_id, child_id)
-                                     VALUES ('$parent_id', '$child_id')";
+try {
+    // Insert guardian account into users table
+    $user_sql = "INSERT INTO users 
+        (role_id, first_name, last_name, email, password, contact_number, address)
+        VALUES 
+        (3, '$first_name', '$last_name', '$email', '$password', '$contact_number', '$address')";
 
-                        if($conn->query($link_sql)){
-                            $message = "Guardian registration successful! You can now login.";
-                        } else {
-                            $error = "Guardian account created, but linking failed: " . $conn->error;
-                        }
-                    } else {
-                        $error = "Error: " . $conn->error;
-                    }
+    if(!$conn->query($user_sql)){
+        throw new Exception("User account creation failed: " . $conn->error);
+    }
+
+    $parent_id = $conn->insert_id;
+
+    // Insert guardian profile into guardians table
+    $guardian_sql = "INSERT INTO guardians 
+        (child_id, user_id, first_name, last_name, relationship_to_child, contact_number, email, address)
+        VALUES 
+        ('$child_id', '$parent_id', '$first_name', '$last_name', '$relationship_to_child', '$contact_number', '$email', '$address')";
+
+    if(!$conn->query($guardian_sql)){
+        throw new Exception("Guardian profile creation failed: " . $conn->error);
+    }
+
+    // Link guardian user to child
+    $link_sql = "INSERT INTO parent_child_links (parent_id, child_id)
+                VALUES ('$parent_id', '$child_id')";
+
+    if(!$conn->query($link_sql)){
+        throw new Exception("Guardian linking failed: " . $conn->error);
+    }
+
+    // If all inserts are successful, save everything
+    $conn->commit();
+
+    $message = "Guardian registration successful! You can now login.";
+
+} catch (Exception $e) {
+    // If one insert fails, cancel all inserts
+    $conn->rollback();
+
+    $error = "Registration failed: " . $e->getMessage();
+}
                 }
             }
         }

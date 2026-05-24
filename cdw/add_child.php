@@ -32,12 +32,7 @@ if(isset($_POST['save'])){
     $allergies = trim($_POST['allergies']);
     $comorbidities = trim($_POST['comorbidities']);
 
-    // GUARDIAN INFORMATION (OPTIONAL)
-    $guardian_name = trim($_POST['guardian_name']);
-    $relationship_to_child = trim($_POST['relationship_to_child']);
-    $contact_number = trim($_POST['contact_number']);
-    $guardian_email = trim($_POST['guardian_email']);
-
+  
     if(empty($child_name) || empty($birthdate) || empty($sex)){
         $error = "Please fill in all required child information fields.";
     } else {
@@ -91,60 +86,40 @@ if(isset($_POST['save'])){
         }
 
         // SAVE CHILD
-        $child_sql = "INSERT INTO children
-            (first_name, middle_name, last_name, birthdate, sex, address, religion, guardian_name, contact_number, cdc_id, access_code)
-            VALUES
-            ('$first_name', '$middle_name', '$last_name', '$birthdate', '$sex', '$address', '$religion', '$guardian_name', '$contact_number', '$cdc_id', '$access_code')";
+    $child_sql = "INSERT INTO children
+    (first_name, middle_name, last_name, birthdate, sex, address, religion, cdc_id, access_code)
+    VALUES
+    ('$first_name', '$middle_name', '$last_name', '$birthdate', '$sex', '$address', '$religion', '$cdc_id', '$access_code')";
 
         if($conn->query($child_sql)){
             $child_id = $conn->insert_id;
 
-            // SAVE GUARDIAN ONLY IF MAY INPUT
-            if(!empty($guardian_name)){
-                $guardian_parts = preg_split('/\s+/', $guardian_name);
+            
 
-                $guardian_first_name = "";
-                $guardian_middle_name = "";
-                $guardian_last_name = "";
+            // SAVE HEALTH INFORMATION ONLY IF MAY INPUT
+                if(empty($error)){
+                    $has_health_info = !empty($vaccination_card_path) || 
+                                    !empty($allergies) || 
+                                    !empty($comorbidities) || 
+                                    !empty($medical_history_path);
 
-                if(count($guardian_parts) == 1){
-                    $guardian_first_name = $guardian_parts[0];
-                } elseif(count($guardian_parts) == 2){
-                    $guardian_first_name = $guardian_parts[0];
-                    $guardian_last_name = $guardian_parts[1];
-                } else {
-                    $guardian_first_name = array_shift($guardian_parts);
-                    $guardian_last_name = array_pop($guardian_parts);
-                    $guardian_middle_name = implode(" ", $guardian_parts);
+                    if($has_health_info){
+                        $health_sql = "INSERT INTO child_health_information
+                            (child_id, vaccination_card_file_path, allergies, comorbidities, medical_history_file_path)
+                            VALUES
+                            ('$child_id', '$vaccination_card_path', '$allergies', '$comorbidities', '$medical_history_path')";
+
+                        $health_saved = $conn->query($health_sql);
+
+                        if(!$health_saved){
+                            $error = "Child saved, but health information failed: " . $conn->error;
+                        } else {
+                            $success = "Child Profile Registration successful! Child Access Code: " . $access_code;
+                        }
+                    } else {
+                        $success = "Child Profile Registration successful! Child Access Code: " . $access_code;
+                    }
                 }
-
-                $guardian_sql = "INSERT INTO guardians
-                    (child_id, first_name, middle_name, last_name, relationship_to_child, contact_number, email, address)
-                    VALUES
-                    ('$child_id', '$guardian_first_name', '$guardian_middle_name', '$guardian_last_name', '$relationship_to_child', '$contact_number', '$guardian_email', '$address')";
-
-                $guardian_saved = $conn->query($guardian_sql);
-
-                if(!$guardian_saved){
-                    $error = "Child saved, but guardian information failed: " . $conn->error;
-                }
-            }
-
-            // SAVE HEALTH INFORMATION
-            if(empty($error)){
-                $health_sql = "INSERT INTO child_health_information
-                    (child_id, vaccination_card_file_path, allergies, comorbidities, medical_history_file_path)
-                    VALUES
-                    ('$child_id', '$vaccination_card_path', '$allergies', '$comorbidities', '$medical_history_path')";
-
-                $health_saved = $conn->query($health_sql);
-
-                if(!$health_saved){
-                    $error = "Child saved, but health information failed: " . $conn->error;
-                } else {
-                    $success = "Child Profile Registration successful! Child Access Code: " . $access_code;
-                }
-            }
         } else {
             $error = "Error: " . $conn->error;
         }
@@ -178,10 +153,17 @@ if(isset($_POST['save'])){
         }
 
 
-        .main-content{
+       .main-content{
             margin-left:260px;
             padding:112px 24px 30px;
             transition:margin-left 0.25s ease;
+            display:flex;
+            justify-content:center;
+        }
+
+        .page-wrapper{
+            width:100%;
+            max-width:850px;
         }
 
         .main-content.full{
@@ -243,7 +225,7 @@ if(isset($_POST['save'])){
 
         .form-grid{
             display:grid;
-            grid-template-columns:1fr 1fr;
+            grid-template-columns:1fr;
             gap:18px;
         }
 
@@ -337,6 +319,7 @@ if(isset($_POST['save'])){
             justify-content:flex-end;
             gap:10px;
             flex-wrap:wrap;
+            width:100%;
         }
 
         .btn{
@@ -464,11 +447,13 @@ if(isset($_POST['save'])){
 <?php include '../includes/cdw_sidebar.php'; ?>
 
 <div class="main-content" id="mainContent">
+    <div class="page-wrapper">
     <div class="page-header">
         <a href="child_list.php" class="back-link">← Back to Pupil List</a>
         <h1 class="page-title">Child Profile Registration</h1>
         <div class="page-subtitle">
-            Active CDC: <?php echo htmlspecialchars($_SESSION['active_cdc_name']); ?>
+            Active CDC: <?php echo htmlspecialchars($_SESSION['active_cdc_name']); ?><br>
+            After saving, give the generated access code to the guardian for account registration.
         </div>
     </div>
 
@@ -512,42 +497,7 @@ if(isset($_POST['save'])){
                     <label class="form-label">Religion</label>
                     <input type="text" name="religion" class="form-control">
                 </div>
-            </div>
-
-            <div class="form-card">
-                <h3 class="section-title">Guardian Information <span class="optional">(Optional)</span></h3>
-
-                <div class="form-row">
-                    <label class="form-label">Parent/Guardian Name</label>
-                    <input type="text" name="guardian_name" class="form-control">
-                </div>
-
-                <div class="form-row">
-                    <label class="form-label">Relationship to Child</label>
-                    <select name="relationship_to_child" class="form-select">
-                        <option value="">Select Relationship</option>
-                        <option value="Mother">Mother</option>
-                        <option value="Father">Father</option>
-                        <option value="Grandmother">Grandmother</option>
-                        <option value="Grandfather">Grandfather</option>
-                        <option value="Guardian">Guardian</option>
-                        <option value="Aunt">Aunt</option>
-                        <option value="Uncle">Uncle</option>
-                        <option value="Sibling">Sibling</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <div class="form-row">
-                    <label class="form-label">Contact Number</label>
-                    <input type="text" name="contact_number" class="form-control">
-                </div>
-
-                <div class="form-row">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="guardian_email" class="form-control">
-                </div>
-            </div>
+                
 
             <div class="form-card full">
                 <h3 class="section-title">Child Health Information <span class="optional">(Optional)</span></h3>
@@ -586,7 +536,7 @@ if(isset($_POST['save'])){
         </div>
     </form>
 </div>
-
+</div>
 <script>
 function toggleSidebar() {
     var sidebar = document.getElementById('sidebar');

@@ -715,7 +715,7 @@ if($child_id > 0){
                     (!empty($child_data['middle_name']) ? $child_data['middle_name'] . ' ' : '') .
                     $child_data['last_name']
                 );
-                $age_now = compute_age_label($child_data['birthdate']);
+                $age_now = compute_age_label($child_data['birthdate']);$age_months_now = compute_age_months_exact($child_data['birthdate'], date('Y-m-d'));
             ?>
 
             <div class="page-header">
@@ -737,10 +737,10 @@ if($child_id > 0){
             <?php } ?>
 
             <div class="child-summary">
-                <div class="summary-item"><strong>Child Name:</strong> <?php echo htmlspecialchars(strtoupper($child_full_name)); ?></div>
-                <div class="summary-item"><strong>Birthdate:</strong> <?php echo date("F d, Y", strtotime($child_data['birthdate'])); ?></div>
-                <div class="summary-item"><strong>Age:</strong> <?php echo htmlspecialchars($age_now); ?></div>
-                <div class="summary-item"><strong>CDC:</strong> <?php echo htmlspecialchars($child_data['cdc_name']); ?></div>
+                <div class="summary-item"><strong>Child Name: </strong> <?php echo htmlspecialchars(strtoupper($child_full_name)); ?></div>
+                <div class="summary-item"><strong>Birthdate: </strong> <?php echo date("F d, Y", strtotime($child_data['birthdate'])); ?></div>
+                <div class="summary-item"><strong>Age in Months: </strong><?php echo ($age_months_now !== null) ? htmlspecialchars($age_months_now . ' month(s) old') : 'N/A'; ?></div>
+                <div class="summary-item"><strong>CDC: </strong> <?php echo htmlspecialchars($child_data['cdc_name']); ?></div>
             </div>
 
             <?php if(!$view_only){ ?>

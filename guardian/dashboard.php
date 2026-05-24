@@ -8,6 +8,7 @@ $user_id = $_SESSION['user_id'];
 
 $child = null;
 $latest_record = null;
+$latest_guidance = null;
 $monthly_measurements = [];
 $error_message = '';
 
@@ -29,7 +30,40 @@ if ($stmt = $conn->prepare($child_sql)) {
     $error_message = "Failed to load child information.";
 }
 
-if ($child) {
+if ($child && isset($child['child_id'])) {
+
+    $child_id = (int) $child['child_id'];
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET LATEST OFFICIAL INTERVENTION GUIDANCE
+    |--------------------------------------------------------------------------
+    | This is used to show Nutritional Alert / Follow-up Reminder
+    | on the Guardian Dashboard.
+    */
+    $guidance_sql = "
+        SELECT *
+        FROM intervention_guidance
+        WHERE child_id = ?
+          AND is_reviewed = 1
+          AND sent_to_guardian = 1
+        ORDER BY sent_at DESC, guidance_id DESC
+        LIMIT 1
+    ";
+
+    if ($stmt = $conn->prepare($guidance_sql)) {
+        $stmt->bind_param("i", $child_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $latest_guidance = $result->fetch_assoc();
+        $stmt->close();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET LATEST ANTHROPOMETRIC RECORD
+    |--------------------------------------------------------------------------
+    */
     $latest_sql = "
         SELECT *
         FROM anthropometric_records
@@ -39,13 +73,18 @@ if ($child) {
     ";
 
     if ($stmt = $conn->prepare($latest_sql)) {
-        $stmt->bind_param("i", $child['child_id']);
+        $stmt->bind_param("i", $child_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $latest_record = $result->fetch_assoc();
         $stmt->close();
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | GET MONTHLY MEASUREMENTS
+    |--------------------------------------------------------------------------
+    */
     $measurements_sql = "
         SELECT date_recorded, weight, height, wfa_status, hfa_status, wflh_status
         FROM anthropometric_records
@@ -55,7 +94,7 @@ if ($child) {
     ";
 
     if ($stmt = $conn->prepare($measurements_sql)) {
-        $stmt->bind_param("i", $child['child_id']);
+        $stmt->bind_param("i", $child_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -210,6 +249,45 @@ function getStatusNote($status) {
     return 'No nutritional record available yet.';
 }
 
+function getGuardianAlertTitle($guidance) {
+    if (!$guidance) {
+        return '';
+    }
+
+    $status_note = strtolower(trim((string)($guidance['status_note'] ?? '')));
+    $needs_counseling = isset($guidance['needs_counseling']) ? (int)$guidance['needs_counseling'] : 0;
+    $needs_referral = isset($guidance['needs_referral']) ? (int)$guidance['needs_referral'] : 0;
+
+    if (strpos($status_note, 'final follow-up reminder') !== false || $needs_referral === 1) {
+        return 'Final Follow-up Reminder';
+    }
+
+    if (strpos($status_note, 'follow-up reminder') !== false || $needs_counseling === 1) {
+        return 'Follow-up Reminder';
+    }
+
+    return 'Nutritional Alert';
+}
+
+function getGuardianAlertMessage($guidance) {
+    if (!$guidance) {
+        return '';
+    }
+
+    $title = getGuardianAlertTitle($guidance);
+    $category = isset($guidance['intervention_category']) ? $guidance['intervention_category'] : 'At-Risk';
+
+    if ($title === 'Final Follow-up Reminder') {
+        return 'Based on the Endline assessment, your child still needs nutritional attention. Please visit the Intervention Guidance page and coordinate with the CDW or health personnel for further assessment if needed.';
+    }
+
+    if ($title === 'Follow-up Reminder') {
+        return 'Based on the latest monitoring assessment, your child still needs nutritional attention. Please visit the Intervention Guidance page and coordinate with the CDW for counseling, nutrition education, and further monitoring.';
+    }
+
+    return 'Your child has been identified as At-Risk under the ' . $category . ' category. Please visit the Intervention Guidance page to view the recommended guidance.';
+}
+
 $age_text = $child ? calculateAgeText($child['birthdate']) : 'N/A';
 $current_status = getPriorityStatusFromRecord($latest_record);
 $status_class = getStatusClass($current_status);
@@ -240,6 +318,59 @@ $upcoming_events = $event_stmt->get_result();
     <title>Guardian Dashboard | NutriTrack</title>
     <link rel="stylesheet" href="../assets/guardian-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    .guardian-nutri-alert {
+        margin-top: 22px;
+        padding: 20px 22px;
+        border-radius: 18px;
+        border: 1px solid #f4c7a1;
+        background: #fff7ed;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    .guardian-nutri-alert-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: #c2410c;
+        margin-bottom: 10px;
+    }
+
+    .guardian-nutri-alert-message {
+        font-size: 15px;
+        line-height: 1.7;
+        color: #374151;
+        margin-bottom: 12px;
+    }
+
+    .guardian-nutri-alert-note {
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #ffffff;
+        border: 1px dashed #fdba74;
+        color: #7c2d12;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 14px;
+    }
+
+    .guardian-nutri-alert-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 11px 16px;
+        border-radius: 10px;
+        background: #c2410c;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .guardian-nutri-alert-btn:hover {
+        background: #9a3412;
+    }
+</style>
 </head>
 <body>
 
@@ -297,10 +428,37 @@ $upcoming_events = $event_stmt->get_result();
                                 <div class="status-note <?php echo $status_class; ?>">
                                     <?php echo htmlspecialchars($status_note); ?>
                                 </div>
+                               
                             </div>
+                            
                         </div>
+
+                         <?php if ($latest_guidance) { ?>
+    <div class="guardian-nutri-alert">
+        <div class="guardian-nutri-alert-title">
+            <?php echo htmlspecialchars(getGuardianAlertTitle($latest_guidance)); ?>
+        </div>
+
+        <div class="guardian-nutri-alert-message">
+            <?php echo htmlspecialchars(getGuardianAlertMessage($latest_guidance)); ?>
+        </div>
+
+        <?php if (!empty($latest_guidance['status_note'])) { ?>
+            <div class="guardian-nutri-alert-note">
+                <?php echo htmlspecialchars($latest_guidance['status_note']); ?>
+            </div>
+        <?php } ?>
+
+        <a href="interventions_reminders.php" class="guardian-nutri-alert-btn">
+            View Intervention Guidance
+        </a>
+    </div>
+<?php } ?>
+
                     </div>
                 </div>
+
+                
 
                 <div class="card">
                     <div class="card-header">

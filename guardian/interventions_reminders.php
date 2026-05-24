@@ -307,7 +307,7 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interventions / Reminders | NutriTrack</title>
+    <title>Interventions Guidance | NutriTrack</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/guardian-style.css">
 
@@ -717,44 +717,81 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
             </div>
 
             <div class="ir-card">
-                <div class="ir-card-header">
-                    <h2 class="ir-card-title">Reminders</h2>
-                </div>
-                <div class="ir-card-body">
-                    <?php if(!empty($notifications)) { ?>
-                        <div class="notif-list">
-                            <?php foreach($notifications as $notif) { ?>
-                                <div class="notif-item">
-                                    <div class="notif-top">
-                                        <div class="notif-title"><?php echo htmlspecialchars($notif['title']); ?></div>
-                                        <div class="notif-date"><?php echo htmlspecialchars(formatDateTimeValue($notif['created_at'])); ?></div>
-                                    </div>
+    <div class="ir-card-header">
+        <h2 class="ir-card-title">Follow-up Reminders</h2>
+    </div>
+    <div class="ir-card-body">
 
-                                    <div class="notif-message"><?php echo htmlspecialchars($notif['message']); ?></div>
+        <?php
+            $has_followup_reminder = false;
+            $followup_title = '';
+            $followup_message = '';
 
-                                    <div class="notif-meta">
-                                        <?php if(!empty($notif['deadline'])) { ?>
-                                            <span class="notif-badge deadline">
-                                                Deadline: <?php echo htmlspecialchars(formatDateValue($notif['deadline'])); ?>
-                                            </span>
-                                        <?php } ?>
+            if($official_guidance){
+                $needs_counseling = isset($official_guidance['needs_counseling']) ? (int)$official_guidance['needs_counseling'] : 0;
+                $needs_referral = isset($official_guidance['needs_referral']) ? (int)$official_guidance['needs_referral'] : 0;
+                $status_note_lower = strtolower(trim((string)($official_guidance['status_note'] ?? '')));
 
-                                        <?php if(isset($notif['is_read']) && (int)$notif['is_read'] === 1) { ?>
-                                            <span class="notif-badge read">Read</span>
-                                        <?php } else { ?>
-                                            <span class="notif-badge unread">Unread</span>
-                                        <?php } ?>
-                                    </div>
-                                </div>
-                            <?php } ?>
+                if($needs_referral === 1 || strpos($status_note_lower, 'final follow-up reminder') !== false){
+                    $has_followup_reminder = true;
+                    $followup_title = 'Final Follow-up Reminder';
+                    $followup_message = 'Based on the Endline assessment, your child still needs nutritional attention. Please coordinate with the CDW or health personnel for further assessment if needed.';
+                }
+                elseif($needs_counseling === 1 || strpos($status_note_lower, 'follow-up reminder') !== false){
+                    $has_followup_reminder = true;
+                    $followup_title = 'Follow-up Reminder';
+                    $followup_message = 'Based on the latest monitoring assessment, your child still needs nutritional attention. Please coordinate with the CDW for counseling, nutrition education, and further monitoring.';
+                }
+            }
+        ?>
+
+        <?php if($has_followup_reminder) { ?>
+            <div class="notif-list">
+                <div class="notif-item">
+                    <div class="notif-top">
+                        <div class="notif-title">
+                            <?php echo htmlspecialchars($followup_title); ?>
                         </div>
-                    <?php } else { ?>
-                        <div class="empty-box">
-                            No reminders available at this time.
+                        <div class="notif-date">
+                            <?php echo htmlspecialchars($guidance_sent_at); ?>
+                        </div>
+                    </div>
+
+                    <div class="notif-message">
+                        <?php echo htmlspecialchars($followup_message); ?>
+                    </div>
+
+                    <div class="notif-meta">
+                        <span class="notif-badge deadline">
+                            Action Needed: Coordinate with CDW
+                        </span>
+
+                        <?php if(isset($official_guidance['needs_referral']) && (int)$official_guidance['needs_referral'] === 1) { ?>
+                            <span class="notif-badge unread">
+                                Possible Further Assessment
+                            </span>
+                        <?php } else { ?>
+                            <span class="notif-badge unread">
+                                Counseling / Nutrition Education
+                            </span>
+                        <?php } ?>
+                    </div>
+
+                    <?php if(!empty($official_guidance['status_note'])) { ?>
+                        <div class="guidance-note">
+                            <?php echo htmlspecialchars($official_guidance['status_note']); ?>
                         </div>
                     <?php } ?>
                 </div>
             </div>
+        <?php } else { ?>
+            <div class="empty-box">
+                No follow-up reminder available at this time.
+            </div>
+        <?php } ?>
+
+    </div>
+</div>
 
         <?php } ?>
     </div>

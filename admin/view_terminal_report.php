@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/intervention_helper.php';
 
 if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
     header("Location: ../login.php");
@@ -166,11 +167,102 @@ function extract_report_rows($payload)
     }
 
     $is_list = array_keys($payload) === range(0, count($payload) - 1);
+
     if ($is_list) {
         return $payload;
     }
 
     return [];
+}
+
+function terminal_get_final_risk_status($wfa_status, $hfa_status, $wflh_status)
+{
+    $statuses = [
+        trim((string)$wfa_status),
+        trim((string)$hfa_status),
+        trim((string)$wflh_status)
+    ];
+
+    $priority_order = [
+        'Severely Wasted',
+        'Severely Underweight',
+        'Severely Stunted',
+        'Moderately Wasted',
+        'Wasted',
+        'Underweight',
+        'Obese',
+        'Overweight',
+        'Stunted',
+        'Normal'
+    ];
+
+    foreach ($priority_order as $priority_status) {
+        if (in_array($priority_status, $statuses, true)) {
+            return $priority_status;
+        }
+    }
+
+    return 'Normal';
+}
+
+function terminal_determine_intervention_category($wfa_status, $hfa_status, $wflh_status)
+{
+    $final_status = terminal_get_final_risk_status($wfa_status, $hfa_status, $wflh_status);
+
+    if (
+        $final_status === 'Underweight' ||
+        $final_status === 'Moderately Wasted' ||
+        $final_status === 'Wasted'
+    ) {
+        return 'Moderately Wasted';
+    }
+
+    if (
+        $final_status === 'Severely Underweight' ||
+        $final_status === 'Severely Wasted'
+    ) {
+        return 'Severely Wasted';
+    }
+
+    if ($final_status === 'Overweight') {
+        return 'Overweight';
+    }
+
+    if ($final_status === 'Obese') {
+        return 'Obese';
+    }
+
+    return null;
+}
+
+function terminal_get_endline_record_id($conn, $child_id)
+{
+    $record_id = 0;
+
+    $sql = "
+        SELECT record_id
+        FROM anthropometric_records
+        WHERE child_id = ?
+          AND LOWER(TRIM(assessment_type)) = 'endline'
+        ORDER BY date_recorded DESC, record_id DESC
+        LIMIT 1
+    ";
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "i", $child_id);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if ($row = mysqli_fetch_assoc($result)) {
+            $record_id = (int)$row['record_id'];
+        }
+
+        mysqli_stmt_close($stmt);
+    }
+
+    return $record_id;
 }
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
@@ -234,6 +326,21 @@ if (!is_array($payload)) {
 }
 
 $rows = extract_report_rows($payload);
+$message = '';
+$message_type = '';
+
+/*
+|--------------------------------------------------------------------------
+| FINAL FOLLOW-UP PREVIEW VARIABLES
+|--------------------------------------------------------------------------
+| ADDED:
+| These variables are used so the Admin can review the final follow-up
+| reminder first before sending it to guardians.
+*/
+$show_final_preview = false;
+$final_preview_children = [];
+$final_preview_rules_by_category = [];
+$final_optional_note = '';
 
 $prepared_by = get_first_existing_value($payload, [
     'prepared_by',
@@ -244,6 +351,7 @@ $prepared_by = get_first_existing_value($payload, [
 ], $report['submitted_by_name']);
 
 $coverage_text = 'All Dates';
+
 if (!empty($report['date_from']) && !empty($report['date_to'])) {
     $coverage_text = format_date_value($report['date_from']) . ' - ' . format_date_value($report['date_to']);
 } elseif (!empty($report['date_from'])) {
@@ -251,6 +359,266 @@ if (!empty($report['date_from']) && !empty($report['date_to'])) {
 } elseif (!empty($report['date_to'])) {
     $coverage_text = 'Up to ' . format_date_value($report['date_to']);
 }
+
+/*
+|--------------------------------------------------------------------------
+| PREVIEW FINAL FOLLOW-UP REMINDER
+|--------------------------------------------------------------------------
+| ADDED:
+| This only prepares the preview list.
+| It does NOT save/send anything yet.
+*/
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['preview_final_followup'])) {
+    $show_final_preview = true;
+
+    foreach ($rows as $row) {
+        $child_id = isset($row['child_id']) ? (int)$row['child_id'] : 0;
+
+        if ($child_id <= 0) {
+            continue;
+        }
+
+        $endline_wfa = get_first_existing_value($row, ['endline_wfa_status', 'endline_wfa'], '');
+        $endline_hfa = get_first_existing_value($row, ['endline_hfa_status', 'endline_hfa'], '');
+        $endline_wflh = get_first_existing_value($row, ['endline_wflh_status', 'endline_wflh', 'endline_wfh_status', 'endline_wfh'], '');
+
+        $intervention_category = terminal_determine_intervention_category(
+            $endline_wfa,
+            $endline_hfa,
+            $endline_wflh
+        );
+
+        if ($intervention_category === null) {
+            continue;
+        }
+
+        $original_status = terminal_get_final_risk_status(
+            $endline_wfa,
+            $endline_hfa,
+            $endline_wflh
+        );
+
+        $final_preview_children[] = [
+            'child_id' => $child_id,
+            'child_name' => build_child_name_from_row($row),
+            'original_status' => $original_status,
+            'intervention_category' => $intervention_category,
+            'endline_wfa' => $endline_wfa,
+            'endline_hfa' => $endline_hfa,
+            'endline_wflh' => $endline_wflh
+        ];
+
+        if (!isset($final_preview_rules_by_category[$intervention_category])) {
+            $final_preview_rules_by_category[$intervention_category] = getInterventionGuidanceRules($intervention_category);
+        }
+    }
+
+    if (empty($final_preview_children)) {
+        $show_final_preview = false;
+        $message = 'No Endline at-risk children found for final follow-up reminder.';
+        $message_type = 'error';
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| CONFIRM AND SEND FINAL FOLLOW-UP REMINDER
+|--------------------------------------------------------------------------
+| FIXED:
+| Before, the save/send logic was running immediately.
+| Now, it only runs when Admin clicks "Confirm and Send".
+*/
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_final_followup'])) {
+    $final_optional_note = isset($_POST['final_optional_note']) ? trim($_POST['final_optional_note']) : '';
+    $reviewed_by = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+    $saved_count = 0;
+
+    foreach ($rows as $row) {
+        $child_id = isset($row['child_id']) ? (int)$row['child_id'] : 0;
+
+        if ($child_id <= 0) {
+            continue;
+        }
+
+        $endline_wfa = get_first_existing_value($row, ['endline_wfa_status', 'endline_wfa'], '');
+        $endline_hfa = get_first_existing_value($row, ['endline_hfa_status', 'endline_hfa'], '');
+        $endline_wflh = get_first_existing_value($row, ['endline_wflh_status', 'endline_wflh', 'endline_wfh_status', 'endline_wfh'], '');
+
+        $intervention_category = terminal_determine_intervention_category(
+            $endline_wfa,
+            $endline_hfa,
+            $endline_wflh
+        );
+
+        if ($intervention_category === null) {
+            continue;
+        }
+
+        $original_status = terminal_get_final_risk_status(
+            $endline_wfa,
+            $endline_hfa,
+            $endline_wflh
+        );
+
+        $record_id = terminal_get_endline_record_id($conn, $child_id);
+
+        if ($record_id <= 0) {
+            continue;
+        }
+
+        $rules = getInterventionGuidanceRules($intervention_category);
+        $guidance_text = buildGuidanceText($rules);
+
+        /*
+        |--------------------------------------------------------------------------
+        | OPTIONAL NOTE
+        |--------------------------------------------------------------------------
+        | FIXED:
+        | If CSWD Admin enters a recommendation/note in the preview form,
+        | it will be saved into optional_note.
+        */
+        $optional_note = $final_optional_note !== ''
+            ? $final_optional_note
+            : 'Generated from Terminal Report Endline assessment.';
+
+        $is_at_risk = 1;
+        $needs_counseling = 1;
+        $needs_referral = 1;
+        $status_note = 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.';
+
+        /*
+        |--------------------------------------------------------------------------
+        | DUPLICATE CHECK
+        |--------------------------------------------------------------------------
+        | This prevents duplicate final reminders for the same child,
+        | same category, and same submitted terminal report.
+        */
+        $check_sql = "
+            SELECT guidance_id
+            FROM intervention_guidance
+            WHERE child_id = ?
+              AND intervention_category = ?
+              AND submitted_report_id = ?
+            LIMIT 1
+        ";
+
+        $check_stmt = mysqli_prepare($conn, $check_sql);
+
+        if (!$check_stmt) {
+            continue;
+        }
+
+        mysqli_stmt_bind_param($check_stmt, "isi", $child_id, $intervention_category, $submitted_report_id);
+        mysqli_stmt_execute($check_stmt);
+        $check_result = mysqli_stmt_get_result($check_stmt);
+
+        if ($existing = mysqli_fetch_assoc($check_result)) {
+            $guidance_id = (int)$existing['guidance_id'];
+
+            $update_sql = "
+                UPDATE intervention_guidance
+                SET record_id = ?,
+                    original_status = ?,
+                    guidance_text = ?,
+                    optional_note = ?,
+                    is_at_risk = ?,
+                    needs_counseling = ?,
+                    needs_referral = ?,
+                    reviewed_by = ?,
+                    is_reviewed = 1,
+                    sent_to_guardian = 1,
+                    sent_at = NOW(),
+                    resend_count = resend_count + 1,
+                    status_note = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE guidance_id = ?
+            ";
+
+            $update_stmt = mysqli_prepare($conn, $update_sql);
+
+            if ($update_stmt) {
+                mysqli_stmt_bind_param(
+                    $update_stmt,
+                    "isssiiiisi",
+                    $record_id,
+                    $original_status,
+                    $guidance_text,
+                    $optional_note,
+                    $is_at_risk,
+                    $needs_counseling,
+                    $needs_referral,
+                    $reviewed_by,
+                    $status_note,
+                    $guidance_id
+                );
+
+                if (mysqli_stmt_execute($update_stmt)) {
+                    $saved_count++;
+                }
+
+                mysqli_stmt_close($update_stmt);
+            }
+        } else {
+            $insert_sql = "
+                INSERT INTO intervention_guidance (
+                    child_id,
+                    record_id,
+                    submitted_report_id,
+                    original_status,
+                    intervention_category,
+                    guidance_text,
+                    optional_note,
+                    is_at_risk,
+                    needs_counseling,
+                    needs_referral,
+                    reviewed_by,
+                    is_reviewed,
+                    sent_to_guardian,
+                    sent_at,
+                    status_note
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 1, NOW(), ?)
+            ";
+
+            $insert_stmt = mysqli_prepare($conn, $insert_sql);
+
+            if ($insert_stmt) {
+                mysqli_stmt_bind_param(
+                    $insert_stmt,
+                    "iiissssiiiis",
+                    $child_id,
+                    $record_id,
+                    $submitted_report_id,
+                    $original_status,
+                    $intervention_category,
+                    $guidance_text,
+                    $optional_note,
+                    $is_at_risk,
+                    $needs_counseling,
+                    $needs_referral,
+                    $reviewed_by,
+                    $status_note
+                );
+
+                if (mysqli_stmt_execute($insert_stmt)) {
+                    $saved_count++;
+                }
+
+                mysqli_stmt_close($insert_stmt);
+            }
+        }
+
+        mysqli_stmt_close($check_stmt);
+    }
+
+    if ($saved_count > 0) {
+        $message = $saved_count . ' final follow-up reminder(s) generated and sent to guardian successfully.';
+        $message_type = 'success';
+    } else {
+        $message = 'No final follow-up reminders were generated. No Endline at-risk children were found or reminders already exist.';
+        $message_type = 'error';
+    }
+}
+
 
 $status = strtolower(trim((string)$report['status']));
 $status_class = 'status-default';
@@ -407,7 +775,7 @@ if ($status === 'submitted') {
 
         .status-approved {
             background: #ede9fe;
-            color: #6d28d9;
+            color: #163b68;
         }
 
         .status-returned {
@@ -529,6 +897,120 @@ if ($status === 'submitted') {
                 <p>Submitted report snapshot for CSWD review.</p>
             </div>
         </div>
+
+        <?php if (!empty($message)) { ?>
+    <div class="summary-card">
+        <div class="<?php echo ($message_type === 'success') ? 'status-approved' : 'status-returned'; ?>" style="padding:14px 18px; border-radius:12px; font-weight:700;">
+            <?php echo h($message); ?>
+        </div>
+    </div>
+<?php } ?>
+
+<div class="summary-card">
+    <!--
+        FIXED:
+        This button now previews the final follow-up reminder first.
+        It does NOT immediately save/send the reminder.
+    -->
+    <form method="POST">
+        <button type="submit" name="preview_final_followup" class="status-badge status-approved" style="border:none; cursor:pointer; padding:12px 18px;">
+            Generate Final Follow-up Reminder
+        </button>
+    </form>
+
+    <p style="margin-top:10px; color:#64748b; font-size:14px;">
+        This will preview final follow-up reminders for children who are still At-Risk based on the Endline assessment.
+    </p>
+</div>
+
+<?php if ($show_final_preview && !empty($final_preview_children)) { ?>
+    <!--
+        ADDED:
+        Preview section before sending final follow-up reminders.
+        CSWD can review the children included and add notes/recommendations.
+    -->
+    <div class="summary-card">
+        <h2 style="font-family:'Poppins', sans-serif; font-size:22px; margin-bottom:8px; color:#163b68;">
+            Generate Final Follow-up Reminder
+        </h2>
+
+        <p style="color:#64748b; margin-bottom:18px;">
+            Review the children included and add final recommendations before sending to guardians.
+        </p>
+
+        <div class="table-wrap" style="margin-bottom:20px;">
+            <table class="report-table" style="min-width:900px;">
+                <thead>
+                    <tr>
+                        <th>Child Name</th>
+                        <th>Endline WFA</th>
+                        <th>Endline HFA</th>
+                        <th>Endline WFL/H</th>
+                        <th>Final Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($final_preview_children as $child_preview) { ?>
+                        <tr>
+                            <td><?php echo h($child_preview['child_name']); ?></td>
+                            <td><?php echo h($child_preview['endline_wfa']); ?></td>
+                            <td><?php echo h($child_preview['endline_hfa']); ?></td>
+                            <td><?php echo h($child_preview['endline_wflh']); ?></td>
+                            <td><?php echo h($child_preview['intervention_category']); ?></td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 style="font-family:'Poppins', sans-serif; font-size:18px; margin-bottom:10px;">
+            Auto-Generated Guidance
+        </h3>
+
+        <?php foreach ($final_preview_rules_by_category as $category => $rules) { ?>
+            <div style="margin-bottom:18px;">
+                <strong><?php echo h($category); ?></strong>
+                <ul style="margin-top:8px; padding-left:22px; color:#334155; line-height:1.8;">
+                    <?php foreach ($rules as $rule) { ?>
+                        <li><?php echo h($rule); ?></li>
+                    <?php } ?>
+                </ul>
+            </div>
+        <?php } ?>
+
+        <div style="padding:14px 16px; border-radius:12px; background:#fff7ed; border-left:5px solid #f59e0b; color:#92400e; margin-bottom:18px;">
+           This is intended for healthy Filipino children aged 0–71 months. Children with specific health conditions should be brought to a registered nutritionist-dietitian or any healthcare provider for consultation regarding their energy and nutrient needs.
+        </div>
+
+        <form method="POST">
+            <label for="final_optional_note" style="display:block; font-weight:700; margin-bottom:8px; color:#334155;">
+                Optional Final Recommendation / Note
+            </label>
+
+            <textarea
+                name="final_optional_note"
+                id="final_optional_note"
+                rows="5"
+                style="width:100%; padding:14px; border:1px solid #cbd5e1; border-radius:12px; resize:vertical; font-family:'Inter', sans-serif;"
+                placeholder="Add CSWD final recommendation or note..."
+            ></textarea>
+
+            <div style="display:flex; gap:12px; margin-top:18px; flex-wrap:wrap;">
+                <!--
+                    ADDED:
+                    This is the only button that saves/sends the final reminder.
+                -->
+                <button type="submit" name="confirm_final_followup" class="status-badge status-approved" style="border:none; cursor:pointer; padding:12px 18px;">
+                    Confirm and Send Final Follow-up Reminder
+                </button>
+
+                <a href="view_terminal_report.php?id=<?php echo (int)$submitted_report_id; ?>" class="status-badge status-default" style="text-decoration:none; padding:12px 18px;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+<?php } ?>
 
         <div class="summary-card">
             <div class="summary-grid">

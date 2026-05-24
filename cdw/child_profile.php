@@ -129,10 +129,34 @@ $child_address = !empty($child['address']) ? $child['address'] : 'N/A';
 $cdc_name = !empty($child['cdc_name']) ? $child['cdc_name'] : 'N/A';
 $cdc_address = !empty($child['cdc_address']) ? $child['cdc_address'] : 'N/A';
 
-$relationship_to_child = !empty($child['relationship_to_child']) ? $child['relationship_to_child'] : 'N/A';
-$guardian_contact_number = !empty($child['guardian_contact_number']) ? $child['guardian_contact_number'] : (!empty($child['contact_number']) ? $child['contact_number'] : 'N/A');
-$guardian_email = !empty($child['guardian_email']) ? $child['guardian_email'] : 'N/A';
-$guardian_address = !empty($child['guardian_address']) ? $child['guardian_address'] : $child_address;
+$relationship_to_child = !empty($child['relationship_to_child']) 
+    ? $child['relationship_to_child'] 
+    : 'N/A';
+
+$guardian_contact_number = !empty($child['guardian_contact_number']) 
+    ? $child['guardian_contact_number'] 
+    : (!empty($child['contact_number']) ? $child['contact_number'] : 'N/A');
+
+$guardian_email = !empty($child['guardian_email']) 
+    ? $child['guardian_email'] 
+    : 'N/A';
+
+$guardian_address = !empty($child['guardian_address']) 
+    ? $child['guardian_address'] 
+    : (!empty($child['address']) ? $child['address'] : 'N/A');
+
+// Detect incomplete guardian profile
+$guardian_profile_incomplete = false;
+
+if (
+    !empty($child['guardian_email']) &&
+    (
+        empty($child['relationship_to_child']) ||
+        empty($child['guardian_contact_number'])
+    )
+) {
+    $guardian_profile_incomplete = true;
+}
 
 $vaccination_records = !empty($child['vaccination_card_file_path']) ? $child['vaccination_card_file_path'] : 'N/A';
 $allergies = !empty($child['allergies']) ? $child['allergies'] : 'N/A';
@@ -619,9 +643,17 @@ if ($guardian_submission_feature_enabled) {
                 </div>
 
                 <div class="info-row">
-                    <span class="info-label">Relationship to the Child</span>
-                    <div class="info-value"><?php echo htmlspecialchars($relationship_to_child); ?></div>
-                </div>
+    <span class="info-label">Relationship to the Child</span>
+    <div class="info-value">
+        <?php 
+            echo htmlspecialchars($relationship_to_child); 
+
+            if ($guardian_profile_incomplete && $relationship_to_child === 'N/A') {
+                echo '<br><small style="color:#b45309;">Guardian profile is incomplete. Please update guardian information.</small>';
+            }
+        ?>
+    </div>
+</div>
 
                 <div class="info-row">
                     <span class="info-label">Guardian Address</span>
@@ -629,9 +661,17 @@ if ($guardian_submission_feature_enabled) {
                 </div>
 
                 <div class="info-row">
-                    <span class="info-label">Contact Number</span>
-                    <div class="info-value"><?php echo htmlspecialchars($guardian_contact_number); ?></div>
-                </div>
+    <span class="info-label">Contact Number</span>
+    <div class="info-value">
+        <?php 
+            echo htmlspecialchars($guardian_contact_number); 
+
+            if ($guardian_profile_incomplete && $guardian_contact_number === 'N/A') {
+                echo '<br><small style="color:#b45309;">Contact number is missing from the guardian profile.</small>';
+            }
+        ?>
+    </div>
+</div>
 
                 <div class="info-row">
                     <span class="info-label">Email</span>

@@ -123,3 +123,191 @@ function checkNoImprovementForTwoMonths($records) {
     return (!$improved_month1 && !$improved_month2);
 }
 
+/* =========================================================
+   NEW HELPER: Progress Status Checker
+   Purpose:
+   Compare previous category and current category.
+========================================================= */
+function getInterventionProgressStatus($previous_category, $current_category) {
+    $previous_category = trim((string)$previous_category);
+    $current_category = trim((string)$current_category);
+
+    if (empty($previous_category) && empty($current_category)) {
+        return 'no_data';
+    }
+
+    if (!empty($previous_category) && empty($current_category)) {
+        return 'improved_to_normal';
+    }
+
+    if (empty($previous_category) && !empty($current_category)) {
+        return 'new_at_risk';
+    }
+
+    if (!isSameInterventionGroup($previous_category, $current_category)) {
+        return 'changed_risk_group';
+    }
+
+    $previous_rank = getInterventionSeverityRank($previous_category);
+    $current_rank = getInterventionSeverityRank($current_category);
+
+    if ($current_rank < $previous_rank) {
+        return 'improved';
+    }
+
+    if ($current_rank === $previous_rank) {
+        return 'no_improvement';
+    }
+
+    if ($current_rank > $previous_rank) {
+        return 'worsened';
+    }
+
+    return 'no_data';
+}
+
+/* =========================================================
+   NEW HELPER: Alert Type
+   Purpose:
+   Decide kung Nutritional Alert, Follow-up Reminder,
+   or Final Follow-up Reminder.
+========================================================= */
+function getGuidanceAlertType($assessment_type, $progress_status, $current_category) {
+    $assessment_type = strtolower(trim((string)$assessment_type));
+    $progress_status = strtolower(trim((string)$progress_status));
+
+    if (empty($current_category)) {
+        return 'none';
+    }
+
+    if ($assessment_type === 'baseline') {
+        return 'nutritional_alert';
+    }
+
+    if ($assessment_type === 'midline') {
+        if (in_array($progress_status, ['no_improvement', 'worsened', 'new_at_risk', 'changed_risk_group'], true)) {
+            return 'follow_up_reminder';
+        }
+
+        return 'nutritional_alert';
+    }
+
+    if ($assessment_type === 'endline') {
+        if (in_array($progress_status, ['no_improvement', 'worsened', 'new_at_risk', 'changed_risk_group'], true)) {
+            return 'final_follow_up_reminder';
+        }
+
+        return 'nutritional_alert';
+    }
+
+    if ($assessment_type === 'monthly_followup') {
+        return 'nutritional_alert';
+    }
+
+    return 'nutritional_alert';
+}
+
+/* =========================================================
+   NEW HELPER: Status Note
+   Purpose:
+   Text na mase-save sa intervention_guidance.status_note
+========================================================= */
+function buildGuidanceStatusNote($alert_type, $assessment_type, $progress_status) {
+    $assessment_type = strtolower(trim((string)$assessment_type));
+    $progress_status = strtolower(trim((string)$progress_status));
+
+    if ($alert_type === 'nutritional_alert') {
+        if ($assessment_type === 'baseline') {
+            return 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.';
+        }
+
+        if ($assessment_type === 'monthly_followup') {
+            return 'Nutritional Alert: Child remains under monitoring based on Follow-up assessment.';
+        }
+
+        if ($assessment_type === 'midline') {
+            return 'Nutritional Alert: Child is still under monitoring based on Midline assessment.';
+        }
+
+        if ($assessment_type === 'endline') {
+            return 'Nutritional Alert: Child is still under monitoring based on Endline assessment.';
+        }
+
+        return 'Nutritional Alert: Child identified as at-risk from submitted report.';
+    }
+
+    if ($alert_type === 'follow_up_reminder') {
+        if ($progress_status === 'new_at_risk') {
+            return 'Follow-up Reminder: Child is identified as at-risk again based on Midline assessment.';
+        }
+
+        if ($progress_status === 'worsened') {
+            return 'Follow-up Reminder: Child nutritional status worsened based on Midline assessment.';
+        }
+
+        if ($progress_status === 'no_improvement') {
+            return 'Follow-up Reminder: Child showed no improvement based on Midline assessment.';
+        }
+
+        if ($progress_status === 'changed_risk_group') {
+            return 'Follow-up Reminder: Child shifted to another at-risk category based on Midline assessment.';
+        }
+
+        return 'Follow-up Reminder: Child still needs nutritional attention based on Midline assessment.';
+    }
+
+    if ($alert_type === 'final_follow_up_reminder') {
+        if ($progress_status === 'new_at_risk') {
+            return 'Final Follow-up Reminder: Child is identified as at-risk again based on Endline assessment.';
+        }
+
+        if ($progress_status === 'worsened') {
+            return 'Final Follow-up Reminder: Child nutritional status worsened based on Endline assessment.';
+        }
+
+        if ($progress_status === 'no_improvement') {
+            return 'Final Follow-up Reminder: Child showed no improvement based on Endline assessment.';
+        }
+
+        if ($progress_status === 'changed_risk_group') {
+            return 'Final Follow-up Reminder: Child shifted to another at-risk category based on Endline assessment.';
+        }
+
+        return 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.';
+    }
+
+    return 'Generated from submitted monitoring report.';
+}
+
+/* =========================================================
+   NEW HELPER: DB Flags
+   Purpose:
+   Convert alert type into intervention_guidance flags.
+========================================================= */
+function getGuidanceFlags($alert_type) {
+    $flags = [
+        'is_at_risk' => 0,
+        'needs_counseling' => 0,
+        'needs_referral' => 0
+    ];
+
+    if ($alert_type === 'nutritional_alert') {
+        $flags['is_at_risk'] = 1;
+        $flags['needs_counseling'] = 0;
+        $flags['needs_referral'] = 0;
+    }
+
+    if ($alert_type === 'follow_up_reminder') {
+        $flags['is_at_risk'] = 1;
+        $flags['needs_counseling'] = 1;
+        $flags['needs_referral'] = 0;
+    }
+
+    if ($alert_type === 'final_follow_up_reminder') {
+        $flags['is_at_risk'] = 1;
+        $flags['needs_counseling'] = 1;
+        $flags['needs_referral'] = 1;
+    }
+
+    return $flags;
+}

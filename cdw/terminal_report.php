@@ -20,7 +20,7 @@ $error = "";
 $success = "";
 $rows = [];
 
-$program_title = "6-Month Nutritional Monitoring Terminal Report";
+$program_title = "Nutritional Monitoring Terminal Report";
 $program_description = "The report is designed to provide a clear comparison of the children's nutritional status at the start, middle, and end of the program, based on the specific assessment types recorded in the system. Only records that are explicitly marked as Baseline, Midline, or Endline will be included in this report to ensure consistency and accuracy in tracking the progress of each child throughout the program duration.";
 $program_duration = "180 Days (6 Months)";
 
