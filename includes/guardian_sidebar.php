@@ -17,8 +17,8 @@ if (!isset($current_page)) {
             Child Profile/Health Information
         </a>
 
-        <a href="interventions_reminders.php" class="sidebar-link <?php echo ($current_page === 'notifications') ? 'active' : ''; ?>">
-            Interventions/Reminders
+        <a href="interventions_reminders.php" class="sidebar-link <?php echo ($current_page === 'interventions_reminders') ? 'active' : ''; ?>">
+    Interventions/Reminders
         </a>
 
         <div class="sidebar-title">Settings</div>

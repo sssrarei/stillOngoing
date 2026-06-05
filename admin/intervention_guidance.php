@@ -22,57 +22,91 @@ function decodeReportPayload($payload) {
 }
 
 function getFinalRiskStatus($wfa_status, $hfa_status, $wflh_status) {
-    $statuses = array(
-        trim((string)$wfa_status),
-        trim((string)$hfa_status),
-        trim((string)$wflh_status)
-    );
+    $wfa_status = trim((string)$wfa_status);
+    $hfa_status = trim((string)$hfa_status);
+    $wflh_status = trim((string)$wflh_status);
 
-    $priority_order = array(
-        'Severely Wasted',
-        'Severely Underweight',
-        'Severely Stunted',
-        'Moderately Wasted',
-        'Underweight',
-        'Stunted',
-        'Obese',
-        'Overweight',
-        'Normal'
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | Final Nutritional Status Priority
+    |--------------------------------------------------------------------------
+    | Wasted, underweight, overweight, and obese statuses are prioritized.
+    | Stunted and Severely Stunted are only used if there is no other
+    | nutritional risk status from WFA or WFL/H.
+    |--------------------------------------------------------------------------
+    */
 
-    foreach ($priority_order as $priority_status) {
-        if (in_array($priority_status, $statuses, true)) {
-            return $priority_status;
-        }
+    if ($wflh_status === 'Severely Wasted') {
+        return 'Severely Wasted';
+    }
+
+    if ($wfa_status === 'Severely Underweight') {
+        return 'Severely Underweight';
+    }
+
+    if ($wflh_status === 'Moderately Wasted' || $wflh_status === 'Wasted') {
+        return 'Moderately Wasted';
+    }
+
+    if ($wfa_status === 'Underweight') {
+        return 'Underweight';
+    }
+
+    if ($wflh_status === 'Obese') {
+        return 'Obese';
+    }
+
+    if ($wflh_status === 'Overweight') {
+        return 'Overweight';
+    }
+
+    if ($hfa_status === 'Severely Stunted') {
+        return 'Severely Stunted';
+    }
+
+    if ($hfa_status === 'Stunted') {
+        return 'Stunted';
     }
 
     return 'Normal';
 }
 
 function determineFinalInterventionCategory($wfa_status, $hfa_status, $wflh_status) {
-    $final_status = getFinalRiskStatus($wfa_status, $hfa_status, $wflh_status);
+    $wfa_status = trim((string)$wfa_status);
+    $hfa_status = trim((string)$hfa_status);
+    $wflh_status = trim((string)$wflh_status);
 
-    if (
-        $final_status === 'Underweight' ||
-        $final_status === 'Wasted' ||
-        $final_status === 'Moderately Wasted'
-    ) {
-        return 'Moderately Wasted';
-    }
+    /*
+    |--------------------------------------------------------------------------
+    | Intervention Guidance Category
+    |--------------------------------------------------------------------------
+    | Only categories that need intervention guidance are returned.
+    | Stunted and Severely Stunted alone are not included here.
+    |--------------------------------------------------------------------------
+    */
 
-    if (
-        $final_status === 'Severely Underweight' ||
-        $final_status === 'Severely Wasted'
-    ) {
+    if ($wflh_status === 'Severely Wasted') {
         return 'Severely Wasted';
     }
 
-    if ($final_status === 'Overweight') {
-        return 'Overweight';
+    if ($wfa_status === 'Severely Underweight') {
+        return 'Severely Wasted';
     }
 
-    if ($final_status === 'Obese') {
+    if ($wflh_status === 'Moderately Wasted' || $wflh_status === 'Wasted') {
+        return 'Moderately Wasted';
+    }
+
+    if ($wfa_status === 'Underweight') {
+        return 'Moderately Wasted';
+    }
+
+    if ($wflh_status === 'Obese') {
         return 'Obese';
+    }
+
+    if ($wflh_status === 'Overweight') {
+        return 'Overweight';
     }
 
     return null;
@@ -403,7 +437,7 @@ function getAlertTypeFromAssessment($assessment_type) {
     return 'nutritional_alert';
 }
 
-function getRecentSubmittedReportsForGuidance($conn, $limit = 10, $filter_month = '', $filter_year = '', $filter_assessment = '', $filter_cdc = 0) {
+function getRecentSubmittedReportsForGuidance($conn, $limit = 10, $offset = 0, $filter_month = '', $filter_year = '', $filter_assessment = '', $filter_cdc = 0) {
     $reports = [];
 
     $sql = "
@@ -451,12 +485,13 @@ function getRecentSubmittedReportsForGuidance($conn, $limit = 10, $filter_month 
     }
 
     $sql .= "
-        ORDER BY sr.submitted_at DESC, sr.submitted_report_id DESC
-        LIMIT ?
-    ";
+    ORDER BY sr.submitted_at DESC, sr.submitted_report_id DESC
+    LIMIT ? OFFSET ?
+";
 
-    $types .= "i";
-    $params[] = (int)$limit;
+$types .= "ii";
+$params[] = (int)$limit;
+$params[] = (int)$offset;
 
     $stmt = $conn->prepare($sql);
 
@@ -806,6 +841,10 @@ $filter_month = isset($_REQUEST['month']) ? trim($_REQUEST['month']) : '';
 $filter_year = isset($_REQUEST['year']) ? trim($_REQUEST['year']) : '';
 $filter_assessment = isset($_REQUEST['assessment_type']) ? trim($_REQUEST['assessment_type']) : '';
 $filter_cdc = isset($_REQUEST['filter_cdc_id']) ? (int)$_REQUEST['filter_cdc_id'] : 0;
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$limit = 5;
+$offset = ($page - 1) * $limit;
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -863,7 +902,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ? $_POST['selected_children']
             : [];
 
-        $optional_note = isset($_POST['optional_note']) ? trim($_POST['optional_note']) : '';
+        $optional_notes_by_category = isset($_POST['optional_note_by_category']) && is_array($_POST['optional_note_by_category'])
+    ? $_POST['optional_note_by_category']
+    : [];
         $reviewed_by = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
 
         if ($selected_report_id <= 0) {
@@ -910,6 +951,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $intervention_category = trim((string)$child['intervention_category']);
                     $assessment_type = strtolower(trim((string)$child['assessment_type']));
                     $original_status = trim((string)$child['original_status']);
+
+                    $optional_note = isset($optional_notes_by_category[$intervention_category])
+                    ? trim((string)$optional_notes_by_category[$intervention_category])
+                    : '';
 
                     $rules = getInterventionGuidanceRules($intervention_category);
                     $guidance_text = buildGuidanceText($rules);
@@ -1334,9 +1379,65 @@ if ($show_preview && !empty($selected_category)) {
     $preview_guidance_text = buildGuidanceText($preview_guidance_rules);
 }
 
+$total_records = 0;
+
+$count_sql = "
+    SELECT COUNT(*) AS total
+    FROM submitted_reports sr
+    WHERE LOWER(sr.report_type) IN ('wmr', 'terminal_report')
+";
+
+$count_types = "";
+$count_params = [];
+
+if ($filter_month !== '') {
+    $count_sql .= " AND MONTH(sr.submitted_at) = ? ";
+    $count_types .= "i";
+    $count_params[] = (int)$filter_month;
+}
+
+if ($filter_year !== '') {
+    $count_sql .= " AND YEAR(sr.submitted_at) = ? ";
+    $count_types .= "i";
+    $count_params[] = (int)$filter_year;
+}
+
+if ($filter_cdc > 0) {
+    $count_sql .= " AND sr.cdc_id = ? ";
+    $count_types .= "i";
+    $count_params[] = (int)$filter_cdc;
+}
+
+if ($filter_assessment === 'endline') {
+    $count_sql .= " AND LOWER(sr.report_type) = 'terminal_report' ";
+} elseif ($filter_assessment === 'baseline' || $filter_assessment === 'midline') {
+    $count_sql .= " AND LOWER(sr.report_type) = 'wmr' ";
+}
+
+$count_stmt = $conn->prepare($count_sql);
+
+if ($count_stmt) {
+    if (!empty($count_params)) {
+        $count_stmt->bind_param($count_types, ...$count_params);
+    }
+
+    $count_stmt->execute();
+    $count_result = $count_stmt->get_result();
+
+    if ($count_result) {
+        $count_row = $count_result->fetch_assoc();
+        $total_records = (int)$count_row['total'];
+    }
+
+    $count_stmt->close();
+}
+
+$total_pages = max(1, (int)ceil($total_records / $limit));
+
 $recent_reports = getRecentSubmittedReportsForGuidance(
     $conn,
-    20,
+    $limit,
+    $offset,
     $filter_month,
     $filter_year,
     $filter_assessment,
@@ -1460,7 +1561,7 @@ if ($selected_report_id > 0) {
     <!-- =====================================================
          RECENT SUBMITTED REPORTS
     ====================================================== -->
-    <div class="table-card">
+    <div class="table-card" id="recent-reports-section">
         <div class="table-header">
             <h2>Recent Submitted Reports</h2>
             <p style="margin-top:6px; color:#64748b; font-size:14px;">
@@ -1544,6 +1645,26 @@ if ($selected_report_id > 0) {
                     <?php endif; ?>
                 </tbody>
             </table>
+        </div>
+               <div class="pagination-controls">
+    <?php if ($page > 1) : ?>
+        <a class="pagination-btn"
+           href="intervention_guidance.php?month=<?php echo urlencode($filter_month); ?>&year=<?php echo urlencode($filter_year); ?>&assessment_type=<?php echo urlencode($filter_assessment); ?>&filter_cdc_id=<?php echo urlencode($filter_cdc); ?>&page=<?php echo h($page - 1); ?>#recent-reports-section">
+            Previous
+        </a>
+    <?php endif; ?>
+
+    <span class="pagination-page">
+        Page <?php echo h($page); ?> of <?php echo h($total_pages); ?>
+    </span>
+
+    <?php if ($page < $total_pages) : ?>
+        <a class="pagination-btn"
+           href="intervention_guidance.php?month=<?php echo urlencode($filter_month); ?>&year=<?php echo urlencode($filter_year); ?>&assessment_type=<?php echo urlencode($filter_assessment); ?>&filter_cdc_id=<?php echo urlencode($filter_cdc); ?>&page=<?php echo h($page + 1); ?>#recent-reports-section">
+            Next
+        </a>
+    <?php endif; ?>
+</div>
         </div>
     </div>
 
@@ -1822,15 +1943,19 @@ if ($selected_report_id > 0) {
                         >
                     <?php endforeach; ?>
 
-                    <div class="note-group">
-                        <label for="optional_note">Optional Note / Recommendation</label>
-                        <textarea
-                            name="optional_note"
-                            id="optional_note"
-                            rows="4"
-                            placeholder="Add optional note or recommendation..."
-                        ><?php echo h($optional_note); ?></textarea>
-                    </div>
+                    <?php foreach ($preview_guidance_rules_by_category as $category => $rules) : ?>
+                <div class="note-group">
+                    <label>
+                        Optional Note / Recommendation for <?php echo h($category); ?>
+                    </label>
+
+                    <textarea
+                        name="optional_note_by_category[<?php echo h($category); ?>]"
+                        rows="4"
+                        placeholder="Add optional note or recommendation for <?php echo h($category); ?>..."
+                    ></textarea>
+                </div>
+            <?php endforeach; ?>
 
                     <div class="preview-actions">
                         <a

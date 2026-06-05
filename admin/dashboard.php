@@ -50,31 +50,80 @@ function getLatestSubmittedWMRPerCDC($conn) {
 }
 
 function getFinalRiskStatus($wfa_status, $hfa_status, $wflh_status) {
-    $statuses = array(
-        trim((string)$wfa_status),
-        trim((string)$hfa_status),
-        trim((string)$wflh_status)
-    );
+    $wfa_status = trim((string)$wfa_status);
+    $hfa_status = trim((string)$hfa_status);
+    $wflh_status = trim((string)$wflh_status);
 
-    $priority_order = array(
-        'Severely Wasted',
-        'Severely Underweight',
-        'Severely Stunted',
-        'Moderately Wasted',
-        'Underweight',
-        'Stunted',
-        'Obese',
-        'Overweight',
-        'Normal'
-    );
+    if ($wflh_status === 'Severely Wasted') {
+        return 'Severely Wasted';
+    }
 
-    foreach ($priority_order as $priority_status) {
-        if (in_array($priority_status, $statuses, true)) {
-            return $priority_status;
-        }
+    if ($wfa_status === 'Severely Underweight') {
+        return 'Severely Underweight';
+    }
+
+    if ($wflh_status === 'Moderately Wasted') {
+        return 'Moderately Wasted';
+    }
+
+    if ($wfa_status === 'Underweight') {
+        return 'Underweight';
+    }
+
+    if ($wflh_status === 'Obese') {
+        return 'Obese';
+    }
+
+    if ($wflh_status === 'Overweight') {
+        return 'Overweight';
+    }
+
+    if ($hfa_status === 'Severely Stunted') {
+        return 'Severely Stunted';
+    }
+
+    if ($hfa_status === 'Stunted') {
+        return 'Stunted';
     }
 
     return 'Normal';
+}
+
+function isAtRiskFinalStatus($final_status) {
+    return (
+        $final_status === 'Underweight' ||
+        $final_status === 'Severely Underweight' ||
+        $final_status === 'Moderately Wasted' ||
+        $final_status === 'Severely Wasted' ||
+        $final_status === 'Overweight' ||
+        $final_status === 'Obese'
+    );
+}
+
+function getInterventionCategoryFromFinalStatus($final_status) {
+    if (
+        $final_status === 'Underweight' ||
+        $final_status === 'Moderately Wasted'
+    ) {
+        return 'Moderately Wasted';
+    }
+
+    if (
+        $final_status === 'Severely Underweight' ||
+        $final_status === 'Severely Wasted'
+    ) {
+        return 'Severely Wasted';
+    }
+
+    if ($final_status === 'Overweight') {
+        return 'Overweight';
+    }
+
+    if ($final_status === 'Obese') {
+        return 'Obese';
+    }
+
+    return null;
 }
 
 $total_cdcs = 0;
@@ -135,23 +184,40 @@ if ($submitted_reports_result && mysqli_num_rows($submitted_reports_result) > 0)
 |--------------------------------------------------------------------------
 */
 $at_risk_child_keys = array();
+$pending_review_child_keys = array();
+$reviewed_or_sent_child_keys = array();
 
 /*
 |--------------------------------------------------------------------------
-| Pending Reviews
-| At-risk children not yet sent to guardian
+| Sent Intervention Guidance Records
+| Specific to submitted WMR report and intervention category
+|--------------------------------------------------------------------------
+| A child is no longer pending only if the intervention guidance
+| was sent for the same child, same submitted report, and same category.
 |--------------------------------------------------------------------------
 */
-$pending_reviews_query = "
-    SELECT COUNT(DISTINCT child_id) AS total
+$sent_intervention_result_keys = array();
+
+$sent_intervention_query = "
+    SELECT DISTINCT child_id, submitted_report_id, intervention_category
     FROM intervention_guidance
     WHERE is_at_risk = 1
-      AND (sent_to_guardian = 0 OR sent_to_guardian IS NULL)
+      AND sent_to_guardian = 1
+      AND submitted_report_id IS NOT NULL
 ";
-$pending_reviews_result = mysqli_query($conn, $pending_reviews_query);
-if ($pending_reviews_result && mysqli_num_rows($pending_reviews_result) > 0) {
-    $pending_reviews_row = mysqli_fetch_assoc($pending_reviews_result);
-    $pending_reviews = (int)$pending_reviews_row['total'];
+$sent_intervention_result = mysqli_query($conn, $sent_intervention_query);
+
+if ($sent_intervention_result) {
+    while ($sent_row = mysqli_fetch_assoc($sent_intervention_result)) {
+        $sent_child_id = (int)$sent_row['child_id'];
+        $sent_report_id = (int)$sent_row['submitted_report_id'];
+        $sent_category = trim((string)$sent_row['intervention_category']);
+
+        if ($sent_child_id > 0 && $sent_report_id > 0 && $sent_category !== '') {
+            $sent_key = 'child_' . $sent_child_id . '|report_' . $sent_report_id . '|category_' . $sent_category;
+            $sent_intervention_result_keys[$sent_key] = true;
+        }
+    }
 }
 
 /*
@@ -196,14 +262,21 @@ foreach ($latest_wmr_reports as $wmr_report) {
 
         $final_status = getFinalRiskStatus($wfa_status, $hfa_status, $wflh_status);
 
-            if (
-                $wfa_status === 'Underweight' ||
-                $wfa_status === 'Severely Underweight' ||
-                $wflh_status === 'Overweight' ||
-                $wflh_status === 'Obese'
-            ) {
+                $current_report_id = (int)$wmr_report['submitted_report_id'];
+
+            if (isAtRiskFinalStatus($final_status)) {
                 $at_risk_child_keys[$child_key] = true;
-            }
+
+                $intervention_category = getInterventionCategoryFromFinalStatus($final_status);
+
+                if ($intervention_category !== null) {
+                    $current_result_key = $child_key . '|report_' . $current_report_id . '|category_' . $intervention_category;
+
+                    if (!isset($sent_intervention_result_keys[$current_result_key])) {
+                        $pending_review_child_keys[$current_result_key] = true;
+                    }
+                }
+}
 
             if (!isset($status_summary[$final_status])) {
                 continue;
@@ -218,6 +291,10 @@ foreach ($latest_wmr_reports as $wmr_report) {
 }
 
 $at_risk_children = count($at_risk_child_keys);
+$pending_reviews = count($pending_review_child_keys);
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -628,32 +705,7 @@ if ($intervention_alerts_result) {
                 <?php } ?>
             </div>
 
-            <div class="panel-card">
-                <h2 class="panel-title">Intervention Alerts</h2>
-
-                <?php if (!empty($intervention_alerts)) { ?>
-                    <div class="alert-list">
-                        <?php foreach ($intervention_alerts as $alert) { ?>
-                            <div class="alert-item">
-                                <h4><?php echo htmlspecialchars($alert['child_name']); ?> • <?php echo htmlspecialchars($alert['nutritional_status']); ?></h4>
-                                <p><?php echo htmlspecialchars($alert['description']); ?></p>
-                                <div class="item-meta"><?php echo htmlspecialchars($alert['meta']); ?></div>
-                                <div class="alert-actions">
-                                    <a href="intervention_guidance.php?child_id=<?php echo (int)$alert['child_id']; ?>" class="alert-action-link">
-                                        Manage Intervention
-                                    </a>
-                                </div>
-                            </div>
-                        <?php } ?>
-                    </div>
-                <?php } else { ?>
-                    <div class="empty-box">
-                        No intervention alerts available yet.
-                        <br><br>
-                        This panel is reserved for officially saved at-risk intervention guidance records.
-                    </div>
-                <?php } ?>
-            </div>
+         
 
             <div class="panel-card">
                 <h2 class="panel-title">Admin Quick Access</h2>

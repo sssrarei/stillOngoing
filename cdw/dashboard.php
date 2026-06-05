@@ -51,6 +51,47 @@ function getShortNutritionLabel($label) {
     return isset($map[$label]) ? $map[$label] : $label;
 }
 
+function getFinalNutritionalStatus($wfa_status, $hfa_status, $wflh_status) {
+    $wfa_status = trim((string)$wfa_status);
+    $hfa_status = trim((string)$hfa_status);
+    $wflh_status = trim((string)$wflh_status);
+
+    if ($wflh_status === 'Severely Wasted') {
+        return 'Severely Wasted';
+    }
+
+    if ($wfa_status === 'Severely Underweight') {
+        return 'Severely Underweight';
+    }
+
+    if ($wflh_status === 'Obese') {
+        return 'Obese';
+    }
+
+    if ($wflh_status === 'Moderately Wasted' || $wflh_status === 'Wasted') {
+        return 'Moderately Wasted';
+    }
+
+    if ($wfa_status === 'Underweight') {
+        return 'Underweight';
+    }
+
+    if ($wflh_status === 'Overweight') {
+        return 'Overweight';
+    }
+
+    if ($hfa_status === 'Severely Stunted') {
+        return 'Severely Stunted';
+    }
+
+    if ($hfa_status === 'Stunted') {
+        return 'Stunted';
+    }
+
+    return 'Normal';
+}
+
+
 // Kunin lahat ng assigned CDC ng logged-in CDW
 $cdc_result = $conn->query("
     SELECT c.cdc_id, c.cdc_name, c.barangay
@@ -136,73 +177,86 @@ if(isset($_SESSION['active_cdc_id']) && !empty($_SESSION['active_cdc_id'])){
         $total_children_count = $total_row['total_children_count'] ?? 0;
     }
 
-    // Latest nutritional status counts per child under active CDC only
-     $summary_sql = "
-        SELECT
-            SUM(
-                CASE
-                    WHEN ar.wfa_status = 'Normal'
-                     AND ar.hfa_status = 'Normal'
-                     AND ar.wflh_status = 'Normal'
-                    THEN 1 ELSE 0
-                END
-            ) AS normal_count,
+   // Latest nutritional status counts per child under active CDC only
+// One child = one final nutritional status only
+$summary_sql = "
+    SELECT
+        ar.child_id,
+        ar.wfa_status,
+        ar.hfa_status,
+        ar.wflh_status
+    FROM anthropometric_records ar
+    INNER JOIN children c 
+        ON ar.child_id = c.child_id
 
-            SUM(CASE WHEN ar.wfa_status = 'Underweight' THEN 1 ELSE 0 END) AS underweight_count,
-            SUM(CASE WHEN ar.wfa_status = 'Severely Underweight' THEN 1 ELSE 0 END) AS severely_underweight_count,
+    INNER JOIN (
+        SELECT 
+            ar2.child_id, 
+            MAX(ar2.date_recorded) AS latest_date
+        FROM anthropometric_records ar2
+        INNER JOIN children c2 
+            ON ar2.child_id = c2.child_id
+        WHERE c2.cdc_id = '$active_cdc_id'
+          AND c2.is_deleted = 0
+          AND ar2.is_deleted = 0
+        GROUP BY ar2.child_id
+    ) latest
+        ON ar.child_id = latest.child_id
+        AND ar.date_recorded = latest.latest_date
 
-            SUM(CASE WHEN ar.hfa_status = 'Stunted' THEN 1 ELSE 0 END) AS stunted_count,
-            SUM(CASE WHEN ar.hfa_status = 'Severely Stunted' THEN 1 ELSE 0 END) AS severely_stunted_count,
+    INNER JOIN (
+        SELECT 
+            ar3.child_id, 
+            ar3.date_recorded, 
+            MAX(ar3.record_id) AS latest_record_id
+        FROM anthropometric_records ar3
+        INNER JOIN children c3 
+            ON ar3.child_id = c3.child_id
+        WHERE c3.cdc_id = '$active_cdc_id'
+          AND c3.is_deleted = 0
+          AND ar3.is_deleted = 0
+        GROUP BY ar3.child_id, ar3.date_recorded
+    ) latest_id
+        ON ar.child_id = latest_id.child_id
+        AND ar.date_recorded = latest_id.date_recorded
+        AND ar.record_id = latest_id.latest_record_id
 
-            SUM(CASE WHEN ar.wflh_status = 'Wasted' THEN 1 ELSE 0 END) AS moderately_wasted_count,
-            SUM(CASE WHEN ar.wflh_status = 'Severely Wasted' THEN 1 ELSE 0 END) AS severely_wasted_count,
-            SUM(CASE WHEN ar.wflh_status = 'Overweight' THEN 1 ELSE 0 END) AS overweight_count,
-            SUM(CASE WHEN ar.wflh_status = 'Obese' THEN 1 ELSE 0 END) AS obese_count
+    WHERE c.cdc_id = '$active_cdc_id'
+      AND c.is_deleted = 0
+      AND ar.is_deleted = 0
+";
 
-        FROM anthropometric_records ar
-        INNER JOIN children c ON ar.child_id = c.child_id
+$summary_result = mysqli_query($conn, $summary_sql);
 
-        INNER JOIN (
-            SELECT ar2.child_id, MAX(ar2.date_recorded) AS latest_date
-            FROM anthropometric_records ar2
-            INNER JOIN children c2 ON ar2.child_id = c2.child_id
-            WHERE c2.cdc_id = '$active_cdc_id'
-            GROUP BY ar2.child_id
-        ) latest
-            ON ar.child_id = latest.child_id
-            AND ar.date_recorded = latest.latest_date
+if($summary_result){
+    while($row = mysqli_fetch_assoc($summary_result)){
+        $final_status = getFinalNutritionalStatus(
+            $row['wfa_status'] ?? '',
+            $row['hfa_status'] ?? '',
+            $row['wflh_status'] ?? ''
+        );
 
-        INNER JOIN (
-            SELECT ar3.child_id, ar3.date_recorded, MAX(ar3.record_id) AS latest_record_id
-            FROM anthropometric_records ar3
-            INNER JOIN children c3 ON ar3.child_id = c3.child_id
-            WHERE c3.cdc_id = '$active_cdc_id'
-            AND ar3.is_deleted = 0
-            GROUP BY ar3.child_id, ar3.date_recorded
-        ) latest_id
-            ON ar.child_id = latest_id.child_id
-            AND ar.date_recorded = latest_id.date_recorded
-            AND ar.record_id = latest_id.latest_record_id
-
-        WHERE c.cdc_id = '$active_cdc_id'
-        AND ar.is_deleted = 0
-    ";
-
-    $summary_result = mysqli_query($conn, $summary_sql);
-
-    if($summary_result){
-        $summary = mysqli_fetch_assoc($summary_result);
-
-        $normal_count = $summary['normal_count'] ?? 0;
-        $underweight_count = $summary['underweight_count'] ?? 0;
-        $severely_underweight_count = $summary['severely_underweight_count'] ?? 0;
-        $overweight_count = $summary['overweight_count'] ?? 0;
-        $obese_count = $summary['obese_count'] ?? 0;
-        $stunted_count = $summary['stunted_count'] ?? 0;
-        $severely_stunted_count = $summary['severely_stunted_count'] ?? 0;
-        $moderately_wasted_count = $summary['moderately_wasted_count'] ?? 0;
-        $severely_wasted_count = $summary['severely_wasted_count'] ?? 0;
+        if ($final_status === 'Normal') {
+            $normal_count++;
+        } elseif ($final_status === 'Underweight') {
+            $underweight_count++;
+        } elseif ($final_status === 'Severely Underweight') {
+            $severely_underweight_count++;
+        } elseif ($final_status === 'Obese') {
+            $obese_count++;
+        } elseif ($final_status === 'Moderately Wasted') {
+            $moderately_wasted_count++;
+        } elseif ($final_status === 'Overweight') {
+            $overweight_count++;
+        } elseif ($final_status === 'Severely Stunted') {
+            $severely_stunted_count++;
+        } elseif ($final_status === 'Stunted') {
+            $stunted_count++;
+        } elseif ($final_status === 'Severely Wasted') {
+            $severely_wasted_count++;
+        }
     }
+}
 
     // Food group consumption graph data
     $food_sql = "

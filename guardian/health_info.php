@@ -278,275 +278,322 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info']))
     <link rel="stylesheet" href="../assets/guardian-style.css">
 
     <style>
+     
+    .health-shell{
+        display:flex;
+        flex-direction:column;
+        gap:22px;
+        max-width:920px;
+        margin:0 auto;
+        width:100%;
+    }
+
+    .health-card{
+        background:rgba(255,255,255,0.98);
+        border:1px solid #e5e7eb;
+        border-radius:24px;
+        overflow:hidden;
+        box-shadow:0 14px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    .health-card-header{
+        background:linear-gradient(135deg, #fff4e6 0%, #f8eadb 100%);
+        padding:22px 28px;
+        border-bottom:1px solid #f0dfcd;
+    }
+
+    .health-card-title{
+        font-family:'Poppins', sans-serif;
+        font-size:22px;
+        font-weight:800;
+        color:#c96f00;
+        line-height:1.25;
+    }
+
+    .health-card-body{
+        padding:26px 28px;
+    }
+
+    .info-list{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:14px 18px;
+    }
+
+    .info-row{
+        padding:16px 18px;
+        border:1px solid #edf0f4;
+        border-radius:16px;
+        background:#fffdf9;
+        min-height:86px;
+    }
+
+    .info-row.full{
+        grid-column:1 / -1;
+    }
+
+    .info-label{
+        display:block;
+        font-size:13px;
+        color:#7b8794;
+        margin-bottom:7px;
+        font-weight:600;
+    }
+
+    .info-value{
+        font-size:15px;
+        font-weight:800;
+        color:#1f2937;
+        line-height:1.5;
+        white-space:pre-line;
+        word-break:break-word;
+    }
+
+    .attached-text{
+        margin-bottom:8px;
+    }
+
+    .file-link{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+        color:#c96f00;
+        font-weight:800;
+        text-decoration:underline;
+        word-break:break-word;
+    }
+
+    .file-link:hover{
+        color:#a95d00;
+    }
+
+    .sub-section-title{
+        font-family:'Poppins', sans-serif;
+        font-size:18px;
+        font-weight:800;
+        color:#243041;
+        margin:24px 0 14px;
+    }
+
+    .message-box{
+        padding:14px 16px;
+        border-radius:14px;
+        font-size:14px;
+        font-weight:700;
+        box-shadow:0 8px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .message-box.success{
+        background:#e8f5e9;
+        color:#2e7d32;
+        border:1px solid #c8e6c9;
+    }
+
+    .message-box.error{
+        background:#fdeaea;
+        color:#b42318;
+        border:1px solid #efb0b0;
+    }
+
+    .pending-box{
+        padding:18px;
+        border:1px solid #f3d9a6;
+        background:linear-gradient(135deg, #fff8e8 0%, #fffaf0 100%);
+        border-radius:18px;
+    }
+
+    .pending-title{
+        font-family:'Poppins', sans-serif;
+        font-size:17px;
+        font-weight:800;
+        color:#a16207;
+        margin-bottom:8px;
+    }
+
+    .pending-text{
+        font-size:14px;
+        color:#7c5a10;
+        line-height:1.6;
+    }
+
+    .health-form{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:18px 20px;
+    }
+
+    .form-group{
+        display:flex;
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .form-group.full{
+        grid-column:1 / -1;
+    }
+
+    .form-label{
+        font-size:14px;
+        font-weight:800;
+        color:#374151;
+    }
+
+    .form-control{
+        width:100%;
+        border:1px solid #d7dce3;
+        border-radius:16px;
+        padding:13px 15px;
+        font-family:'Inter', sans-serif;
+        font-size:14px;
+        color:#243041;
+        background:#ffffff;
+        resize:vertical;
+        min-height:82px;
+        max-height:150px;
+        outline:none;
+        transition:0.2s ease;
+    }
+
+    input.form-input-file{
+        width:100%;
+        border:1px dashed #d8b98f;
+        border-radius:16px;
+        padding:12px 14px;
+        font-family:'Inter', sans-serif;
+        font-size:14px;
+        color:#243041;
+        background:#fffaf3;
+        outline:none;
+        transition:0.2s ease;
+    }
+
+    .form-control:focus,
+    .form-input-file:focus{
+        border-color:#c96f00;
+        box-shadow:0 0 0 4px rgba(201,111,0,0.10);
+        background:#ffffff;
+    }
+
+    .form-help{
+        font-size:12px;
+        color:#6b7280;
+        line-height:1.45;
+    }
+
+    .form-actions{
+        grid-column:1 / -1;
+        margin-top:4px;
+        display:flex;
+        justify-content:flex-start;
+    }
+
+    .btn-submit-health{
+        border:none;
+        border-radius:14px;
+        padding:13px 22px;
+        background:linear-gradient(135deg, #d97706 0%, #c96f00 100%);
+        color:#ffffff;
+        font-size:14px;
+        font-weight:800;
+        font-family:'Inter', sans-serif;
+        cursor:pointer;
+        box-shadow:0 10px 20px rgba(201, 111, 0, 0.18);
+        transition:0.2s ease;
+    }
+
+    .btn-submit-health:hover{
+        background:linear-gradient(135deg, #c96f00 0%, #a95d00 100%);
+        transform:translateY(-1px);
+        box-shadow:0 14px 24px rgba(201, 111, 0, 0.22);
+    }
+
+    body.dark-mode .health-card{
+        background:#111827;
+        border-color:#334155;
+        box-shadow:none;
+    }
+
+    body.dark-mode .health-card-header{
+        background:#1e293b;
+        border-bottom-color:#334155;
+    }
+
+    body.dark-mode .health-card-title,
+    body.dark-mode .sub-section-title,
+    body.dark-mode .info-value{
+        color:#f8fafc;
+    }
+
+    body.dark-mode .info-row{
+        background:#0f172a;
+        border-color:#334155;
+    }
+
+    body.dark-mode .info-label,
+    body.dark-mode .form-label,
+    body.dark-mode .form-help{
+        color:#cbd5e1;
+    }
+
+    body.dark-mode .form-control,
+    body.dark-mode .form-input-file{
+        background:#0f172a;
+        color:#f8fafc;
+        border-color:#475569;
+    }
+
+    body.dark-mode .pending-box{
+        background:#3b2f11;
+        border-color:#7c5a10;
+    }
+
+    body.dark-mode .pending-title,
+    body.dark-mode .pending-text{
+        color:#fde68a;
+    }
+
+    body.dark-mode .file-link{
+        color:#fbbf24;
+    }
+
+    body.dark-mode .file-link:hover{
+        color:#fde68a;
+    }
+
+    @media (max-width: 900px){
         .health-shell{
-            display:flex;
-            flex-direction:column;
-            gap:24px;
-            max-width:1080px;
-            margin:0 auto;
-            width:100%;
+            max-width:100%;
         }
 
-        .health-card{
-            background:#ffffff;
-            border:1px solid #d7dde5;
-            border-radius:22px;
-            overflow:hidden;
-            box-shadow:0 10px 30px rgba(15, 23, 42, 0.05);
+        .health-form,
+        .info-list{
+            grid-template-columns:1fr;
         }
 
+        .health-card-body,
         .health-card-header{
-            background:#f5ede5;
-            padding:20px 24px;
-            border-bottom:1px solid #e7e7e7;
+            padding:20px;
+        }
+    }
+
+    @media (max-width: 520px){
+        .health-card{
+            border-radius:20px;
         }
 
         .health-card-title{
-            font-family:'Poppins', sans-serif;
-            font-size:20px;
-            font-weight:700;
-            color:#c96f00;
-        }
-
-        .health-card-body{
-            padding:24px;
-        }
-
-        .info-list{
-            display:flex;
-            flex-direction:column;
-        }
-
-        .info-row{
-            padding:14px 0;
-            border-bottom:1px solid #e5e7eb;
-        }
-
-        .info-row:last-child{
-            border-bottom:none;
-        }
-
-        .info-label{
-            display:block;
-            font-size:13px;
-            color:#7b8794;
-            margin-bottom:6px;
-        }
-
-        .info-value{
-            font-size:15px;
-            font-weight:600;
-            color:#1f2937;
-            line-height:1.6;
-            white-space:pre-line;
-            word-break:break-word;
-        }
-
-        .attached-text{
-            margin-bottom:8px;
-        }
-
-        .file-link{
-            display:inline-flex;
-            align-items:center;
-            gap:6px;
-            color:#c96f00;
-            font-weight:700;
-            text-decoration:underline;
-            word-break:break-word;
-        }
-
-        .file-link:hover{
-            color:#a95d00;
-        }
-
-        .sub-section-title{
-            font-family:'Poppins', sans-serif;
-            font-size:18px;
-            font-weight:700;
-            color:#243041;
-            margin:26px 0 10px;
-        }
-
-        .message-box{
-            padding:14px 16px;
-            border-radius:12px;
-            font-size:14px;
-            font-weight:600;
-        }
-
-        .message-box.success{
-            background:#e8f5e9;
-            color:#2e7d32;
-            border:1px solid #c8e6c9;
-        }
-
-        .message-box.error{
-            background:#fdeaea;
-            color:#b42318;
-            border:1px solid #efb0b0;
-        }
-
-        .pending-box{
-            margin-top:12px;
-            padding:16px;
-            border:1px solid #f3d9a6;
-            background:#fff8e8;
-            border-radius:12px;
-        }
-
-        .pending-title{
-            font-family:'Poppins', sans-serif;
-            font-size:16px;
-            color:#a16207;
-            margin-bottom:8px;
-        }
-
-        .pending-text{
-            font-size:14px;
-            color:#7c5a10;
-            line-height:1.6;
-        }
-
-        .health-form{
-            display:flex;
-            flex-direction:column;
-            gap:16px;
-        }
-
-        .form-group{
-            display:flex;
-            flex-direction:column;
-            gap:6px;
-        }
-
-        .form-label{
-            font-size:13px;
-            font-weight:600;
-            color:#555;
+            font-size:19px;
         }
 
         .form-control{
-            width:100%;
-            border:1px solid #cfcfcf;
-            border-radius:12px;
-            padding:12px 14px;
-            font-family:'Inter', sans-serif;
-            font-size:14px;
-            color:#243041;
-            background:#ffffff;
-            resize:vertical;
-            min-height:110px;
-            outline:none;
-        }
-
-        input.form-input-file{
-            width:100%;
-            border:1px solid #cfcfcf;
-            border-radius:12px;
-            padding:12px 14px;
-            font-family:'Inter', sans-serif;
-            font-size:14px;
-            color:#243041;
-            background:#ffffff;
-            outline:none;
-        }
-
-        .form-control:focus,
-        .form-input-file:focus{
-            border-color:#c96f00;
-            box-shadow:0 0 0 3px rgba(201,111,0,0.08);
-        }
-
-        .form-help{
-            font-size:12px;
-            color:#6b7280;
-            line-height:1.5;
-        }
-
-        .form-actions{
-            margin-top:8px;
-            display:flex;
-            justify-content:flex-start;
+            min-height:78px;
         }
 
         .btn-submit-health{
-            border:none;
-            border-radius:10px;
-            padding:12px 18px;
-            background:#c96f00;
-            color:#ffffff;
-            font-size:14px;
-            font-weight:600;
-            font-family:'Inter', sans-serif;
-            cursor:pointer;
+            width:100%;
         }
-
-        .btn-submit-health:hover{
-            background:#a95d00;
-        }
-
-        body.dark-mode .health-card{
-            background:#111827;
-            border-color:#334155;
-        }
-
-        body.dark-mode .health-card-header{
-            background:#1e293b;
-            border-bottom-color:#334155;
-        }
-
-        body.dark-mode .health-card-title,
-        body.dark-mode .sub-section-title,
-        body.dark-mode .info-value{
-            color:#f8fafc;
-        }
-
-        body.dark-mode .info-label,
-        body.dark-mode .form-label,
-        body.dark-mode .form-help{
-            color:#cbd5e1;
-        }
-
-        body.dark-mode .info-row{
-            border-bottom-color:#334155;
-        }
-
-        body.dark-mode .form-control,
-        body.dark-mode .form-input-file{
-            background:#0f172a;
-            color:#f8fafc;
-            border-color:#475569;
-        }
-
-        body.dark-mode .pending-box{
-            background:#3b2f11;
-            border-color:#7c5a10;
-        }
-
-        body.dark-mode .pending-title,
-        body.dark-mode .pending-text{
-            color:#fde68a;
-        }
-
-        body.dark-mode .file-link{
-            color:#fbbf24;
-        }
-
-        body.dark-mode .file-link:hover{
-            color:#fde68a;
-        }
-
-        @media (max-width: 768px){
-            .health-card-body,
-            .health-card-header{
-                padding:18px;
-            }
-
-            .health-shell{
-                max-width:100%;
-            }
-        }
+    }
+</style>
     </style>
 </head>
 <body class="<?php echo ($theme_mode === 'dark') ? 'dark-mode' : ''; ?>">
