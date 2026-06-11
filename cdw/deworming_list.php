@@ -111,7 +111,14 @@ if(isset($_POST['save_deworming_records'])){
             foreach($_POST['attendance'] as $child_id => $attendance){
                 $child_id = (int) $child_id;
                 $attendance = trim($attendance);
-                $remarks = isset($_POST['remarks'][$child_id]) ? trim($_POST['remarks'][$child_id]) : "";
+                $remarks_choice = isset($_POST['remarks'][$child_id]) ? trim($_POST['remarks'][$child_id]) : "";
+                $remarks_other = isset($_POST['remarks_other'][$child_id]) ? trim($_POST['remarks_other'][$child_id]) : "";
+
+                if ($remarks_choice === "Others") {
+                    $remarks = $remarks_other !== "" ? "Others: " . $remarks_other : "Others";
+                } else {
+                    $remarks = $remarks_choice;
+                }
 
                 $validate_child_stmt->bind_param("ii", $child_id, $selected_cdc_id);
                 $validate_child_stmt->execute();
@@ -262,6 +269,26 @@ if($selected_cdc_id > 0){
                             <h3>Deworming Attendance</h3>
                         </div>
 
+                        <div class="remarks-all-row">
+    <div class="form-group remarks-all-group">
+        <label for="remarksForAllSelect">Remarks for All</label>
+        <select id="remarksForAllSelect" class="table-select">
+            <option value="">Select remarks</option>
+            <option value="N/A">N/A</option>
+            <option value="Taken">Taken</option>
+            <option value="Not Taken">Not Taken</option>
+            <option value="Refused">Refused</option>
+            <option value="Vomited">Vomited</option>
+            <option value="Absent">Absent</option>
+            <option value="Others">Others</option>
+        </select>
+    </div>
+
+    <button type="button" id="applyRemarksToTableBtn" class="btn btn-save remarks-apply-btn">
+        Apply Remarks to Table
+    </button>
+</div>
+
                         <div class="table-responsive">
                             <table class="deworm-table">
                                 <thead>
@@ -308,11 +335,25 @@ if($selected_cdc_id > 0){
                                                 </td>
 
                                                 <td>
+                                                    <select
+                                                        name="remarks[<?php echo $child['child_id']; ?>]"
+                                                        class="table-select remarks-select"
+                                                    >
+                                                        <option value="N/A">N/A</option>
+                                                        <option value="Taken">Taken</option>
+                                                        <option value="Not Taken">Not Taken</option>
+                                                        <option value="Refused">Refused</option>
+                                                        <option value="Vomited">Vomited</option>
+                                                        <option value="Absent">Absent</option>
+                                                        <option value="Others">Others</option>
+                                                    </select>
+
                                                     <input
                                                         type="text"
-                                                        name="remarks[<?php echo $child['child_id']; ?>]"
-                                                        class="table-input remarks-input"
-                                                        placeholder="Optional remarks"
+                                                        name="remarks_other[<?php echo $child['child_id']; ?>]"
+                                                        class="table-input remarks-other-input"
+                                                        placeholder="Please specify"
+                                                        style="display:none; margin-top:8px;"
                                                     >
                                                 </td>
 
@@ -407,32 +448,63 @@ document.addEventListener("DOMContentLoaded", function () {
     const dosage = document.getElementById("dosage");
     const applyBtn = document.getElementById("applyToTableBtn");
 
+    const remarksForAllSelect = document.getElementById("remarksForAllSelect");
+    const applyRemarksToTableBtn = document.getElementById("applyRemarksToTableBtn");
+
+    function toggleRemarksOtherInput(select) {
+        const row = select.closest("tr");
+        const otherInput = row ? row.querySelector(".remarks-other-input") : null;
+
+        if (!otherInput) return;
+
+        if (select.value === "Others") {
+            otherInput.style.display = "block";
+        } else {
+            otherInput.style.display = "none";
+            otherInput.value = "";
+        }
+    }
+
     function applyNotTakenBehavior(row) {
         const attendance = row.querySelector(".attendance-select");
         const medicineInput = row.querySelector(".medicine-input");
         const dosageInput = row.querySelector(".dosage-input");
-        const remarksInput = row.querySelector(".remarks-input");
+        const remarksSelect = row.querySelector(".remarks-select");
+        const remarksOtherInput = row.querySelector(".remarks-other-input");
+
+        if (!attendance || !medicineInput || !dosageInput || !remarksSelect) return;
 
         if (attendance.value === "Not Taken") {
             medicineInput.value = "";
             dosageInput.value = "";
-            remarksInput.value = "Not Taken";
+
+            remarksSelect.value = "Not Taken";
+
+            if (remarksOtherInput) {
+                remarksOtherInput.style.display = "none";
+                remarksOtherInput.value = "";
+            }
 
             medicineInput.disabled = true;
             dosageInput.disabled = true;
-            remarksInput.disabled = true;
+            remarksSelect.disabled = true;
+
+            if (remarksOtherInput) {
+                remarksOtherInput.disabled = true;
+            }
 
             row.classList.add("row-not-taken");
         } else {
             medicineInput.disabled = false;
             dosageInput.disabled = false;
-            remarksInput.disabled = false;
+            remarksSelect.disabled = false;
 
-            if (remarksInput.value === "Not Taken") {
-                remarksInput.value = "";
+            if (remarksOtherInput) {
+                remarksOtherInput.disabled = false;
             }
 
             row.classList.remove("row-not-taken");
+            toggleRemarksOtherInput(remarksSelect);
         }
     }
 
@@ -442,12 +514,12 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const rows = document.querySelectorAll(".deworm-row");
-
-        rows.forEach(function (row) {
+        document.querySelectorAll(".deworm-row").forEach(function (row) {
             const attendance = row.querySelector(".attendance-select");
             const medicineInput = row.querySelector(".medicine-input");
             const dosageInput = row.querySelector(".dosage-input");
+
+            if (!attendance || !medicineInput || !dosageInput) return;
 
             if (attendance.value === "Taken") {
                 medicineInput.value = medicine.value;
@@ -461,31 +533,63 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    document.querySelectorAll(".remarks-select").forEach(function (select) {
+        select.addEventListener("change", function () {
+            toggleRemarksOtherInput(select);
+        });
+
+        toggleRemarksOtherInput(select);
+    });
+
+    if (applyRemarksToTableBtn && remarksForAllSelect) {
+        applyRemarksToTableBtn.addEventListener("click", function () {
+            const selectedRemark = remarksForAllSelect.value;
+
+            if (selectedRemark === "") {
+                alert("Please select a remark first.");
+                return;
+            }
+
+            document.querySelectorAll(".deworm-row").forEach(function (row) {
+                const attendance = row.querySelector(".attendance-select");
+                const remarksSelect = row.querySelector(".remarks-select");
+
+                if (!attendance || !remarksSelect) return;
+
+                if (attendance.value === "Taken") {
+                    remarksSelect.value = selectedRemark;
+                    toggleRemarksOtherInput(remarksSelect);
+                }
+            });
+        });
+    }
+
     if (applyBtn) {
         applyBtn.addEventListener("click", function () {
             applySetupToTakenRows();
         });
     }
 
-    const rows = document.querySelectorAll(".deworm-row");
-
-    rows.forEach(function (row) {
+    document.querySelectorAll(".deworm-row").forEach(function (row) {
         const attendance = row.querySelector(".attendance-select");
 
         applyNotTakenBehavior(row);
 
-        attendance.addEventListener("change", function () {
-            if (this.value === "Taken") {
-                if (medicine.value !== "") {
-                    row.querySelector(".medicine-input").value = medicine.value;
-                }
-                if (dosage.value !== "") {
-                    row.querySelector(".dosage-input").value = dosage.value;
-                }
-            }
+        if (attendance) {
+            attendance.addEventListener("change", function () {
+                if (this.value === "Taken") {
+                    if (medicine.value !== "") {
+                        row.querySelector(".medicine-input").value = medicine.value;
+                    }
 
-            applyNotTakenBehavior(row);
-        });
+                    if (dosage.value !== "") {
+                        row.querySelector(".dosage-input").value = dosage.value;
+                    }
+                }
+
+                applyNotTakenBehavior(row);
+            });
+        }
     });
 
     const sidebar = document.getElementById("sidebar");
@@ -512,8 +616,8 @@ function toggleSidebar() {
     content.classList.toggle("full");
 
     if (overlay && window.innerWidth <= 991) {
-    overlay.classList.toggle("show");
-}
+        overlay.classList.toggle("show");
+    }
 
     const isHidden = sidebar.classList.contains("hide");
     localStorage.setItem("cdw_sidebar_hidden", isHidden ? "true" : "false");
@@ -530,11 +634,13 @@ function closeSidebar() {
     content.classList.add("full");
 
     if (overlay && window.innerWidth <= 991) {
-    overlay.classList.remove("show");
-}
+        overlay.classList.remove("show");
+    }
 
     localStorage.setItem("cdw_sidebar_hidden", "true");
 }
+
+
 </script>
 <script src="../assets/cdw/sidebar.js"></script>
 </body>

@@ -74,6 +74,10 @@ a{
 
 .submit-form{
     margin:0;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
 }
 
 .alert{
@@ -365,8 +369,29 @@ a{
     color:#ffffff;
 }
 
+
+
 .btn-primary:hover{
     background:#256728;
+}
+
+.btn-print{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border:none;
+    border-radius:10px;
+    padding:10px 16px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    background:#16a34a;
+    color:#ffffff;
+    transition:0.2s ease;
+}
+
+.btn-print:hover{
+    background:#15803d;
 }
 
 .btn-secondary,
@@ -503,6 +528,21 @@ body.dark-mode .empty-state{
 
     .status-grid{
         grid-template-columns:repeat(2, minmax(170px, 1fr));
+    }
+}
+
+@media (max-width: 900px){
+    .health-info-panel{
+        grid-template-columns:1fr;
+    }
+
+    .health-info-row{
+        grid-template-columns:1fr;
+    }
+
+    .health-info-label{
+        border-right:none;
+        border-bottom:1px solid #edf2f0;
     }
 }
 
@@ -704,15 +744,424 @@ body.dark-mode .empty-state{
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 8px;
     background: #e8f5e9;
     color: #2e7d32;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     text-decoration: none;
 }
 
 .file-link:hover {
     background: #c8e6c9;
+}
+
+.health-info-panel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.health-info-group{
+    border:1px solid #dcdcdc;
+    border-radius:14px;
+    background:#ffffff;
+    overflow:hidden;
+    min-height:170px;
+}
+
+.health-info-group-title{
+    padding:14px 16px;
+    background:#f5f8f6;
+    border-bottom:1px solid #dfe7df;
+    font-family:'Poppins', sans-serif;
+    font-size:16px;
+    font-weight:700;
+    color:#1f2937;
+}
+
+.health-info-row{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    border-bottom:1px solid #edf2f0;
+    min-height:62px;
+}
+
+.health-info-row:last-child{
+    border-bottom:none;
+}
+
+.health-info-label{
+    padding:16px 18px;
+    background:#fafcfb;
+    border-right:1px solid #edf2f0;
+    font-size:14px;
+    font-weight:700;
+    color:#1f2937;
+    display:flex;
+    align-items:center;
+}
+
+.health-info-value{
+    padding:16px 18px;
+    font-size:14px;
+    color:#374151;
+    line-height:1.5;
+    word-break:break-word;
+    display:flex;
+    align-items:center;
+}
+
+body.dark-mode .health-info-group{
+    background:#111827;
+    border-color:#334155;
+}
+
+body.dark-mode .health-info-group-title{
+    background:#1f2937;
+    border-bottom-color:#334155;
+    color:#f8fafc;
+}
+
+body.dark-mode .health-info-label{
+    background:#18212f;
+    border-right-color:#334155;
+    color:#f8fafc;
+}
+
+body.dark-mode .health-info-value{
+    color:#e5e7eb;
+}
+
+/* =========================
+   PRINT / SAVE AS PDF
+========================= */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 8mm;
+    }
+
+    body{
+        background:#ffffff !important;
+        color:#000000 !important;
+        font-family:Arial, sans-serif !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    .topbar,
+    .sidebar,
+    .sidebar-overlay,
+    .back-link,
+    .submit-form,
+    .no-print,
+    .pagination-wrap,
+    .alert,
+    .notif-dropdown,
+    .notif-btn{
+        display:none !important;
+    }
+
+    .main-content{
+        margin-left:0 !important;
+        padding:0 !important;
+        width:100% !important;
+    }
+
+    .report-page{
+        padding:0 !important;
+    }
+
+    .report-header-card{
+        border:none !important;
+        border-bottom:1px solid #000000 !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        background:#ffffff !important;
+        padding:0 0 10px 0 !important;
+        margin:0 0 10px 0 !important;
+        display:block !important;
+        text-align:center !important;
+    }
+
+    .section-label{
+        color:#000000 !important;
+        font-size:9px !important;
+        margin-bottom:4px !important;
+    }
+
+    .report-header-copy h1{
+        color:#000000 !important;
+        font-size:20px !important;
+        text-align:center !important;
+        margin-bottom:5px !important;
+    }
+
+    .report-header-copy p{
+        color:#000000 !important;
+        font-size:10px !important;
+        line-height:1.35 !important;
+        max-width:none !important;
+        margin:0 auto !important;
+        text-align:center !important;
+    }
+
+    .summary-grid{
+        display:grid !important;
+        grid-template-columns:repeat(4, 1fr) !important;
+        gap:6px !important;
+        margin-bottom:8px !important;
+    }
+
+    .summary-card{
+        border:1px solid #000000 !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        background:#ffffff !important;
+        padding:6px 7px !important;
+    }
+
+    .summary-label,
+    .summary-value{
+        color:#000000 !important;
+        line-height:1.2 !important;
+    }
+
+    .summary-label{
+        font-size:8px !important;
+    }
+
+    .summary-value{
+        font-size:11px !important;
+        font-weight:bold !important;
+    }
+
+    .content-section{
+        border:1px solid #000000 !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        background:#ffffff !important;
+        padding:8px !important;
+        margin-bottom:8px !important;
+        page-break-inside:auto !important;
+    }
+
+    .section-title-wrap{
+        margin-bottom:6px !important;
+    }
+
+    .section-title-wrap h2{
+        color:#000000 !important;
+        font-size:12px !important;
+    }
+
+    .record-badge{
+        background:#ffffff !important;
+        color:#000000 !important;
+        border:1px solid #000000 !important;
+        border-radius:0 !important;
+        padding:2px 5px !important;
+        font-size:8px !important;
+    }
+
+    .table-wrap,
+    .selector-table-wrap{
+        overflow:visible !important;
+        width:100% !important;
+    }
+
+    .report-table,
+    .simple-table{
+        width:100% !important;
+        min-width:0 !important;
+        border-collapse:collapse !important;
+        table-layout:fixed !important;
+    }
+
+    .report-table thead th,
+    .simple-table thead th,
+    .report-table tbody th,
+    .report-table tbody td,
+    .simple-table tbody td{
+        border:1px solid #000000 !important;
+        background:#ffffff !important;
+        color:#000000 !important;
+        padding:4px 5px !important;
+        font-size:7.5px !important;
+        line-height:1.2 !important;
+        vertical-align:top !important;
+        white-space:normal !important;
+        word-break:break-word !important;
+    }
+
+    .report-table tbody th{
+        width:auto !important;
+        font-weight:bold !important;
+    }
+
+    .status-grid,
+    .status-pill-grid{
+        display:grid !important;
+        grid-template-columns:repeat(4, 1fr) !important;
+        gap:6px !important;
+        margin-bottom:8px !important;
+    }
+
+    .status-box,
+    .status-pill{
+        border:1px solid #000000 !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        background:#ffffff !important;
+        color:#000000 !important;
+        padding:6px 7px !important;
+        min-height:auto !important;
+    }
+
+    .status-box-label,
+    .status-box-value,
+    .pill-label,
+    .pill-value{
+        color:#000000 !important;
+        font-size:8px !important;
+        line-height:1.2 !important;
+    }
+
+    .status-box-value,
+    .pill-value{
+        font-weight:bold !important;
+    }
+
+    .food-list{
+        margin:0 !important;
+        padding-left:12px !important;
+    }
+
+    .food-list li{
+        margin-bottom:2px !important;
+        line-height:1.2 !important;
+    }
+
+    .file-link{
+        background:#ffffff !important;
+        color:#000000 !important;
+        padding:0 !important;
+        border-radius:0 !important;
+        font-size:7.5px !important;
+        font-weight:normal !important;
+    }
+
+    .graph-grid{
+        display:grid !important;
+        grid-template-columns:1fr 1fr !important;
+        gap:8px !important;
+    }
+
+    .graph-card{
+        border:1px solid #000000 !important;
+        border-radius:0 !important;
+        box-shadow:none !important;
+        background:#ffffff !important;
+        padding:8px !important;
+    }
+
+    .graph-card h3{
+        color:#000000 !important;
+        font-size:11px !important;
+        margin-bottom:5px !important;
+    }
+
+    .chart-box{
+        height:220px !important;
+    }
+
+    .empty-state{
+        border:1px solid #000000 !important;
+        background:#ffffff !important;
+        color:#000000 !important;
+        border-radius:0 !important;
+        padding:8px !important;
+        font-size:10px !important;
+    }
+}
+
+.content-section:last-of-type{
+    page-break-before: always !important;
+    break-before: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.graph-grid{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.graph-card{
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    overflow:hidden !important;
+}
+
+.chart-box{
+    height:170px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+}
+
+.chart-box canvas{
+    max-height:170px !important;
+}
+
+.health-info-panel{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:6px !important;
+}
+
+.health-info-group{
+    border:1px solid #000000 !important;
+    border-radius:0 !important;
+    background:#ffffff !important;
+    overflow:hidden !important;
+}
+
+.health-info-group-title{
+    padding:4px 5px !important;
+    background:#ffffff !important;
+    border-bottom:1px solid #000000 !important;
+    color:#000000 !important;
+    font-size:8px !important;
+    font-weight:bold !important;
+}
+
+.health-info-row{
+    display:grid !important;
+    grid-template-columns:100px 1fr !important;
+    border-bottom:1px solid #000000 !important;
+}
+
+.health-info-row:last-child{
+    border-bottom:none !important;
+}
+
+.health-info-label{
+    padding:4px 5px !important;
+    background:#ffffff !important;
+    border-right:1px solid #000000 !important;
+    color:#000000 !important;
+    font-size:7.5px !important;
+    font-weight:bold !important;
+}
+
+.health-info-value{
+    padding:4px 5px !important;
+    color:#000000 !important;
+    font-size:7.5px !important;
+    line-height:1.2 !important;
 }

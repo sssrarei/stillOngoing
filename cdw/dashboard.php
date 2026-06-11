@@ -15,6 +15,17 @@ $theme_mode = $_SESSION['theme_mode'];
 $user_id = $_SESSION['user_id'];
 $error = "";
 
+function formatCdcDisplayName($cdc_name) {
+    $cdc_name = trim((string)$cdc_name);
+
+    $cdc_name = str_replace('Day Care Center', 'Child Development Center', $cdc_name);
+    $cdc_name = str_replace('DAY CARE CENTER', 'CHILD DEVELOPMENT CENTER', $cdc_name);
+    $cdc_name = str_replace('Daycare Center', 'Child Development Center', $cdc_name);
+    $cdc_name = str_replace('DAYCARE CENTER', 'CHILD DEVELOPMENT CENTER', $cdc_name);
+
+    return $cdc_name;
+}
+
 function getShortFoodGroupLabel($label) {
     $map = array(
         'Rice, Corn, Root Crops' => 'Rice',
@@ -370,7 +381,7 @@ $is_dark_mode = ($theme_mode === 'dark');
             <div class="cdc-title">
                 <?php
                 if(isset($_SESSION['active_cdc_name']) && !empty($_SESSION['active_cdc_name'])){
-                    echo htmlspecialchars($_SESSION['active_cdc_name']);
+                    echo htmlspecialchars(formatCdcDisplayName($_SESSION['active_cdc_name']));
                 } else {
                     echo "NO ACTIVE CDC";
                 }
@@ -390,7 +401,7 @@ $is_dark_mode = ($theme_mode === 'dark');
                                 echo "selected";
                             }
                             ?>>
-                            <?php echo htmlspecialchars($cdc['cdc_name'] . " - " . $cdc['barangay']); ?>
+                            <?php echo htmlspecialchars(formatCdcDisplayName($cdc['cdc_name']) . " - " . $cdc['barangay']); ?>
                         </option>
                     <?php
                         }
@@ -403,7 +414,7 @@ $is_dark_mode = ($theme_mode === 'dark');
             <?php if(isset($_SESSION['active_cdc_name'])){ ?>
                 <div class="active-cdc-text">
                     Active CDC:
-                    <?php echo htmlspecialchars($_SESSION['active_cdc_name']); ?>
+                    <?php echo htmlspecialchars(formatCdcDisplayName($_SESSION['active_cdc_name'])); ?>
                     <?php
                     if(isset($_SESSION['active_cdc_barangay']) && !empty($_SESSION['active_cdc_barangay'])){
                         echo " - " . htmlspecialchars($_SESSION['active_cdc_barangay']);
@@ -576,7 +587,7 @@ else{
         <div class="chart-box">
             <div class="chart-title">
                 Summary of Food Group Consumption
-                <?php echo isset($_SESSION['active_cdc_name']) ? htmlspecialchars(strtoupper($_SESSION['active_cdc_name'])) : ''; ?>
+                <?php echo isset($_SESSION['active_cdc_name']) ? htmlspecialchars(strtoupper(formatCdcDisplayName($_SESSION['active_cdc_name']))) : ''; ?>
             </div>
             <div class="chart-canvas-wrap">
                 <canvas id="foodChart"></canvas>
@@ -586,7 +597,7 @@ else{
         <div class="chart-box">
             <div class="chart-title">
                 Graphical Representation of the Nutritional Status of Children
-                <?php echo isset($_SESSION['active_cdc_name']) ? htmlspecialchars(strtoupper($_SESSION['active_cdc_name'])) : ''; ?>
+                <?php echo isset($_SESSION['active_cdc_name']) ? htmlspecialchars(strtoupper(formatCdcDisplayName($_SESSION['active_cdc_name']))) : ''; ?>
             </div>
             <div class="chart-canvas-wrap">
                 <canvas id="nutriChart"></canvas>

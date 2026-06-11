@@ -112,7 +112,14 @@ if(isset($_POST['save_milk_records'])){
             foreach($_POST['attendance'] as $child_id => $attendance){
                 $child_id = (int) $child_id;
                 $attendance = trim($attendance);
-                $remarks = isset($_POST['remarks'][$child_id]) ? trim($_POST['remarks'][$child_id]) : "";
+                $remarks_choice = isset($_POST['remarks'][$child_id]) ? trim($_POST['remarks'][$child_id]) : "";
+                $remarks_other = isset($_POST['remarks_other'][$child_id]) ? trim($_POST['remarks_other'][$child_id]) : "";
+
+                if ($remarks_choice === "Others") {
+                    $remarks = $remarks_other !== "" ? "Others: " . $remarks_other : "Others";
+                } else {
+                    $remarks = $remarks_choice;
+                }
 
                 $validate_child_stmt->bind_param("ii", $child_id, $selected_cdc_id);
                 $validate_child_stmt->execute();
@@ -276,6 +283,26 @@ if($selected_cdc_id > 0){
                             <h3>Milk Feeding Attendance</h3>
                         </div>
 
+                        <div class="remarks-all-row">
+    <div class="form-group remarks-all-group">
+        <label for="remarksForAllSelect">Remarks for All</label>
+        <select id="remarksForAllSelect" class="table-select">
+            <option value="">Select remarks</option>
+            <option value="N/A">N/A</option>
+            <option value="Finished">Finished</option>
+            <option value="Half">Half</option>
+            <option value="Refused">Refused</option>
+            <option value="Vomited">Vomited</option>
+            <option value="Leftover">Leftover</option>
+            <option value="Others">Others</option>
+        </select>
+    </div>
+
+    <button type="button" id="applyRemarksToTableBtn" class="btn btn-save remarks-apply-btn">
+        Apply Remarks to Table
+    </button>
+</div>
+
                         <div class="table-responsive">
                             <table class="milk-table">
                                 <thead>
@@ -322,11 +349,25 @@ if($selected_cdc_id > 0){
                                                 </td>
 
                                                 <td>
+                                                    <select
+                                                        name="remarks[<?php echo $child['child_id']; ?>]"
+                                                        class="table-select remarks-select"
+                                                    >
+                                                        <option value="N/A">N/A</option>
+                                                        <option value="Finished">Finished</option>
+                                                        <option value="Half">Half</option>
+                                                        <option value="Refused">Refused</option>
+                                                        <option value="Vomited">Vomited</option>
+                                                        <option value="Leftover">Leftover</option>
+                                                        <option value="Others">Others</option>
+                                                    </select>
+
                                                     <input
                                                         type="text"
-                                                        name="remarks[<?php echo $child['child_id']; ?>]"
-                                                        class="table-input remarks-input"
-                                                        placeholder="Optional remarks"
+                                                        name="remarks_other[<?php echo $child['child_id']; ?>]"
+                                                        class="table-input remarks-other-input"
+                                                        placeholder="Please specify"
+                                                        style="display:none; margin-top:8px;"
                                                     >
                                                 </td>
 
@@ -415,38 +456,70 @@ if($selected_cdc_id > 0){
 </div>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
     const feedingDate = document.getElementById("feeding_date");
     const milkType = document.getElementById("milk_type");
     const amount = document.getElementById("amount");
     const applyBtn = document.getElementById("applyToTableBtn");
 
+    const remarksForAllSelect = document.getElementById("remarksForAllSelect");
+    const applyRemarksToTableBtn = document.getElementById("applyRemarksToTableBtn");
+
+    function toggleRemarksOtherInput(select) {
+        const row = select.closest("tr");
+        const otherInput = row ? row.querySelector(".remarks-other-input") : null;
+
+        if (!otherInput) return;
+
+        if (select.value === "Others") {
+            otherInput.style.display = "block";
+        } else {
+            otherInput.style.display = "none";
+            otherInput.value = "";
+        }
+    }
+
     function applyAbsentBehavior(row) {
         const attendance = row.querySelector(".attendance-select");
         const milkTypeInput = row.querySelector(".milk-type-input");
         const amountInput = row.querySelector(".amount-input");
-        const remarksInput = row.querySelector(".remarks-input");
+        const remarksSelect = row.querySelector(".remarks-select");
+        const remarksOtherInput = row.querySelector(".remarks-other-input");
+
+        if (!attendance || !milkTypeInput || !amountInput || !remarksSelect) return;
 
         if (attendance.value === "Absent") {
             milkTypeInput.value = "";
             amountInput.value = "";
-            remarksInput.value = "Absent";
+
+            remarksSelect.value = "N/A";
+
+            if (remarksOtherInput) {
+                remarksOtherInput.style.display = "none";
+                remarksOtherInput.value = "";
+            }
 
             milkTypeInput.disabled = true;
             amountInput.disabled = true;
-            remarksInput.disabled = true;
+            remarksSelect.disabled = true;
+
+            if (remarksOtherInput) {
+                remarksOtherInput.disabled = true;
+            }
 
             row.classList.add("row-absent");
         } else {
             milkTypeInput.disabled = false;
             amountInput.disabled = false;
-            remarksInput.disabled = false;
+            remarksSelect.disabled = false;
 
-            if (remarksInput.value === "Absent") {
-                remarksInput.value = "";
+            if (remarksOtherInput) {
+                remarksOtherInput.disabled = false;
             }
 
             row.classList.remove("row-absent");
+            toggleRemarksOtherInput(remarksSelect);
         }
     }
 
@@ -456,12 +529,12 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const rows = document.querySelectorAll(".milk-row");
-
-        rows.forEach(function (row) {
+        document.querySelectorAll(".milk-row").forEach(function (row) {
             const attendance = row.querySelector(".attendance-select");
             const milkTypeInput = row.querySelector(".milk-type-input");
             const amountInput = row.querySelector(".amount-input");
+
+            if (!attendance || !milkTypeInput || !amountInput) return;
 
             if (attendance.value === "Present") {
                 milkTypeInput.value = milkType.value;
@@ -475,31 +548,63 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    document.querySelectorAll(".remarks-select").forEach(function (select) {
+        select.addEventListener("change", function () {
+            toggleRemarksOtherInput(select);
+        });
+
+        toggleRemarksOtherInput(select);
+    });
+
+    if (applyRemarksToTableBtn && remarksForAllSelect) {
+        applyRemarksToTableBtn.addEventListener("click", function () {
+            const selectedRemark = remarksForAllSelect.value;
+
+            if (selectedRemark === "") {
+                alert("Please select a remark first.");
+                return;
+            }
+
+            document.querySelectorAll(".milk-row").forEach(function (row) {
+                const attendance = row.querySelector(".attendance-select");
+                const remarksSelect = row.querySelector(".remarks-select");
+
+                if (!attendance || !remarksSelect) return;
+
+                if (attendance.value === "Present") {
+                    remarksSelect.value = selectedRemark;
+                    toggleRemarksOtherInput(remarksSelect);
+                }
+            });
+        });
+    }
+
     if (applyBtn) {
         applyBtn.addEventListener("click", function () {
             applySetupToPresentRows();
         });
     }
 
-    const rows = document.querySelectorAll(".milk-row");
-
-    rows.forEach(function (row) {
+    document.querySelectorAll(".milk-row").forEach(function (row) {
         const attendance = row.querySelector(".attendance-select");
 
         applyAbsentBehavior(row);
 
-        attendance.addEventListener("change", function () {
-            if (this.value === "Present") {
-                if (milkType.value !== "") {
-                    row.querySelector(".milk-type-input").value = milkType.value;
-                }
-                if (amount.value !== "") {
-                    row.querySelector(".amount-input").value = amount.value;
-                }
-            }
+        if (attendance) {
+            attendance.addEventListener("change", function () {
+                if (this.value === "Present") {
+                    if (milkType.value !== "") {
+                        row.querySelector(".milk-type-input").value = milkType.value;
+                    }
 
-            applyAbsentBehavior(row);
-        });
+                    if (amount.value !== "") {
+                        row.querySelector(".amount-input").value = amount.value;
+                    }
+                }
+
+                applyAbsentBehavior(row);
+            });
+        }
     });
 
     const sidebar = document.getElementById("sidebar");
@@ -526,8 +631,8 @@ function toggleSidebar() {
     content.classList.toggle("full");
 
     if (overlay && window.innerWidth <= 991) {
-    overlay.classList.toggle("show");
-}
+        overlay.classList.toggle("show");
+    }
 
     const isHidden = sidebar.classList.contains("hide");
     localStorage.setItem("cdw_sidebar_hidden", isHidden ? "true" : "false");
@@ -544,11 +649,12 @@ function closeSidebar() {
     content.classList.add("full");
 
     if (overlay && window.innerWidth <= 991) {
-    overlay.classList.remove("show");
-}
+        overlay.classList.remove("show");
+    }
 
     localStorage.setItem("cdw_sidebar_hidden", "true");
 }
+
 </script>
 <script src="../assets/cdw/sidebar.js"></script>
 </body>

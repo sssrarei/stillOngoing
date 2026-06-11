@@ -320,28 +320,39 @@ if (!$child) {
 
 $guardian = null;
 
-if (table_exists($conn, 'parent_child_links') && table_exists($conn, 'guardians')) {
+if (table_exists($conn, 'parent_child_links') && table_exists($conn, 'guardians') && table_exists($conn, 'users')) {
     $guardian_sql = "
-        SELECT g.*
+        SELECT 
+            g.*,
+            u.first_name AS user_first_name,
+            u.last_name AS user_last_name,
+            u.email AS user_email
         FROM parent_child_links pcl
-        INNER JOIN guardians g ON g.guardian_id = pcl.guardian_id
+        INNER JOIN users u
+            ON pcl.parent_id = u.user_id
+        LEFT JOIN guardians g
+            ON g.user_id = u.user_id
         WHERE pcl.child_id = ?
         LIMIT 1
     ";
 
     $guardian_stmt = mysqli_prepare($conn, $guardian_sql);
+
     if ($guardian_stmt) {
         mysqli_stmt_bind_param($guardian_stmt, 'i', $child_id);
         mysqli_stmt_execute($guardian_stmt);
         $guardian_result = mysqli_stmt_get_result($guardian_stmt);
-        if ($guardian_result) {
+
+        if ($guardian_result && mysqli_num_rows($guardian_result) > 0) {
             $guardian = mysqli_fetch_assoc($guardian_result);
         }
+
         mysqli_stmt_close($guardian_stmt);
     }
 }
 
 $health_info = null;
+
 if (table_exists($conn, 'child_health_information')) {
     $health_sql = "
         SELECT *
@@ -359,6 +370,56 @@ if (table_exists($conn, 'child_health_information')) {
             $health_info = mysqli_fetch_assoc($health_result);
         }
         mysqli_stmt_close($health_stmt);
+    }
+}
+
+/*
+    Fallback:
+    If official child_health_information is empty or outdated,
+    get the latest approved guardian health submission for display.
+*/
+if (table_exists($conn, 'child_health_information_requests')) {
+    $request_sql = "
+        SELECT *
+        FROM child_health_information_requests
+        WHERE child_id = ?
+          AND status = 'Approved'
+        ORDER BY submitted_at DESC, request_id DESC
+        LIMIT 1
+    ";
+
+    $request_stmt = mysqli_prepare($conn, $request_sql);
+
+    if ($request_stmt) {
+        mysqli_stmt_bind_param($request_stmt, 'i', $child_id);
+        mysqli_stmt_execute($request_stmt);
+        $request_result = mysqli_stmt_get_result($request_stmt);
+
+        if ($request_result && mysqli_num_rows($request_result) > 0) {
+            $latest_request = mysqli_fetch_assoc($request_result);
+
+            if (!is_array($health_info)) {
+                $health_info = [];
+            }
+
+            if (!empty($latest_request['vaccination_card_file_path'])) {
+                $health_info['vaccination_card_file_path'] = $latest_request['vaccination_card_file_path'];
+            }
+
+            if (!empty($latest_request['allergies'])) {
+                $health_info['allergies'] = $latest_request['allergies'];
+            }
+
+            if (!empty($latest_request['comorbidities'])) {
+                $health_info['comorbidities'] = $latest_request['comorbidities'];
+            }
+
+            if (!empty($latest_request['medical_history_file_path'])) {
+                $health_info['medical_history_file_path'] = $latest_request['medical_history_file_path'];
+            }
+        }
+
+        mysqli_stmt_close($request_stmt);
     }
 }
 
@@ -405,122 +466,63 @@ if (!empty($anthro_history)) {
 
 $feeding_rows = [];
 
-$feeding_record_cols = get_table_columns($conn, 'feeding_records');
-$feeding_item_cols = get_table_columns($conn, 'feeding_record_items');
-$food_item_cols = get_table_columns($conn, 'food_items');
-$food_group_cols = get_table_columns($conn, 'food_groups');
+if (table_exists($conn, 'feeding_records') && table_exists($conn, 'feeding_record_items')) {
+    $feeding_sql = "
+        SELECT
+            fr.feeding_record_id,
+            fr.feeding_date,
+            fr.attendance,
+            fr.remarks,
+            GROUP_CONCAT(
+                CASE
+                    WHEN fi.food_item_name IS NOT NULL AND fi.food_item_name != '' THEN
+                        CONCAT(
+                            COALESCE(fg.food_group_name, 'Uncategorized'),
+                            ': ',
+                            fi.food_item_name,
+                            CASE
+                                WHEN fri.measurement_text IS NOT NULL AND fri.measurement_text != '' 
+                                    THEN CONCAT(' (', fri.measurement_text, ')')
+                                WHEN fri.quantity IS NOT NULL 
+                                    THEN CONCAT(' (', CAST(fri.quantity AS CHAR), ')')
+                                ELSE ''
+                            END
+                        )
+                    ELSE NULL
+                END
+                ORDER BY fri.feeding_item_id ASC
+                SEPARATOR '||'
+            ) AS food_details
+        FROM feeding_records fr
+        LEFT JOIN feeding_record_items fri 
+            ON fr.feeding_record_id = fri.feeding_record_id
+        LEFT JOIN food_groups fg 
+            ON fri.food_group_id = fg.food_group_id
+        LEFT JOIN food_items fi 
+            ON fri.food_item_id = fi.food_item_id
+        WHERE fr.child_id = ?
+        GROUP BY 
+            fr.feeding_record_id,
+            fr.feeding_date,
+            fr.attendance,
+            fr.remarks
+        ORDER BY fr.feeding_date DESC, fr.feeding_record_id DESC
+    ";
 
-if (!empty($feeding_record_cols) && !empty($feeding_item_cols)) {
-    $fr_pk = first_existing_column($feeding_record_cols, ['feeding_record_id', 'record_id', 'id']);
-    $fri_fk = first_existing_column($feeding_item_cols, ['feeding_record_id', 'record_id']);
-    $feeding_date_col = first_existing_column($feeding_record_cols, ['feeding_date', 'date_recorded', 'record_date', 'date']);
-    $fri_child_col = first_existing_column($feeding_item_cols, ['child_id']);
-    $fr_child_col = first_existing_column($feeding_record_cols, ['child_id']);
+    $feeding_stmt = mysqli_prepare($conn, $feeding_sql);
 
-    if ($fr_pk && $fri_fk && $feeding_date_col && ($fri_child_col || $fr_child_col)) {
-        $where_clause = '';
-        if ($fri_child_col) {
-            $where_clause = "fri.`$fri_child_col` = ?";
-        } else {
-            $where_clause = "fr.`$fr_child_col` = ?";
-        }
+    if ($feeding_stmt) {
+        mysqli_stmt_bind_param($feeding_stmt, 'i', $child_id);
+        mysqli_stmt_execute($feeding_stmt);
+        $feeding_result = mysqli_stmt_get_result($feeding_stmt);
 
-        $attendance_col = first_existing_column($feeding_item_cols, ['attendance', 'status']);
-        $amount_col = first_existing_column($feeding_item_cols, ['amount', 'serving', 'servings']);
-        $measurement_col = first_existing_column($feeding_item_cols, ['measurement', 'unit']);
-        $remarks_col = first_existing_column($feeding_item_cols, ['remarks', 'remark']);
-        $food_item_id_col = first_existing_column($feeding_item_cols, ['food_item_id']);
-
-        $food_items_pk = first_existing_column($food_item_cols, ['food_item_id', 'id']);
-        $food_items_name_col = first_existing_column($food_item_cols, ['food_item_name', 'item_name', 'food_name', 'name']);
-        $food_items_group_fk = first_existing_column($food_item_cols, ['food_group_id']);
-
-        $food_groups_pk = first_existing_column($food_group_cols, ['food_group_id', 'id']);
-        $food_groups_name_col = first_existing_column($food_group_cols, ['food_group_name', 'group_name', 'name']);
-
-        $select_parts = [
-            "fr.`$feeding_date_col` AS feeding_date"
-        ];
-
-        if ($attendance_col) {
-            $select_parts[] = "fri.`$attendance_col` AS attendance";
-        } else {
-            $select_parts[] = "'' AS attendance";
-        }
-
-        if ($amount_col) {
-            $select_parts[] = "fri.`$amount_col` AS amount";
-        } else {
-            $select_parts[] = "'' AS amount";
-        }
-
-        if ($measurement_col) {
-            $select_parts[] = "fri.`$measurement_col` AS measurement";
-        } else {
-            $select_parts[] = "'' AS measurement";
-        }
-
-        if ($remarks_col) {
-            $select_parts[] = "fri.`$remarks_col` AS remarks";
-        } else {
-            $select_parts[] = "'' AS remarks";
-        }
-
-        if ($food_item_id_col && $food_items_pk && $food_items_name_col) {
-            $select_parts[] = "fi.`$food_items_name_col` AS food_item_name";
-        } elseif (has_column($feeding_item_cols, 'food_item')) {
-            $select_parts[] = "fri.`food_item` AS food_item_name";
-        } elseif (has_column($feeding_item_cols, 'food_name')) {
-            $select_parts[] = "fri.`food_name` AS food_item_name";
-        } elseif (has_column($feeding_item_cols, 'item_name')) {
-            $select_parts[] = "fri.`item_name` AS food_item_name";
-        } else {
-            $select_parts[] = "'' AS food_item_name";
-        }
-
-        if ($food_item_id_col && $food_items_pk && $food_items_group_fk && $food_groups_pk && $food_groups_name_col) {
-            $select_parts[] = "fg.`$food_groups_name_col` AS food_group_name";
-        } else {
-            $select_parts[] = "'' AS food_group_name";
-        }
-
-        $feeding_sql = "
-            SELECT " . implode(", ", $select_parts) . "
-            FROM feeding_record_items fri
-            INNER JOIN feeding_records fr ON fr.`$fr_pk` = fri.`$fri_fk`
-        ";
-
-        if ($food_item_id_col && $food_items_pk) {
-            $feeding_sql .= "
-                LEFT JOIN food_items fi ON fi.`$food_items_pk` = fri.`$food_item_id_col`
-            ";
-        }
-
-        if ($food_item_id_col && $food_items_pk && $food_items_group_fk && $food_groups_pk) {
-            $feeding_sql .= "
-                LEFT JOIN food_groups fg ON fg.`$food_groups_pk` = fi.`$food_items_group_fk`
-            ";
-        }
-
-        $feeding_sql .= "
-            WHERE $where_clause
-            ORDER BY fr.`$feeding_date_col` DESC
-        ";
-
-        $feeding_stmt = mysqli_prepare($conn, $feeding_sql);
-        if ($feeding_stmt) {
-            mysqli_stmt_bind_param($feeding_stmt, 'i', $child_id);
-            mysqli_stmt_execute($feeding_stmt);
-            $feeding_result = mysqli_stmt_get_result($feeding_stmt);
-
-            if ($feeding_result) {
-                while ($row = mysqli_fetch_assoc($feeding_result)) {
-                    $feeding_rows[] = $row;
-                }
+        if ($feeding_result) {
+            while ($row = mysqli_fetch_assoc($feeding_result)) {
+                $feeding_rows[] = $row;
             }
-
-            mysqli_stmt_close($feeding_stmt);
         }
+
+        mysqli_stmt_close($feeding_stmt);
     }
 }
 
@@ -646,14 +648,38 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
                         <div class="mini-card-body">
                             <div class="detail-list">
                                 <?php if ($guardian) { ?>
-                                    <div class="detail-item"><strong>Guardian Name:</strong> <?php echo h(get_full_name_from_row($guardian)); ?></div>
-                                    <div class="detail-item"><strong>Email:</strong> <?php echo h($guardian['email'] ?? '-'); ?></div>
-                                    <div class="detail-item"><strong>Contact Number:</strong> <?php echo h($guardian['contact_number'] ?? '-'); ?></div>
-                                    <div class="detail-item"><strong>Address:</strong> <?php echo h($guardian['address'] ?? '-'); ?></div>
+                                    <?php
+                                        $guardian_name_display = get_full_name_from_row($guardian);
+
+                                        if ($guardian_name_display === 'N/A' || $guardian_name_display === '-') {
+                                            $guardian_name_display = trim(($guardian['user_first_name'] ?? '') . ' ' . ($guardian['user_last_name'] ?? ''));
+                                        }
+
+                                        if ($guardian_name_display === '') {
+                                            $guardian_name_display = '-';
+                                        }
+
+                                        $guardian_email_display = !empty($guardian['email'])
+                                            ? $guardian['email']
+                                            : ($guardian['user_email'] ?? '-');
+
+                                        $guardian_contact_display = !empty($guardian['contact_number'])
+                                            ? $guardian['contact_number']
+                                            : ($child['contact_number'] ?? '-');
+
+                                        $guardian_address_display = !empty($guardian['address'])
+                                            ? $guardian['address']
+                                            : ($child['address'] ?? '-');
+                                    ?>
+
+                                    <div class="detail-item"><strong>Guardian Name:</strong> <?php echo h($guardian_name_display); ?></div>
+                                    <div class="detail-item"><strong>Email:</strong> <?php echo h($guardian_email_display); ?></div>
+                                    <div class="detail-item"><strong>Contact Number:</strong> <?php echo h($guardian_contact_display); ?></div>
+                                    <div class="detail-item"><strong>Address:</strong> <?php echo h($guardian_address_display); ?></div>
                                 <?php } else { ?>
                                     <div class="detail-item"><strong>Guardian Name:</strong> <?php echo h($child['guardian_name'] ?? '-'); ?></div>
                                     <div class="detail-item"><strong>Contact Number:</strong> <?php echo h($child['guardian_contact'] ?? ($child['contact_number'] ?? '-')); ?></div>
-                                    <div class="detail-item"><strong>Address:</strong> <?php echo h($child['guardian_address'] ?? '-'); ?></div>
+                                    <div class="detail-item"><strong>Address:</strong> <?php echo h($child['address'] ?? '-'); ?></div>
                                 <?php } ?>
                             </div>
                         </div>
@@ -676,7 +702,7 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
             </div>
 
             <div class="detail-item">
-                <strong>Allergies:</strong> <?php echo h($health_info['allergies'] ?? '-'); ?>
+                <strong>Allergies / Allergen:</strong> <?php echo h($health_info['allergies'] ?? '-'); ?>
             </div>
 
             <div class="detail-item">
@@ -800,27 +826,27 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
                                     <th>Feeding Date</th>
                                     <th>Attendance</th>
                                     <th>Food Details</th>
-                                    <th>Amount</th>
                                     <th>Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($feeding_rows as $row) { ?>
-                                    <?php
-                                        $food_details = '';
-                                        if (!empty($row['food_group_name'])) {
-                                            $food_details .= $row['food_group_name'] . ': ';
-                                        }
-                                        $food_details .= !empty($row['food_item_name']) ? $row['food_item_name'] : '-';
-                                        if (!empty($row['measurement'])) {
-                                            $food_details .= ' (' . $row['measurement'] . ')';
-                                        }
-                                    ?>
-                                    <tr>
+                                   <tr>
                                         <td><?php echo h(format_date_value($row['feeding_date'] ?? '')); ?></td>
                                         <td><?php echo h($row['attendance'] ?? '-'); ?></td>
-                                        <td class="food-details-cell"><?php echo h($food_details); ?></td>
-                                        <td><?php echo h($row['amount'] ?? '-'); ?></td>
+                                        <td class="food-details-cell">
+                                            <?php
+                                                if (!empty($row['food_details'])) {
+                                                    $foods = explode('||', $row['food_details']);
+
+                                                    foreach ($foods as $food) {
+                                                        echo '<div class="food-detail-line">' . h($food) . '</div>';
+                                                    }
+                                                } else {
+                                                    echo 'N/A';
+                                                }
+                                            ?>
+                                        </td>
                                         <td><?php echo h($row['remarks'] ?? '-'); ?></td>
                                     </tr>
                                 <?php } ?>

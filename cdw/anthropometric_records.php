@@ -539,10 +539,7 @@ if($child_id > 0){
             text-align: center;
         }
 
-        .measurements-table .col-recorded-by {
-            width: 120px;
-            text-align: center;
-        }
+
 
         .measurements-table .col-action {
             width: 120px;
@@ -562,11 +559,7 @@ if($child_id > 0){
             line-height: 1.25;
         }
 
-        .measurements-table td.recorded-by-cell {
-            text-align: center;
-            line-height: 1.25;
-        }
-
+       
         .measurements-table td.action-cell {
             text-align: center;
         }
@@ -696,8 +689,8 @@ if($child_id > 0){
                         ?>
                             <div class="pupil-item">
                                 <div class="pupil-name"><?php echo htmlspecialchars($full_name); ?></div>
-                                <a href="anthropometric_records.php?child_id=<?php echo $row['child_id']; ?>" class="open-btn">
-                                    Open Input Height, Weight and MUAC
+                                <a href="anthropometric_records.php?child_id=<?php echo $row['child_id']; ?>" class="view-arrow-btn" title="Open Input Height, Weight and MUAC">
+                                    <span class="arrow-icon">➜</span>
                                 </a>
                             </div>
                         <?php } ?>
@@ -829,7 +822,7 @@ if($child_id > 0){
                                         <th class="col-wfa center-cell">WFA</th>
                                         <th class="col-hfa center-cell">HFA</th>
                                         <th class="col-wflh center-cell">WFL/H</th>
-                                        <th class="col-recorded-by center-cell">Recorded<br>By</th>
+                                       
                                         <?php if(!$view_only){ ?>
                                             <th class="col-action center-cell">Action</th>
                                         <?php } ?>
@@ -869,7 +862,7 @@ if($child_id > 0){
                                             <td class="status-cell"><?php echo status_badge($record['wfa_status'] ?? '--'); ?></td>
                                             <td class="status-cell"><?php echo status_badge($record['hfa_status'] ?? '--'); ?></td>
                                             <td class="status-cell"><?php echo status_badge($record['wflh_status'] ?? '--'); ?></td>
-                                            <td class="recorded-by-cell"><?php echo htmlspecialchars($recorded_by_name); ?></td>
+                                           
                                             <?php if(!$view_only){ ?>
                                             <td class="action-cell">
                                                 <a href="anthropometric_records.php?child_id=<?php echo $child_id; ?>&edit_id=<?php echo $record['record_id']; ?>" class="edit-btn-table">

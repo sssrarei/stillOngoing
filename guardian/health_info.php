@@ -161,9 +161,42 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info']))
         $message = "You already have a pending health information submission waiting for CDW review.";
         $message_type = 'error';
     } else {
-        $allergies = trim($_POST['allergies'] ?? '');
-        $comorbidities = trim($_POST['comorbidities'] ?? '');
-        $medical_history_text = trim($_POST['medical_history_text'] ?? '');
+        $allergy_status = trim($_POST['allergy_status'] ?? '');
+$allergen_type = trim($_POST['allergen_type'] ?? '');
+$allergen_other = trim($_POST['allergen_other'] ?? '');
+
+$comorbidity_status = trim($_POST['comorbidity_status'] ?? '');
+$comorbidity_type = trim($_POST['comorbidity_type'] ?? '');
+$comorbidity_other = trim($_POST['comorbidity_other'] ?? '');
+
+$medical_history_text = '';
+
+$allergies = '';
+$comorbidities = '';
+
+if ($allergy_status === 'No') {
+    $allergies = 'No';
+} elseif ($allergy_status === 'Yes') {
+    if ($allergen_type === 'Others' && $allergen_other !== '') {
+        $allergies = 'Yes - Others: ' . $allergen_other;
+    } elseif ($allergen_type !== '') {
+        $allergies = 'Yes - ' . $allergen_type;
+    } else {
+        $allergies = 'Yes';
+    }
+}
+
+if ($comorbidity_status === 'No') {
+    $comorbidities = 'No';
+} elseif ($comorbidity_status === 'Yes') {
+    if ($comorbidity_type === 'Others' && $comorbidity_other !== '') {
+        $comorbidities = 'Yes - Others: ' . $comorbidity_other;
+    } elseif ($comorbidity_type !== '') {
+        $comorbidities = 'Yes - ' . $comorbidity_type;
+    } else {
+        $comorbidities = 'Yes';
+    }
+}
 
         $upload_dir = "../uploads/";
         if (!is_dir($upload_dir)) {
@@ -191,19 +224,13 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info']))
             }
         }
 
-        if(empty($vaccination_path) && empty($allergies) && empty($comorbidities) && empty($medical_history_text) && empty($medical_file_path)){
+      if(empty($vaccination_path) && empty($allergies) && empty($comorbidities) && empty($medical_file_path)){
             $message = "Please provide at least one health information entry before submitting.";
             $message_type = 'error';
+        
+
         } else {
-            if(!empty($medical_history_text) && !empty($medical_file_path)){
-                $medical_history_value = $medical_history_text . "\n\nAttached File: " . $medical_file_path;
-            } elseif(!empty($medical_history_text)) {
-                $medical_history_value = $medical_history_text;
-            } elseif(!empty($medical_file_path)) {
-                $medical_history_value = $medical_file_path;
-            } else {
-                $medical_history_value = '';
-            }
+           
 
             $insert_sql = "
                 INSERT INTO child_health_information_requests (
@@ -663,7 +690,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info']))
                     </div>
 
                     <div class="info-row">
-                        <span class="info-label">Allergies</span>
+                        <span class="info-label">Allergen</span>
                         <div class="info-value"><?php echo htmlspecialchars($official_allergies); ?></div>
                     </div>
 
@@ -707,21 +734,67 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info']))
 
                         <div class="form-group">
                             <label class="form-label">Allergies</label>
-                            <textarea name="allergies" class="form-control" placeholder="Enter allergies"><?php echo ($official_allergies !== 'N/A') ? htmlspecialchars($official_allergies) : ''; ?></textarea>
+                            <select name="allergy_status" id="allergyStatus" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
+                            </select>
+                            <div class="form-help">Select Yes if the child has any known allergy.</div>
+                        </div>
+
+                        <div class="form-group" id="allergenGroup" style="display:none;">
+                            <label class="form-label">Allergen</label>
+                            <select name="allergen_type" id="allergenType" class="form-control form-select">
+                                <option value="">Select allergen</option>
+                                <option value="Peanut">Peanut</option>
+                                <option value="Egg">Egg</option>
+                                <option value="Milk">Milk</option>
+                                <option value="Seafood">Seafood</option>
+                                <option value="Medicine">Medicine</option>
+                                <option value="Dust">Dust</option>
+                                <option value="Insect Bite">Insect Bite</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <div class="form-help">Choose the specific allergen if allergies is Yes.</div>
+                        </div>
+
+                        <div class="form-group" id="allergenOtherGroup" style="display:none;">
+                            <label class="form-label">Specify Other Allergen</label>
+                            <input type="text" name="allergen_other" id="allergenOther" class="form-text-input" placeholder="Type other allergen">
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Comorbidities</label>
-                            <textarea name="comorbidities" class="form-control" placeholder="Enter comorbidities"><?php echo ($official_comorbidities !== 'N/A') ? htmlspecialchars($official_comorbidities) : ''; ?></textarea>
+                            <select name="comorbidity_status" id="comorbidityStatus" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
+                            </select>
+                            <div class="form-help">Select Yes if the child has an existing health condition.</div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Medical History (Text)</label>
-                            <textarea name="medical_history_text" class="form-control" placeholder="Enter medical history"><?php echo ($official_medical_history !== 'N/A') ? htmlspecialchars($official_medical_history) : ''; ?></textarea>
+                        <div class="form-group" id="comorbidityGroup" style="display:none;">
+                            <label class="form-label">Comorbidity Type</label>
+                            <select name="comorbidity_type" id="comorbidityType" class="form-control form-select">
+                                <option value="">Select comorbidity</option>
+                                <option value="Asthma">Asthma</option>
+                                <option value="Heart Condition">Heart Condition</option>
+                                <option value="Diabetes">Diabetes</option>
+                                <option value="Anemia">Anemia</option>
+                                <option value="Seizure Disorder">Seizure Disorder</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <div class="form-help">Choose the condition if comorbidities is Yes.</div>
                         </div>
 
+                        <div class="form-group" id="comorbidityOtherGroup" style="display:none;">
+                            <label class="form-label">Specify Other Comorbidity</label>
+                            <input type="text" name="comorbidity_other" id="comorbidityOther" class="form-text-input" placeholder="Type other comorbidity">
+                        </div>
+                        
+
                         <div class="form-group">
-                            <label class="form-label">Medical History (Upload Image)</label>
+                            <label class="form-label">Medical History / Medical Document (Upload Image)</label>
                             <input type="file" name="medical_file" class="form-input-file" accept=".jpg,.jpeg,.png,.webp">
                             <div class="form-help">You may upload a medical document image if needed.</div>
                         </div>
@@ -742,6 +815,78 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info']))
 </div>
 
 <script>
+
+function setupConditionalDropdowns() {
+    const allergyStatus = document.getElementById('allergyStatus');
+    const allergenGroup = document.getElementById('allergenGroup');
+    const allergenType = document.getElementById('allergenType');
+    const allergenOtherGroup = document.getElementById('allergenOtherGroup');
+
+    const comorbidityStatus = document.getElementById('comorbidityStatus');
+    const comorbidityGroup = document.getElementById('comorbidityGroup');
+    const comorbidityType = document.getElementById('comorbidityType');
+    const comorbidityOtherGroup = document.getElementById('comorbidityOtherGroup');
+
+    function updateAllergyFields() {
+        if (!allergyStatus || !allergenGroup || !allergenType || !allergenOtherGroup) return;
+
+        if (allergyStatus.value === 'Yes') {
+            allergenGroup.style.display = 'flex';
+        } else {
+            allergenGroup.style.display = 'none';
+            allergenOtherGroup.style.display = 'none';
+            allergenType.value = '';
+        }
+    }
+
+    function updateAllergenOtherField() {
+        if (!allergenType || !allergenOtherGroup) return;
+
+        allergenOtherGroup.style.display = allergenType.value === 'Others' ? 'flex' : 'none';
+    }
+
+    function updateComorbidityFields() {
+        if (!comorbidityStatus || !comorbidityGroup || !comorbidityType || !comorbidityOtherGroup) return;
+
+        if (comorbidityStatus.value === 'Yes') {
+            comorbidityGroup.style.display = 'flex';
+        } else {
+            comorbidityGroup.style.display = 'none';
+            comorbidityOtherGroup.style.display = 'none';
+            comorbidityType.value = '';
+        }
+    }
+
+    function updateComorbidityOtherField() {
+        if (!comorbidityType || !comorbidityOtherGroup) return;
+
+        comorbidityOtherGroup.style.display = comorbidityType.value === 'Others' ? 'flex' : 'none';
+    }
+
+    if (allergyStatus) {
+        allergyStatus.addEventListener('change', updateAllergyFields);
+    }
+
+    if (allergenType) {
+        allergenType.addEventListener('change', updateAllergenOtherField);
+    }
+
+    if (comorbidityStatus) {
+        comorbidityStatus.addEventListener('change', updateComorbidityFields);
+    }
+
+    if (comorbidityType) {
+        comorbidityType.addEventListener('change', updateComorbidityOtherField);
+    }
+
+    updateAllergyFields();
+    updateAllergenOtherField();
+    updateComorbidityFields();
+    updateComorbidityOtherField();
+}
+
+setupConditionalDropdowns();
+
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 const sidebarOverlay = document.getElementById('sidebarOverlay');

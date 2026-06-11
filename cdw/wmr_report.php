@@ -439,6 +439,15 @@ if($data['error'] !== ''){
             border:1px solid #d6d6d6;
         }
 
+        .btn-print{
+            background:#16a34a;
+            color:#ffffff;
+        }
+
+        .btn-print:hover{
+            background:#15803d;
+        }
+
         .error-message{
             background:#fdeaea;
             color:#c62828;
@@ -607,6 +616,146 @@ if($data['error'] !== ''){
                 grid-template-columns:1fr;
             }
         }
+
+        /* =========================
+   PRINT / SAVE AS PDF
+========================= */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 8mm;
+    }
+
+    body{
+        background:#ffffff !important;
+        color:#000000 !important;
+        font-family:Arial, sans-serif !important;
+    }
+
+    .topbar,
+    .sidebar,
+    .sidebar-overlay,
+    .back-link,
+    .button-group,
+    .no-print,
+    .success-message,
+    .error-message{
+        display:none !important;
+    }
+
+    .main-content{
+        margin-left:0 !important;
+        padding:0 !important;
+        width:100% !important;
+    }
+
+    .page-header{
+        border:none !important;
+        padding:0 0 10px 0 !important;
+        margin-bottom:10px !important;
+        background:#ffffff !important;
+    }
+
+    .page-title{
+        color:#000000 !important;
+        font-size:18px !important;
+        text-align:center !important;
+        margin-bottom:5px !important;
+    }
+
+    .page-subtitle{
+        color:#000000 !important;
+        text-align:center !important;
+        font-size:11px !important;
+    }
+
+    .content-card{
+        border:none !important;
+        padding:0 !important;
+        background:#ffffff !important;
+    }
+
+    .report-meta{
+        display:grid !important;
+        grid-template-columns:repeat(4, 1fr) !important;
+        gap:6px !important;
+        margin-bottom:8px !important;
+    }
+
+    .meta-card{
+        border:1px solid #000000 !important;
+        background:#ffffff !important;
+        border-radius:0 !important;
+        padding:5px 6px !important;
+    }
+
+    .meta-label,
+    .meta-value{
+        color:#000000 !important;
+        font-size:9px !important;
+        line-height:1.2 !important;
+    }
+
+    .meta-value{
+        font-weight:bold !important;
+    }
+
+    .table-wrapper{
+        overflow:visible !important;
+        width:100% !important;
+    }
+
+    .wmr-table{
+        width:100% !important;
+        min-width:0 !important;
+        border-collapse:collapse !important;
+        table-layout:fixed !important;
+    }
+
+    .wmr-table th,
+    .wmr-table td{
+        border:1px solid #000000 !important;
+        padding:3px 4px !important;
+        color:#000000 !important;
+        background:#ffffff !important;
+        font-size:7.5px !important;
+        line-height:1.15 !important;
+        vertical-align:top !important;
+        word-break:break-word !important;
+        white-space:normal !important;
+    }
+
+    .wmr-table th{
+        font-weight:bold !important;
+        text-align:center !important;
+    }
+
+    .wmr-table tbody tr:hover{
+        background:#ffffff !important;
+    }
+
+    .assessment-badge,
+    .submit-badge{
+        min-width:0 !important;
+        padding:0 !important;
+        border-radius:0 !important;
+        background:#ffffff !important;
+        color:#000000 !important;
+        font-size:7.5px !important;
+        font-weight:normal !important;
+    }
+
+    .status-text{
+        color:#000000 !important;
+        font-size:7.5px !important;
+        font-weight:normal !important;
+    }
+
+    .no-data{
+        color:#000000 !important;
+        font-size:11px !important;
+    }
+}
     </style>
 </head>
 <body class="<?php echo (isset($_SESSION['theme_mode']) && $_SESSION['theme_mode'] === 'dark') ? 'dark-mode' : ''; ?>">
@@ -632,7 +781,7 @@ if($data['error'] !== ''){
             <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
         <?php } ?>
 
-        <form method="GET">
+        <form method="GET" class="no-print">
             <div class="filter-grid">
                 <div class="form-group">
                     <label>Assessment Type</label>
@@ -652,7 +801,7 @@ if($data['error'] !== ''){
                 </div>
             </div>
 
-            <div class="button-group">
+            <div class="button-group no-print">
                 <button type="submit" class="btn btn-generate">Generate Report</button>
                 <a href="wmr_report.php" class="btn btn-reset">Reset</a>
             </div>
@@ -663,9 +812,13 @@ if($data['error'] !== ''){
             <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($date_to); ?>">
             <input type="hidden" name="assessment_type" value="<?php echo htmlspecialchars($assessment_type); ?>">
 
-            <div class="button-group" style="margin-top:-6px;">
-                <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
-            </div>
+            <div class="button-group no-print" style="margin-top:-6px;">
+    <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
+
+    <button type="button" class="btn btn-print" onclick="window.print()">
+        Print / Save as PDF
+    </button>
+</div>
         </form>
 
         <div class="report-meta">
@@ -709,7 +862,7 @@ if($data['error'] !== ''){
                             <th>WFA</th>
                             <th>HFA</th>
                             <th>WFL/H</th>
-                            <th class="left-cell">Recorded By</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -740,9 +893,7 @@ if($data['error'] !== ''){
                                 <td><span class="status-text"><?php echo htmlspecialchars($row['muac_status'] ?: '--'); ?></span></td>
                                 <td><span class="status-text"><?php echo htmlspecialchars($row['wfa_status']); ?></span></td>
                                 <td><span class="status-text"><?php echo htmlspecialchars($row['hfa_status']); ?></span></td>
-                                <td><span class="status-text"><?php echo htmlspecialchars($row['wflh_status']); ?></span></td>
-                                <td class="left-cell"><?php echo htmlspecialchars($row['recorded_by_name'] ?: 'N/A'); ?></td>
-                            </tr>
+                                <td><span class="status-text"><?php echo htmlspecialchars($row['wflh_status']); ?></span></td>                            </tr>
                         <?php } ?>
                     </tbody>
                 </table>

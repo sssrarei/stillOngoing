@@ -398,6 +398,15 @@ $date_range_display = get_date_range_display($date_from, $date_to);
             color:#fff;
         }
 
+        .btn-print{
+            background:#16a34a;
+            color:#ffffff;
+        }
+
+        .btn-print:hover{
+            background:#15803d;
+        }
+
         .error-message{
             background:#fdeaea;
             color:#c62828;
@@ -523,6 +532,15 @@ $date_range_display = get_date_range_display($date_from, $date_to);
             background:#fff;
         }
 
+       
+            table th:nth-child(2),
+            table td:nth-child(2),
+            table th:nth-child(4),
+            table td:nth-child(4){
+                text-align:center;
+                vertical-align:middle;
+            }
+
         tbody tr:hover{
             background:#f8fbf8;
         }
@@ -568,7 +586,10 @@ $date_range_display = get_date_range_display($date_from, $date_to);
         .footer-row{
             display:flex;
             justify-content:flex-end;
+            align-items:center;
+            gap:12px;
             margin-top:18px;
+            flex-wrap:wrap;
         }
 
         @media (max-width: 991px){
@@ -626,6 +647,227 @@ $date_range_display = get_date_range_display($date_from, $date_to);
                 grid-template-columns:1fr;
             }
         }
+
+        /* =========================
+   PRINT / SAVE AS PDF
+========================= */
+/* =========================
+   PRINT / SAVE AS PDF
+========================= */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    body{
+        background:#ffffff !important;
+        color:#000000 !important;
+        font-family:Arial, sans-serif !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    .topbar,
+    .sidebar,
+    .sidebar-overlay,
+    .back-link,
+    .button-group,
+    .footer-row,
+    .no-print,
+    .success-message,
+    .error-message{
+        display:none !important;
+    }
+
+    .main-content{
+        margin-left:0 !important;
+        padding:0 !important;
+        width:100% !important;
+    }
+
+    .page-header{
+        border:none !important;
+        padding:0 0 12px 0 !important;
+        margin:0 0 12px 0 !important;
+        background:#ffffff !important;
+        text-align:center !important;
+        border-bottom:1px solid #000000 !important;
+    }
+
+    .page-title{
+        color:#000000 !important;
+        font-size:20px !important;
+        text-align:center !important;
+        margin-bottom:6px !important;
+    }
+
+    .page-subtitle{
+        color:#000000 !important;
+        text-align:center !important;
+        font-size:11px !important;
+        line-height:1.4 !important;
+    }
+
+    .content-card{
+        border:none !important;
+        padding:0 !important;
+        background:#ffffff !important;
+    }
+
+    /* REPORT DETAILS */
+    .meta-box{
+        width:100% !important;
+        border:none !important;
+        border-bottom:1px solid #000000 !important;
+        background:#ffffff !important;
+        border-radius:0 !important;
+        padding:8px 0 10px 0 !important;
+        margin:0 0 10px 0 !important;
+    }
+
+    .meta-grid{
+        display:grid !important;
+        grid-template-columns:1fr 1fr !important;
+        column-gap:40px !important;
+        row-gap:6px !important;
+        width:90% !important;
+        margin:0 auto !important;
+        align-items:start !important;
+    }
+
+    .meta-item{
+        color:#000000 !important;
+        font-size:10px !important;
+        line-height:1.35 !important;
+        text-align:left !important;
+        white-space:normal !important;
+        word-break:normal !important;
+    }
+
+    .meta-item strong{
+        font-weight:bold !important;
+    }
+
+    /* SUMMARY CARDS */
+    .summary-grid{
+        display:grid !important;
+        grid-template-columns:repeat(4, 1fr) !important;
+        gap:6px !important;
+        margin-bottom:8px !important;
+    }
+
+    .summary-card{
+        border:1px solid #000000 !important;
+        background:#ffffff !important;
+        border-radius:0 !important;
+        padding:6px 7px !important;
+    }
+
+    .summary-label{
+        color:#000000 !important;
+        font-size:9px !important;
+        line-height:1.2 !important;
+    }
+
+    .summary-value{
+        color:#000000 !important;
+        font-size:13px !important;
+        line-height:1.2 !important;
+        font-weight:bold !important;
+    }
+
+    .report-list{
+        gap:8px !important;
+    }
+
+    .date-group-card{
+        border:1px solid #000000 !important;
+        border-radius:0 !important;
+        background:#ffffff !important;
+        overflow:visible !important;
+        page-break-inside:auto !important;
+    }
+
+    .date-group-header{
+        background:#ffffff !important;
+        color:#000000 !important;
+        border-bottom:1px solid #000000 !important;
+        padding:5px 7px !important;
+    }
+
+    .date-group-title{
+        color:#000000 !important;
+        font-size:11px !important;
+    }
+
+    .table-wrapper{
+        overflow:visible !important;
+        width:100% !important;
+    }
+
+    table{
+        width:100% !important;
+        min-width:0 !important;
+        border-collapse:collapse !important;
+        table-layout:fixed !important;
+    }
+
+    th,
+    td{
+        border:1px solid #000000 !important;
+        padding:4px 5px !important;
+        color:#000000 !important;
+        background:#ffffff !important;
+        font-size:8px !important;
+        line-height:1.2 !important;
+        vertical-align:top !important;
+        word-break:break-word !important;
+        white-space:normal !important;
+    }
+
+    th{
+        font-weight:bold !important;
+        text-align:center !important;
+    }
+
+    table th:nth-child(2),
+    table td:nth-child(2),
+    table th:nth-child(4),
+    table td:nth-child(4){
+        text-align:center !important;
+        vertical-align:middle !important;
+    }
+
+    tbody tr:hover{
+        background:#ffffff !important;
+    }
+
+    .badge{
+        background:#ffffff !important;
+        color:#000000 !important;
+        border-radius:0 !important;
+        padding:0 !important;
+        font-size:8px !important;
+        font-weight:normal !important;
+    }
+
+    .food-details-list{
+        margin:0 !important;
+        padding-left:12px !important;
+    }
+
+    .food-details-list li{
+        margin-bottom:2px !important;
+        line-height:1.2 !important;
+    }
+
+    .no-data{
+        color:#000000 !important;
+        font-size:11px !important;
+    }
+}
+
     </style>
 </head>
 <?php include __DIR__ . '/../includes/auth.php'; ?>
@@ -652,7 +894,7 @@ $date_range_display = get_date_range_display($date_from, $date_to);
             <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
         <?php } ?>
 
-        <form method="GET">
+        <form method="GET" class="no-print">
             <div class="filter-grid">
                 <div class="form-group">
                     <label>Date From</label>
@@ -761,9 +1003,13 @@ $date_range_display = get_date_range_display($date_from, $date_to);
                 <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($date_from); ?>">
                 <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($date_to); ?>">
 
-                <div class="footer-row">
-                    <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
-                </div>
+                <div class="footer-row no-print">
+                <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
+
+                <button type="button" class="btn btn-print" onclick="window.print()">
+                    Print / Save as PDF
+                </button>
+            </div>
             </form>
         <?php } else { ?>
             <p class="no-data">No feeding attendance records found.</p>

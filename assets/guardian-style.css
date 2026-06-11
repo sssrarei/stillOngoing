@@ -630,6 +630,53 @@ a{
     color:#111827;
 }
 
+.form-select{
+    min-height:50px;
+    resize:none;
+    cursor:pointer;
+}
+
+.form-text-input{
+    width:100%;
+    border:1px solid #d7dce3;
+    border-radius:16px;
+    padding:13px 15px;
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    color:#243041;
+    background:#ffffff;
+    outline:none;
+    transition:0.2s ease;
+}
+
+.form-text-input:focus{
+    border-color:#c96f00;
+    box-shadow:0 0 0 4px rgba(201,111,0,0.10);
+    background:#ffffff;
+}
+
+body.dark-mode .form-text-input{
+    background:#0f172a;
+    color:#f8fafc;
+    border-color:#475569;
+}
+
+.form-select{
+    min-height:0;
+    height:48px;
+    resize:none;
+    cursor:pointer;
+    padding:10px 14px;
+}
+
+select.form-control.form-select{
+    min-height:0 !important;
+    height:48px !important;
+    max-height:48px !important;
+}
+
+
+
 /* =========================
    MOBILE / RESPONSIVE
 ========================= */

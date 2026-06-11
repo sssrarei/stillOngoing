@@ -31,6 +31,46 @@ $severely_stunted = 0;
 $moderately_wasted = 0;
 $severely_wasted = 0;
 
+function getFinalNutritionalStatus($wfa_status, $hfa_status, $wflh_status) {
+    $wfa_status = trim((string)$wfa_status);
+    $hfa_status = trim((string)$hfa_status);
+    $wflh_status = trim((string)$wflh_status);
+
+    if ($wflh_status === 'Severely Wasted') {
+        return 'Severely Wasted';
+    }
+
+    if ($wfa_status === 'Severely Underweight') {
+        return 'Severely Underweight';
+    }
+
+    if ($wflh_status === 'Obese') {
+        return 'Obese';
+    }
+
+    if ($wflh_status === 'Moderately Wasted' || $wflh_status === 'Wasted') {
+        return 'Moderately Wasted';
+    }
+
+    if ($wfa_status === 'Underweight') {
+        return 'Underweight';
+    }
+
+    if ($wflh_status === 'Overweight') {
+        return 'Overweight';
+    }
+
+    if ($hfa_status === 'Severely Stunted') {
+        return 'Severely Stunted';
+    }
+
+    if ($hfa_status === 'Stunted') {
+        return 'Stunted';
+    }
+
+    return 'Normal';
+}
+
 function percent($value, $total){
     if($total <= 0){
         return 0;
@@ -72,92 +112,103 @@ function build_nutritional_summary_data($conn, $cdc_id, $selected_month){
     } else {
         $error = "Failed to prepare total count query.";
     }
-
+//
     if(empty($error)){
-        $summary_sql = "
-            SELECT
-                SUM(
-                    CASE
-                        WHEN ar.wfa_status = 'Normal'
-                         AND ar.hfa_status = 'Normal'
-                         AND ar.wflh_status = 'Normal'
-                        THEN 1 ELSE 0
-                    END
-                ) AS normal_count,
+    $summary_sql = "
+        SELECT
+            ar.child_id,
+            ar.wfa_status,
+            ar.hfa_status,
+            ar.wflh_status
+        FROM anthropometric_records ar
+        INNER JOIN children c 
+            ON ar.child_id = c.child_id
 
-                SUM(CASE WHEN ar.wfa_status = 'Underweight' THEN 1 ELSE 0 END) AS underweight_count,
-                SUM(CASE WHEN ar.wfa_status = 'Severely Underweight' THEN 1 ELSE 0 END) AS severely_underweight_count,
+        INNER JOIN (
+            SELECT 
+                ar2.child_id, 
+                MAX(ar2.date_recorded) AS latest_date
+            FROM anthropometric_records ar2
+            INNER JOIN children c2 
+                ON ar2.child_id = c2.child_id
+            WHERE c2.cdc_id = ?
+              AND c2.is_deleted = 0
+              AND ar2.is_deleted = 0
+            GROUP BY ar2.child_id
+        ) latest
+            ON ar.child_id = latest.child_id
+            AND ar.date_recorded = latest.latest_date
 
-                SUM(CASE WHEN ar.wflh_status = 'Overweight' THEN 1 ELSE 0 END) AS overweight_count,
-                SUM(CASE WHEN ar.wflh_status = 'Obese' THEN 1 ELSE 0 END) AS obese_count,
+        INNER JOIN (
+            SELECT 
+                ar3.child_id, 
+                ar3.date_recorded, 
+                MAX(ar3.record_id) AS latest_record_id
+            FROM anthropometric_records ar3
+            INNER JOIN children c3 
+                ON ar3.child_id = c3.child_id
+            WHERE c3.cdc_id = ?
+              AND c3.is_deleted = 0
+              AND ar3.is_deleted = 0
+            GROUP BY ar3.child_id, ar3.date_recorded
+        ) latest_id
+            ON ar.child_id = latest_id.child_id
+            AND ar.date_recorded = latest_id.date_recorded
+            AND ar.record_id = latest_id.latest_record_id
 
-                SUM(CASE WHEN ar.hfa_status = 'Stunted' THEN 1 ELSE 0 END) AS stunted_count,
-                SUM(CASE WHEN ar.hfa_status = 'Severely Stunted' THEN 1 ELSE 0 END) AS severely_stunted_count,
+        WHERE c.cdc_id = ?
+          AND c.is_deleted = 0
+          AND ar.is_deleted = 0
+    ";
 
-                SUM(CASE WHEN ar.wflh_status = 'Moderately Wasted' THEN 1 ELSE 0 END) AS moderately_wasted_count,
-                SUM(CASE WHEN ar.wflh_status = 'Severely Wasted' THEN 1 ELSE 0 END) AS severely_wasted_count
+    $summary_stmt = $conn->prepare($summary_sql);
 
-            FROM anthropometric_records ar
-            INNER JOIN children c ON ar.child_id = c.child_id
+    if($summary_stmt){
+        $summary_stmt->bind_param(
+            "iii",
+            $cdc_id,
+            $cdc_id,
+            $cdc_id
+        );
 
-            INNER JOIN (
-                SELECT ar2.child_id, MAX(ar2.date_recorded) AS latest_date
-                FROM anthropometric_records ar2
-                INNER JOIN children c2 ON ar2.child_id = c2.child_id
-                WHERE c2.cdc_id = ?
-                  AND DATE(ar2.date_recorded) <= ?
-                GROUP BY ar2.child_id
-            ) latest
-                ON ar.child_id = latest.child_id
-                AND ar.date_recorded = latest.latest_date
+        $summary_stmt->execute();
+        $summary_result = $summary_stmt->get_result();
 
-            INNER JOIN (
-                SELECT ar3.child_id, ar3.date_recorded, MAX(ar3.record_id) AS latest_record_id
-                FROM anthropometric_records ar3
-                INNER JOIN children c3 ON ar3.child_id = c3.child_id
-                WHERE c3.cdc_id = ?
-                  AND DATE(ar3.date_recorded) <= ?
-                GROUP BY ar3.child_id, ar3.date_recorded
-            ) latest_id
-                ON ar.child_id = latest_id.child_id
-                AND ar.date_recorded = latest_id.date_recorded
-                AND ar.record_id = latest_id.latest_record_id
-
-            WHERE c.cdc_id = ?
-        ";
-
-        $summary_stmt = $conn->prepare($summary_sql);
-
-        if($summary_stmt){
-            $summary_stmt->bind_param(
-                "isisi",
-                $cdc_id,
-                $month_end,
-                $cdc_id,
-                $month_end,
-                $cdc_id
+        while($row = $summary_result->fetch_assoc()){
+            $final_status = getFinalNutritionalStatus(
+                $row['wfa_status'] ?? '',
+                $row['hfa_status'] ?? '',
+                $row['wflh_status'] ?? ''
             );
 
-            $summary_stmt->execute();
-            $summary_result = $summary_stmt->get_result();
-
-            if($summary_row = $summary_result->fetch_assoc()){
-                $normal = (int)($summary_row['normal_count'] ?? 0);
-                $underweight = (int)($summary_row['underweight_count'] ?? 0);
-                $severely_underweight = (int)($summary_row['severely_underweight_count'] ?? 0);
-                $overweight = (int)($summary_row['overweight_count'] ?? 0);
-                $obese = (int)($summary_row['obese_count'] ?? 0);
-                $stunted = (int)($summary_row['stunted_count'] ?? 0);
-                $severely_stunted = (int)($summary_row['severely_stunted_count'] ?? 0);
-                $moderately_wasted = (int)($summary_row['moderately_wasted_count'] ?? 0);
-                $severely_wasted = (int)($summary_row['severely_wasted_count'] ?? 0);
+            if ($final_status === 'Normal') {
+                $normal++;
+            } elseif ($final_status === 'Underweight') {
+                $underweight++;
+            } elseif ($final_status === 'Severely Underweight') {
+                $severely_underweight++;
+            } elseif ($final_status === 'Overweight') {
+                $overweight++;
+            } elseif ($final_status === 'Obese') {
+                $obese++;
+            } elseif ($final_status === 'Stunted') {
+                $stunted++;
+            } elseif ($final_status === 'Severely Stunted') {
+                $severely_stunted++;
+            } elseif ($final_status === 'Moderately Wasted') {
+                $moderately_wasted++;
+            } elseif ($final_status === 'Severely Wasted') {
+                $severely_wasted++;
             }
-
-            $summary_stmt->close();
-        } else {
-            $error = "Failed to prepare nutritional summary query.";
         }
+
+        $summary_stmt->close();
+    } else {
+        $error = "Failed to prepare nutritional summary query.";
     }
+}
+
+//
 
     $normal_pct = percent($normal, $total);
     $underweight_pct = percent($underweight, $total);
@@ -521,6 +572,22 @@ a{
     color:#fff;
 }
 
+.btn-print{
+    background:#16a34a;
+    color:#ffffff;
+}
+
+.btn-print:hover{
+    background:#15803d;
+}
+
+.footer-actions{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
 /* MESSAGES */
 .error-message{
     background:#fdeaea;
@@ -673,6 +740,178 @@ th:last-child{
         grid-template-columns:1fr;
     }
 }
+
+/* =========================
+   PRINT / SAVE AS PDF
+========================= */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    body{
+        background:#ffffff !important;
+        color:#000000 !important;
+        font-family:Arial, sans-serif !important;
+        margin:0 !important;
+        padding:0 !important;
+    }
+
+    .topbar,
+    .sidebar,
+    .sidebar-overlay,
+    .back-link,
+    .button-group,
+    .footer-row,
+    .no-print,
+    .success-message,
+    .error-message{
+        display:none !important;
+    }
+
+    .main-content{
+        margin-left:0 !important;
+        padding:0 !important;
+        width:100% !important;
+    }
+
+    .page-header{
+        border:none !important;
+        border-bottom:1px solid #000000 !important;
+        padding:0 0 12px 0 !important;
+        margin:0 0 12px 0 !important;
+        background:#ffffff !important;
+        text-align:center !important;
+    }
+
+    .page-title{
+        color:#000000 !important;
+        font-size:20px !important;
+        text-align:center !important;
+        margin-bottom:6px !important;
+    }
+
+    .page-subtitle{
+        color:#000000 !important;
+        text-align:center !important;
+        font-size:11px !important;
+        line-height:1.4 !important;
+    }
+
+    .content-card{
+        border:none !important;
+        padding:0 !important;
+        background:#ffffff !important;
+    }
+
+    .meta-box{
+        width:100% !important;
+        border:none !important;
+        border-bottom:1px solid #000000 !important;
+        background:#ffffff !important;
+        border-radius:0 !important;
+        padding:8px 0 10px 0 !important;
+        margin:0 0 10px 0 !important;
+    }
+
+    .meta-grid{
+        display:grid !important;
+        grid-template-columns:1fr 1fr !important;
+        column-gap:40px !important;
+        row-gap:6px !important;
+        width:90% !important;
+        margin:0 auto !important;
+        align-items:start !important;
+    }
+
+    .meta-item{
+        color:#000000 !important;
+        font-size:10px !important;
+        line-height:1.35 !important;
+        text-align:left !important;
+        white-space:normal !important;
+        word-break:normal !important;
+    }
+
+    .meta-item strong{
+        font-weight:bold !important;
+    }
+
+    .summary-box,
+    .concern-box{
+        border:1px solid #000000 !important;
+        background:#ffffff !important;
+        border-radius:0 !important;
+        padding:8px 10px !important;
+        margin-bottom:8px !important;
+    }
+
+    .summary-title,
+    .concern-title{
+        color:#000000 !important;
+        font-size:11px !important;
+        margin-bottom:3px !important;
+    }
+
+    .summary-text,
+    .concern-text{
+        color:#000000 !important;
+        font-size:10px !important;
+        line-height:1.35 !important;
+    }
+
+    .table-wrapper{
+        overflow:visible !important;
+        width:100% !important;
+        border:none !important;
+        border-radius:0 !important;
+        margin-bottom:0 !important;
+    }
+
+    table{
+        width:100% !important;
+        min-width:0 !important;
+        border-collapse:collapse !important;
+        table-layout:fixed !important;
+    }
+
+    th,
+    td{
+        border:1px solid #000000 !important;
+        padding:5px 6px !important;
+        color:#000000 !important;
+        background:#ffffff !important;
+        font-size:8px !important;
+        line-height:1.2 !important;
+        text-align:center !important;
+        vertical-align:middle !important;
+        word-break:break-word !important;
+        white-space:normal !important;
+    }
+
+    th{
+        font-weight:bold !important;
+    }
+
+    .status-value,
+    .status-pct{
+        color:#000000 !important;
+        font-size:8px !important;
+        line-height:1.2 !important;
+    }
+
+    .status-value{
+        font-weight:bold !important;
+    }
+
+    .empty-state{
+        color:#000000 !important;
+        font-size:11px !important;
+    }
+}
+
+
     </style>
 </head>
 <?php include __DIR__ . '/../includes/auth.php'; ?>
@@ -699,7 +938,7 @@ th:last-child{
             <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
         <?php } ?>
 
-        <form method="GET">
+        <form method="GET" class="no-print">
             <div class="filter-row">
                 <div class="form-group">
                     <label>Reporting Month</label>
@@ -805,10 +1044,17 @@ th:last-child{
         <form method="POST">
             <input type="hidden" name="month" value="<?php echo htmlspecialchars($selected_month); ?>">
 
-            <div class="footer-row">
-                <div class="date-generated">Date Generated: <?php echo date("F d, Y"); ?></div>
-                <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
-            </div>
+            <div class="footer-row no-print">
+    <div class="date-generated">Date Generated: <?php echo date("F d, Y"); ?></div>
+
+    <div class="footer-actions">
+        <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
+
+        <button type="button" class="btn btn-print" onclick="window.print()">
+            Print / Save as PDF
+        </button>
+    </div>
+</div>
         </form>
     </div>
 </div>

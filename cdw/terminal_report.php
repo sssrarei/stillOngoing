@@ -90,7 +90,7 @@ function find_first_record_of_type_after_baseline($records, $type, $baseline_dat
 | GET CHILDREN UNDER ACTIVE CDC
 |--------------------------------------------------------------------------
 */
-$children_sql = "SELECT child_id, first_name, middle_name, last_name
+$children_sql = "SELECT child_id, first_name, middle_name, last_name, sex
                  FROM children
                  WHERE cdc_id = ?
                  ORDER BY last_name ASC, first_name ASC";
@@ -152,10 +152,11 @@ if (!$children_stmt) {
         $full_name = trim($child['first_name'] . $middle_name . ' ' . $child['last_name']);
 
         $rows[] = [
-            'child_id' => $child_id,
-            'child_name' => $full_name,
+    'child_id' => $child_id,
+    'child_name' => $full_name,
+    'sex' => !empty($child['sex']) ? $child['sex'] : 'N/A',
 
-            'baseline_date' => $baseline ? $baseline['date_recorded'] : '',
+    'baseline_date' => $baseline ? $baseline['date_recorded'] : '',
             'baseline_date_display' => $baseline ? format_date_display($baseline['date_recorded']) : 'N/A',
             'baseline_wfa' => $baseline ? normalize_status($baseline['wfa_status']) : 'No Data',
             'baseline_hfa' => $baseline ? normalize_status($baseline['hfa_status']) : 'No Data',
@@ -338,16 +339,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_report'])) {
     </div>
 
     <div class="content-card">
-        <form method="POST" class="top-actions">
-            <button
-                type="submit"
-                name="submit_report"
-                class="btn btn-submit <?php echo !$can_submit ? 'btn-disabled' : ''; ?>"
-                <?php echo !$can_submit ? 'disabled' : ''; ?>
-            >
-                Submit Report
-            </button>
-        </form>
+        <form method="POST" class="top-actions no-print">
+    <button
+        type="submit"
+        name="submit_report"
+        class="btn btn-submit <?php echo !$can_submit ? 'btn-disabled' : ''; ?>"
+        <?php echo !$can_submit ? 'disabled' : ''; ?>
+    >
+        Submit Report
+    </button>
+
+    <button type="button" class="btn btn-print" onclick="window.print()">
+        Print / Save as PDF
+    </button>
+</form>
 
         <?php if (!empty($error)) { ?>
             <div class="error-message"><?php echo h($error); ?></div>

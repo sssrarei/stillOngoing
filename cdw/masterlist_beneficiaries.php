@@ -37,19 +37,45 @@ function compute_age_months_from_birthdate($birthdate){
 function fetch_masterlist_rows($conn, $cdc_id){
     $rows = [];
 
-    $sql = "SELECT
-                child_id,
-                first_name,
-                middle_name,
-                last_name,
-                birthdate,
-                sex,
-                guardian_name,
-                address
-            FROM children
-            WHERE cdc_id = ?
-            ORDER BY last_name ASC, first_name ASC";
+  $sql = "SELECT
+            c.child_id,
+            c.first_name,
+            c.middle_name,
+            c.last_name,
+            c.birthdate,
+            c.sex,
+            c.address,
 
+            TRIM(
+                CONCAT(
+                    COALESCE(g.first_name, gu.first_name, ''),
+                    CASE
+                        WHEN COALESCE(g.first_name, gu.first_name, '') != ''
+                        AND COALESCE(g.last_name, gu.last_name, '') != ''
+                        THEN ' '
+                        ELSE ''
+                    END,
+                    COALESCE(g.last_name, gu.last_name, '')
+                )
+            ) AS linked_guardian_name,
+
+            c.guardian_name AS child_guardian_name
+
+        FROM children c
+
+        LEFT JOIN parent_child_links pcl
+            ON c.child_id = pcl.child_id
+
+        LEFT JOIN users gu
+            ON pcl.parent_id = gu.user_id
+
+        LEFT JOIN guardians g
+            ON gu.user_id = g.user_id
+
+        WHERE c.cdc_id = ?
+          AND c.is_deleted = 0
+
+        ORDER BY c.last_name ASC, c.first_name ASC";
     $stmt = $conn->prepare($sql);
 
     if(!$stmt){
@@ -61,11 +87,20 @@ function fetch_masterlist_rows($conn, $cdc_id){
     $result = $stmt->get_result();
 
     while($row = $result->fetch_assoc()){
-        $middle_name = !empty($row['middle_name']) ? ' ' . $row['middle_name'] : '';
-        $row['full_name'] = trim($row['first_name'] . $middle_name . ' ' . $row['last_name']);
-        $row['age_in_months'] = compute_age_months_from_birthdate($row['birthdate']);
-        $rows[] = $row;
+    $middle_name = !empty($row['middle_name']) ? ' ' . $row['middle_name'] : '';
+    $row['full_name'] = trim($row['first_name'] . $middle_name . ' ' . $row['last_name']);
+    $row['age_in_months'] = compute_age_months_from_birthdate($row['birthdate']);
+
+    if (!empty($row['linked_guardian_name'])) {
+        $row['guardian_name'] = $row['linked_guardian_name'];
+    } elseif (!empty($row['child_guardian_name'])) {
+        $row['guardian_name'] = $row['child_guardian_name'];
+    } else {
+        $row['guardian_name'] = 'N/A';
     }
+
+    $rows[] = $row;
+}
 
     $stmt->close();
 
@@ -261,6 +296,15 @@ a{
     color:#fff;
 }
 
+.btn-print{
+    background:#16a34a;
+    color:#ffffff;
+}
+
+.btn-print:hover{
+    background:#15803d;
+}
+
 .prepared-by{
     margin-bottom:18px;
     padding:12px 14px;
@@ -378,6 +422,111 @@ a{
         display:none;
     }
 }
+
+/* =========================
+   PRINT / SAVE AS PDF
+========================= */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 12mm;
+    }
+
+    body{
+        background:#ffffff !important;
+        color:#000000 !important;
+        font-family:Arial, sans-serif !important;
+    }
+
+    .topbar,
+    .sidebar,
+    .sidebar-overlay,
+    .back-link,
+    .button-group,
+    .no-print{
+        display:none !important;
+    }
+
+    .main-content{
+        margin-left:0 !important;
+        padding:0 !important;
+        width:100% !important;
+    }
+
+    .page-header{
+        border:none !important;
+        padding:0 0 12px 0 !important;
+        margin-bottom:12px !important;
+        background:#ffffff !important;
+    }
+
+    .page-title{
+        color:#000000 !important;
+        font-size:20px !important;
+        text-align:center !important;
+        margin-bottom:6px !important;
+    }
+
+    .page-subtitle{
+        color:#000000 !important;
+        text-align:center !important;
+        font-size:12px !important;
+    }
+
+    .content-card{
+        border:none !important;
+        padding:0 !important;
+        background:#ffffff !important;
+    }
+
+    .prepared-by{
+        border:1px solid #000000 !important;
+        background:#ffffff !important;
+        padding:8px 10px !important;
+        margin-bottom:10px !important;
+    }
+
+    .prepared-by-label,
+    .prepared-by-value{
+        color:#000000 !important;
+        font-size:12px !important;
+    }
+
+    .table-wrapper{
+        overflow:visible !important;
+    }
+
+    .masterlist-table{
+        width:100% !important;
+        min-width:0 !important;
+        border-collapse:collapse !important;
+        font-size:11px !important;
+    }
+
+    .masterlist-table th,
+    .masterlist-table td{
+        border:1px solid #000000 !important;
+        padding:6px 7px !important;
+        color:#000000 !important;
+        background:#ffffff !important;
+        font-size:11px !important;
+        vertical-align:top !important;
+    }
+
+    .masterlist-table th{
+        font-weight:bold !important;
+        text-align:center !important;
+    }
+
+    .masterlist-table tbody tr:hover{
+        background:#ffffff !important;
+    }
+
+    .success-message,
+    .error-message{
+        display:none !important;
+    }
+}
     </style>
 </head>
 <?php include __DIR__ . '/../includes/auth.php'; ?>
@@ -407,10 +556,14 @@ a{
         <?php } ?>
 
         <form method="POST">
-            <div class="button-group">
-                <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
-            </div>
-        </form>
+        <div class="button-group no-print">
+            <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
+
+            <button type="button" class="btn btn-print" onclick="window.print()">
+                Print / Save as PDF
+            </button>
+        </div>
+    </form>
 
         <div class="prepared-by">
             <div class="prepared-by-label">Prepared by</div>

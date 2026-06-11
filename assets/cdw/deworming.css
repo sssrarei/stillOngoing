@@ -412,3 +412,56 @@ body.dark-mode .mini-status.not-taken {
 .page-wrapper {
     padding: 20px 30px;
 }
+
+.remarks-all-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: end;
+    gap: 10px;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.remarks-all-group {
+    width: 260px;
+}
+
+.remarks-all-group .table-select {
+    width: 100%;
+}
+
+.remarks-apply-btn {
+    height: 46px;
+    width: auto;
+    white-space: nowrap;
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
+.deworm-table-card .remarks-all-row {
+    margin-left: auto;
+}
+
+.remarks-select,
+.remarks-other-input {
+    width: 100%;
+}
+
+.remarks-other-input {
+    margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+    .remarks-all-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .remarks-all-group {
+        width: 100%;
+    }
+
+    .remarks-apply-btn {
+        width: 100%;
+    }
+}

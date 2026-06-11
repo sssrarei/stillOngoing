@@ -734,7 +734,6 @@ mysqli_stmt_close($stmt_deworm);
 
         <div class="report-header-card">
             <div class="report-header-copy">
-                <span class="section-label">CDW Report Module</span>
                 <h1>Individual Child Report</h1>
                 <p>
                     This report combines the child profile, health information, guardian details,
@@ -742,9 +741,13 @@ mysqli_stmt_close($stmt_deworm);
                 </p>
             </div>
 
-            <form method="POST" class="submit-form">
-                <button type="submit" name="submit_report" class="btn-primary">Submit Report to CSWD</button>
-            </form>
+            <form method="POST" class="submit-form no-print">
+            <button type="submit" name="submit_report" class="btn-primary">Submit Report to CSWD</button>
+
+            <button type="button" class="btn-print" onclick="window.print()">
+                Print / Save as PDF
+            </button>
+        </form>
         </div>
 
         <?php if ($success_message !== ''): ?>
@@ -847,49 +850,57 @@ mysqli_stmt_close($stmt_deworm);
             </div>
         </div>
 
-        <div class="content-section">
-            <div class="section-title-wrap">
-                <h2>Child Health Information</h2>
+      <div class="content-section">
+    <div class="section-title-wrap">
+        <h2>Child Health Information</h2>
+    </div>
+
+    <div class="health-info-panel">
+        <div class="health-info-group">
+            <div class="health-info-group-title">Documents</div>
+
+            <div class="health-info-row">
+                <div class="health-info-label">Vaccination Card File</div>
+                <div class="health-info-value">
+                    <?php if (!empty($child['vaccination_card_file_path'])): ?>
+                        <a href="<?php echo h($child['vaccination_card_file_path']); ?>" target="_blank" class="file-link">
+                            View Vaccination Card
+                        </a>
+                    <?php else: ?>
+                        N/A
+                    <?php endif; ?>
+                </div>
             </div>
 
-            <div class="table-wrap">
-                <table class="report-table">
-                    <tbody>
-                       <tr>
-    <th>Vaccination Card File</th>
-    <td>
-        <?php if (!empty($child['vaccination_card_file_path'])): ?>
-            <a href="<?php echo h($child['vaccination_card_file_path']); ?>" target="_blank" class="file-link">
-                View Vaccination Card
-            </a>
-        <?php else: ?>
-            N/A
-        <?php endif; ?>
-    </td>
-
-    <th>Medical History File</th>
-    <td>
-        <?php if (!empty($child['medical_history_file_path'])): ?>
-            <a href="<?php echo h($child['medical_history_file_path']); ?>" target="_blank" class="file-link">
-                View Medical History File
-            </a>
-        <?php else: ?>
-            N/A
-        <?php endif; ?>
-    </td>
-</tr>
-                        <tr>
-                            <th>Allergies</th>
-                            <td colspan="3"><?php echo h(safe_value($child['allergies'])); ?></td>
-                        </tr>
-                        <tr>
-                            <th>Comorbidities</th>
-                            <td colspan="3"><?php echo h(safe_value($child['comorbidities'])); ?></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="health-info-row">
+                <div class="health-info-label">Medical History File</div>
+                <div class="health-info-value">
+                    <?php if (!empty($child['medical_history_file_path'])): ?>
+                        <a href="<?php echo h($child['medical_history_file_path']); ?>" target="_blank" class="file-link">
+                            View Medical History File
+                        </a>
+                    <?php else: ?>
+                        N/A
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
+
+        <div class="health-info-group">
+            <div class="health-info-group-title">Health Details</div>
+
+            <div class="health-info-row">
+                <div class="health-info-label">Allergies / Allergen</div>
+                <div class="health-info-value"><?php echo h(safe_value($child['allergies'])); ?></div>
+            </div>
+
+            <div class="health-info-row">
+                <div class="health-info-label">Comorbidities</div>
+                <div class="health-info-value"><?php echo h(safe_value($child['comorbidities'])); ?></div>
+            </div>
+        </div>
+    </div>
+</div>
 
         <div class="content-section">
             <div class="section-title-wrap">

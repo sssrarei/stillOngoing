@@ -184,7 +184,7 @@
 
 .food-row{
     display:grid;
-    grid-template-columns: 2fr 2fr 2fr 120px;
+    grid-template-columns: 1.4fr 1.6fr 1.2fr 1.2fr 100px;
     gap:14px;
     padding:16px;
     border:1px solid var(--border-light);
@@ -592,4 +592,276 @@ body.dark-mode .small-label,
 body.dark-mode .meal-inputs-title,
 body.dark-mode .recent-section-title{
     color:var(--text-color);
+}
+
+/* =========================
+   SUPPLEMENTARY FEEDING TABLE LAYOUT
+========================= */
+
+.remarks-all-row{
+    display:flex;
+    justify-content:flex-end;
+    align-items:end;
+    gap:10px;
+    margin-bottom:18px;
+    width:100%;
+}
+
+.remarks-all-group{
+    width:260px;
+}
+
+.remarks-all-group .form-control{
+    width:100%;
+}
+
+.remarks-apply-btn{
+    height:44px;
+    width:auto;
+    white-space:nowrap;
+    padding-left:18px;
+    padding-right:18px;
+}
+
+.remarks-select,
+.remarks-other-input{
+    width:100%;
+}
+
+.remarks-other-input{
+    margin-top:8px;
+}
+
+.feeding-table-wrapper{
+    width:100%;
+    overflow-x:auto;
+}
+
+.feeding-table{
+    width:100%;
+    min-width:950px;
+    border-collapse:collapse;
+    background:var(--card-bg);
+    border:1px solid var(--border-light);
+}
+
+.feeding-table th{
+    background:#f8fafc;
+    color:var(--text-color);
+    font-family:'Poppins', sans-serif;
+    font-size:14px;
+    font-weight:700;
+    padding:14px 12px;
+    text-align:center;
+    border:1px solid var(--border-light);
+}
+
+.feeding-table td{
+    padding:16px 12px;
+    border:1px solid var(--border-light);
+    vertical-align:middle;
+    color:var(--text-color);
+}
+
+.child-name-cell{
+    font-family:'Poppins', sans-serif;
+    font-size:14px;
+    font-weight:700;
+    text-align:center;
+    min-width:180px;
+}
+
+.feeding-table .table-select,
+.feeding-table .table-input{
+    width:100%;
+    min-height:42px;
+    border:1px solid var(--input-border);
+    border-radius:10px;
+    padding:8px 12px;
+    background:var(--input-bg);
+    color:var(--text-color);
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+}
+
+.feeding-table .recorded-by-input{
+    background:#f8f9fa;
+}
+
+.feeding-table .meal-inputs-grid{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.feeding-table .meal-measurement-item{
+    padding:0;
+    border:none;
+    background:transparent;
+}
+
+.feeding-table .meal-measurement-item .small-label{
+    font-size:11px;
+    margin-bottom:4px;
+}
+
+.feeding-table .no-meal-items{
+    text-align:center;
+    font-size:13px;
+    color:var(--muted-text);
+}
+
+.feeding-row.row-absent,
+.feeding-row:has(.attendance-select option[value="Absent"]:checked){
+    background:#fafafa;
+}
+
+.table-save-actions{
+    justify-content:flex-end;
+    margin-top:18px;
+}
+
+.table-save-actions .btn-save{
+    min-width:220px;
+}
+
+/* RECENT FEEDING RECORDS TABLE STYLE */
+.recent-feeding-table{
+    width:100%;
+    min-width:950px;
+    border-collapse:collapse;
+    background:var(--card-bg);
+    border:1px solid var(--border-light);
+}
+
+.recent-feeding-table th,
+.recent-feeding-table td{
+    padding:14px 12px;
+    border:1px solid var(--border-light);
+    font-size:14px;
+    color:var(--text-color);
+}
+
+.recent-feeding-table th{
+    background:#f8fafc;
+    font-family:'Poppins', sans-serif;
+    font-weight:700;
+}
+
+/* DARK MODE */
+body.dark-mode .feeding-table,
+body.dark-mode .recent-feeding-table{
+    background:var(--card-bg);
+    border-color:var(--border-color);
+}
+
+body.dark-mode .feeding-table th,
+body.dark-mode .recent-feeding-table th{
+    background:var(--table-head);
+    color:var(--text-color);
+    border-color:var(--border-color);
+}
+
+body.dark-mode .feeding-table td,
+body.dark-mode .recent-feeding-table td{
+    background:var(--card-bg);
+    color:var(--text-color);
+    border-color:var(--border-color);
+}
+
+body.dark-mode .feeding-table .recorded-by-input{
+    background:var(--input-bg);
+}
+
+/* MOBILE */
+@media (max-width: 600px){
+    .remarks-all-row{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .remarks-all-group{
+        width:100%;
+    }
+
+    .remarks-apply-btn{
+        width:100%;
+    }
+
+    .table-save-actions{
+        justify-content:stretch;
+    }
+
+    .table-save-actions .btn-save{
+        width:100%;
+    }
+}
+
+/* =========================
+   RECENT FEEDING RECORDS TABLE
+========================= */
+
+.recent-feeding-table-wrapper{
+    width:100%;
+    overflow-x:auto;
+}
+
+.recent-feeding-table{
+    width:100%;
+    min-width:950px;
+    border-collapse:collapse;
+    background:var(--card-bg);
+    border:1px solid var(--border-light);
+}
+
+.recent-feeding-table th{
+    background:#f8fafc;
+    color:var(--text-color);
+    font-family:'Poppins', sans-serif;
+    font-size:14px;
+    font-weight:700;
+    padding:14px 12px;
+    text-align:left;
+    border:1px solid var(--border-light);
+}
+
+.recent-feeding-table td{
+    padding:14px 12px;
+    border:1px solid var(--border-light);
+    font-size:14px;
+    color:var(--text-color);
+    vertical-align:top;
+}
+
+.recent-feeding-table td:nth-child(1),
+.recent-feeding-table td:nth-child(3){
+    text-align:center;
+    vertical-align:middle;
+}
+
+.table-summary-list{
+    margin:0;
+    padding-left:18px;
+    line-height:1.6;
+}
+
+.table-summary-list li{
+    margin-bottom:4px;
+}
+
+body.dark-mode .recent-feeding-table{
+    background:var(--card-bg);
+    border-color:var(--border-color);
+}
+
+body.dark-mode .recent-feeding-table th{
+    background:var(--table-head);
+    color:var(--text-color);
+    border-color:var(--border-color);
+}
+
+body.dark-mode .recent-feeding-table td{
+    background:var(--card-bg);
+    color:var(--text-color);
+    border-color:var(--border-color);
 }

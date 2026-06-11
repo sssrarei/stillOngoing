@@ -148,6 +148,17 @@ $prepared_by = safe_value($payload['prepared_by'] ?? '', $report['submitted_by_n
 $assessment_scope = safe_value($payload['assessment_scope'] ?? '', 'N/A');
 $total_records = isset($payload['total_records']) ? (int)$payload['total_records'] : count($rows);
 
+$date_recorded_text = 'N/A';
+
+if (!empty($rows) && !empty($rows[0]['date_recorded'])) {
+    $date_recorded_text = format_date_value($rows[0]['date_recorded']);
+} elseif (!empty($payload['date_recorded'])) {
+    $date_recorded_text = format_date_value($payload['date_recorded']);
+} elseif (!empty($report['date_from']) && !empty($report['date_to']) && $report['date_from'] === $report['date_to']) {
+    $date_recorded_text = format_date_value($report['date_from']);
+} elseif (!empty($report['date_from'])) {
+    $date_recorded_text = format_date_value($report['date_from']);
+}
 $coverage_text = 'All Dates';
 if (!empty($report['date_from']) && !empty($report['date_to'])) {
     $coverage_text = format_date_value($report['date_from']) . ' - ' . format_date_value($report['date_to']);
@@ -221,13 +232,13 @@ if ($status === 'submitted') {
             font-family: 'Poppins', sans-serif;
             font-size: 28px;
             font-weight: 700;
-            color: #163b68;
+            color: #000000;
         }
 
         .report-header p {
             margin: 8px 0 0;
             font-size: 14px;
-            color: #64748b;
+            color: #000000;
         }
 
         .summary-card {
@@ -236,8 +247,8 @@ if ($status === 'submitted') {
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(180px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
         .summary-item {
@@ -250,7 +261,7 @@ if ($status === 'submitted') {
         .summary-label {
             font-size: 12px;
             font-weight: 700;
-            color: #64748b;
+            color: #000000;
             text-transform: uppercase;
             letter-spacing: 0.4px;
             margin-bottom: 8px;
@@ -259,7 +270,7 @@ if ($status === 'submitted') {
         .summary-value {
             font-size: 15px;
             font-weight: 700;
-            color: #163b68;
+            color: #000000;
             line-height: 1.5;
         }
 
@@ -278,13 +289,13 @@ if ($status === 'submitted') {
             font-family: 'Poppins', sans-serif;
             font-size: 20px;
             font-weight: 700;
-            color: #163b68;
+            color: #000000;
         }
 
         .table-header p {
             margin: 6px 0 0;
             font-size: 13px;
-            color: #64748b;
+            color: #000000;
         }
 
         .record-count,
@@ -301,7 +312,7 @@ if ($status === 'submitted') {
 
         .record-count {
             background: #edf4ff;
-            color: #163b68;
+            color: #000000;
         }
 
         .status-badge {
@@ -339,10 +350,10 @@ if ($status === 'submitted') {
         }
 
         .report-table {
-            width: 100%;
-            min-width: 1450px;
-            border-collapse: collapse;
-        }
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+}
 
         .report-table thead th {
             background: #f8fafc;
@@ -416,13 +427,155 @@ if ($status === 'submitted') {
             }
         }
 
-        @media (max-width: 768px) {
+
+
+                @media (max-width: 768px) {
             .report-view-wrapper {
                 padding: 16px;
             }
 
             .summary-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+                .report-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .print-btn {
+            background: #163b68;
+            color: #ffffff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .print-btn:hover {
+            background: #102f54;
+        }
+
+        @media print {
+            @page {
+                size: landscape;
+                margin: 12mm;
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+
+            .no-print,
+            .sidebar,
+            #sidebar,
+            .sidebar-overlay,
+            #sidebarOverlay,
+            .topbar,
+            .admin-topbar,
+            header,
+            nav,
+            button,
+            .back-link {
+                display: none !important;
+            }
+
+            .main-content,
+            #mainContent {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+
+            .report-view-wrapper {
+                padding: 0 !important;
+            }
+
+            .report-header-card,
+            .summary-card,
+            .table-card {
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin-bottom: 14px !important;
+                border: none !important;
+            }
+
+            .report-header-card {
+                padding: 0 0 10px 0 !important;
+            }
+
+            .summary-card {
+                padding: 10px 0 !important;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px !important;
+            }
+
+            .summary-item {
+                padding: 8px !important;
+                border: 1px solid #cccccc !important;
+                background: #ffffff !important;
+                min-height: 48px !important;
+            }
+
+            .summary-label {
+                color: #000000 !important;
+                font-size: 10px !important;
+            }
+
+            .summary-value {
+                color: #000000 !important;
+                font-size: 11px !important;
+            }
+
+            .table-header {
+                padding: 8px 0 !important;
+                border-bottom: 1px solid #cccccc !important;
+            }
+
+            .table-wrap {
+                overflow: visible !important;
+            }
+
+            .report-table {
+                width: 100% !important;
+                min-width: 0 !important;
+                font-size: 10px !important;
+            }
+
+            .report-table thead th,
+            .report-table tbody td {
+                padding: 6px 5px !important;
+                font-size: 9px !important;
+                color: #000000 !important;
+                border: 1px solid #cccccc !important;
+                white-space: normal !important;
+            }
+
+            .report-table thead th {
+                background: #f2f2f2 !important;
+            }
+
+            .report-table tbody tr:hover {
+                background: transparent !important;
+            }
+
+            .status-normal,
+            .status-alert {
+                color: #000000 !important;
+                font-weight: 700 !important;
             }
         }
     </style>
@@ -436,66 +589,59 @@ if ($status === 'submitted') {
     <div class="report-view-wrapper">
 
         <div class="report-header-card">
-            <a href="monitoring_reports.php" class="back-link">← Back to Monitoring Reports</a>
-            <div class="report-header">
-                <h1>Weight Monitoring Report (WMR)</h1>
-                <p>Submitted report snapshot for CSWD review.</p>
-            </div>
-        </div>
+    <div class="report-actions no-print">
+        <a href="monitoring_reports.php" class="back-link">← Back to Monitoring Reports</a>
+
+        <button type="button" class="print-btn" onclick="window.print()">
+            Print / Save as PDF
+        </button>
+    </div>
+
+    <div class="report-header">
+        <h1>Weight Monitoring Report (WMR)</h1>
+        <p>Submitted report snapshot for CSWD review.</p>
+    </div>
+</div>
 
         <div class="summary-card">
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <div class="summary-label">CDC</div>
-                    <div class="summary-value"><?php echo h(safe_value($payload['cdc_name'] ?? '', $report['cdc_name'])); ?></div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Coverage</div>
-                    <div class="summary-value"><?php echo h($coverage_text); ?></div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Submitted By</div>
-                    <div class="summary-value"><?php echo h(safe_value($report['submitted_by_name'])); ?></div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Prepared By</div>
-                    <div class="summary-value"><?php echo h($prepared_by); ?></div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Submitted At</div>
-                    <div class="summary-value"><?php echo h(format_datetime_value($report['submitted_at'])); ?></div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Assessment Scope</div>
-                    <div class="summary-value"><?php echo h($assessment_scope); ?></div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Status</div>
-                    <div class="summary-value">
-                        <span class="status-badge <?php echo h($status_class); ?>">
-                            <?php echo h(safe_value($report['status'])); ?>
-                        </span>
-                    </div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Total Rows</div>
-                    <div class="summary-value"><?php echo (int)$total_records; ?></div>
-                </div>
-            </div>
+    <div class="summary-grid">
+        <div class="summary-item">
+            <div class="summary-label">CDC</div>
+            <div class="summary-value"><?php echo h(safe_value($payload['cdc_name'] ?? '', $report['cdc_name'])); ?></div>
         </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Date Recorded</div>
+            <div class="summary-value"><?php echo h($date_recorded_text); ?></div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Prepared By</div>
+            <div class="summary-value"><?php echo h($prepared_by); ?></div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Submitted At</div>
+            <div class="summary-value"><?php echo h(format_datetime_value($report['submitted_at'])); ?></div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Assessment Type</div>
+            <div class="summary-value"><?php echo h($assessment_scope); ?></div>
+        </div>
+
+        <div class="summary-item">
+            <div class="summary-label">Total Rows</div>
+            <div class="summary-value"><?php echo (int)$total_records; ?></div>
+        </div>
+    </div>
+</div>
 
         <div class="table-card">
             <div class="table-header">
                 <div>
                     <h2>WMR Table</h2>
-                    <p>Submitted baseline monitoring rows saved in this report snapshot.</p>
+
                 </div>
                 <span class="record-count"><?php echo (int)$total_records; ?> record(s)</span>
             </div>
@@ -508,9 +654,9 @@ if ($status === 'submitted') {
                                 <th>#</th>
                                 <th>Child Name</th>
                                 <th>CDC</th>
-                                <th>Date Recorded</th>
-                                <th>Assessment Type</th>
+
                                 <th>Age in Months</th>
+        
                                 <th>Height</th>
                                 <th>Weight</th>
                                 <th>MUAC</th>
@@ -520,23 +666,21 @@ if ($status === 'submitted') {
                                 <th>WFA</th>
                                 <th>HFA</th>
                                 <th>WFL/H</th>
-                                <th>Recorded By</th>
+
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($rows as $index => $row): ?>
                                 <tr>
                                     <td><?php echo (int)($index + 1); ?></td>
-                                    <td><?php echo h(safe_value($row['child_name'] ?? '')); ?></td>
-                                    <td><?php echo h(safe_value($row['cdc_name'] ?? '', $report['cdc_name'])); ?></td>
-                                    <td><?php echo h(format_date_value($row['date_recorded'] ?? '')); ?></td>
-                                    <td><?php echo h(safe_value($row['assessment_type'] ?? '')); ?></td>
-                                    <td><?php echo h(safe_value($row['age_in_months'] ?? '')); ?></td>
-                                    <td><?php echo h(safe_value($row['height'] ?? '')); ?></td>
-                                    <td><?php echo h(safe_value($row['weight'] ?? '')); ?></td>
-                                    <td><?php echo h(safe_value($row['muac'] ?? '')); ?></td>
-                                    <td><?php echo h(safe_value($row['edema_status'] ?? '', '--')); ?></td>
-                                    <td><?php echo h(safe_value($row['edema_grade'] ?? '', '--')); ?></td>
+                                        <td><?php echo h(safe_value($row['child_name'] ?? '')); ?></td>
+                                        <td><?php echo h(safe_value($row['cdc_name'] ?? '', $report['cdc_name'])); ?></td>
+                                        <td><?php echo h(safe_value($row['age_in_months'] ?? '')); ?></td>
+                                        <td><?php echo h(safe_value($row['height'] ?? '')); ?></td>
+                                        <td><?php echo h(safe_value($row['weight'] ?? '')); ?></td>
+                                        <td><?php echo h(safe_value($row['muac'] ?? '')); ?></td>
+                                        <td><?php echo h(safe_value($row['edema_status'] ?? '', '--')); ?></td>
+                                        <td><?php echo h(safe_value($row['edema_grade'] ?? '', '--')); ?></td>
                                     <td class="<?php echo h(status_class($row['muac_status'] ?? '')); ?>">
                                         <?php echo h(safe_value($row['muac_status'] ?? '', '--')); ?>
                                     </td>
@@ -549,7 +693,7 @@ if ($status === 'submitted') {
                                     <td class="<?php echo h(status_class($row['wflh_status'] ?? '')); ?>">
                                         <?php echo h(safe_value($row['wflh_status'] ?? '')); ?>
                                     </td>
-                                    <td><?php echo h(safe_value($row['recorded_by_name'] ?? '', $prepared_by)); ?></td>
+                                   
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>

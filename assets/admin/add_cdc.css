@@ -207,7 +207,8 @@ body{
     margin-bottom:8px;
 }
 
-.form-group input{
+.form-group input,
+.form-group select{
     height:44px;
     border:1px solid #d1d5db;
     border-radius:10px;
@@ -216,6 +217,7 @@ body{
     font-family:'Inter', sans-serif;
     background:#ffffff;
     color:#111827;
+    outline:none;
 }
 
 .form-actions{
@@ -324,7 +326,8 @@ body.dark-mode .form-group label{
 }
 
 body.dark-mode .search-input,
-body.dark-mode .form-group input{
+body.dark-mode .form-group input,
+body.dark-mode .form-group select{
     background:#111827;
     border:1px solid #374151;
     color:#f9fafb;

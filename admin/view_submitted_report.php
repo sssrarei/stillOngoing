@@ -60,6 +60,19 @@ function calculate_age_months($birthdate, $record_date = null)
     }
 }
 
+
+function render_attachment_preview($file_path, $label = 'View Attached File')
+{
+    if (empty($file_path)) {
+        return 'N/A';
+    }
+
+    $safe_path = h($file_path);
+    $safe_label = h($label);
+
+    return '<a href="' . $safe_path . '" target="_blank" class="file-link">' . $safe_label . '</a>';
+}
+
 function status_class($status)
 {
     $status = strtolower(trim((string) $status));
@@ -579,49 +592,34 @@ mysqli_stmt_close($stmt_deworm);
     <div class="report-view-wrapper">
 
         <div class="report-header-card">
-            <a href="monitoring_reports.php" class="back-link">← Back to Monitoring Reports</a>
-            <div class="report-header">
-                <h1>Individual Child Report</h1>
-                <p>Submitted report details for CSWD review and child profile linking.</p>
-            </div>
+    <div class="report-actions no-print">
+        <a href="monitoring_reports.php" class="back-link">← Back to Monitoring Reports</a>
+
+        <div class="report-action-buttons">
+            <?php if ($report['status'] !== 'saved_to_child_profile'): ?>
+                <form method="POST" style="margin:0;">
+                    <button type="submit" name="save_to_child_profile" class="blue-save-btn">
+                        Save to Child Profile
+                    </button>
+                </form>
+            <?php else: ?>
+                <span class="saved-badge">Already Saved to Child Profile</span>
+                <a href="child_records.php" class="view-btn">Go to Child Profiles</a>
+            <?php endif; ?>
+
+            <button type="button" class="print-btn" onclick="window.print()">
+                Print / Save as PDF
+            </button>
         </div>
+    </div>
 
-        <div class="summary-card">
-            <div class="summary-grid">
-                <div class="summary-item">
-                    <div class="summary-label">Child Name</div>
-                    <div class="summary-value"><?php echo h($child_full_name); ?></div>
-                </div>
+    <div class="report-header">
+        <h1>Individual Child Report</h1>
+        
+    </div>
+</div>
 
-                <div class="summary-item">
-                    <div class="summary-label">Sex</div>
-                    <div class="summary-value"><?php echo h(safe_value($child['sex'])); ?></div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Age</div>
-                    <div class="summary-value"><?php echo h($age_text); ?></div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">CDC</div>
-                    <div class="summary-value"><?php echo h(safe_value($child['cdc_name'])); ?></div>
-                </div>
-            </div>
-
-            <div class="action-row">
-                <?php if ($report['status'] !== 'saved_to_child_profile'): ?>
-                    <form method="POST" style="margin:0;">
-                        <button type="submit" name="save_to_child_profile" class="blue-save-btn">
-                            Save to Child Profile
-                        </button>
-                    </form>
-                <?php else: ?>
-                    <span class="saved-badge">Already Saved to Child Profile</span>
-                    <a href="child_records.php" class="view-btn">Go to Child Profiles</a>
-                <?php endif; ?>
-            </div>
-        </div>
+        
 
         <div class="table-card">
             <div class="table-header">
@@ -710,36 +708,25 @@ mysqli_stmt_close($stmt_deworm);
             <div class="table-wrap">
                 <table class="report-table">
                     <tbody>
-                        <tr>
-                            <th>Vaccination Card File</th>
-                            <td>
-                                <?php if (!empty($child['vaccination_card_file_path'])): ?>
-                                    <a href="<?php echo h($child['vaccination_card_file_path']); ?>" target="_blank">
-                                        View Attached File
-                                    </a>
-                                <?php else: ?>
-                                    N/A
-                                <?php endif; ?>
-                            </td>
-                            <th>Medical History File</th>
-                            <td>
-                                <?php if (!empty($child['medical_history_file_path'])): ?>
-                                    <a href="<?php echo h($child['medical_history_file_path']); ?>" target="_blank">
-                                        View Attached File
-                                    </a>
-                                <?php else: ?>
-                                    N/A
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Allergies</th>
-                            <td colspan="3"><?php echo h(safe_value($child['allergies'])); ?></td>
-                        </tr>
-                        <tr>
-                            <th>Comorbidities</th>
-                            <td colspan="3"><?php echo h(safe_value($child['comorbidities'])); ?></td>
-                        </tr>
+                      <tr>
+    <th>Vaccination Card File</th>
+    <td>
+        <?php echo render_attachment_preview($child['vaccination_card_file_path'] ?? '', 'View Vaccination Card'); ?>
+    </td>
+
+    <th>Medical History File</th>
+    <td>
+        <?php echo render_attachment_preview($child['medical_history_file_path'] ?? '', 'View Medical History File'); ?>
+    </td>
+</tr>
+
+<tr>
+    <th>Allergies / Allergen</th>
+    <td><?php echo h(safe_value($child['allergies'])); ?></td>
+
+    <th>Comorbidities</th>
+    <td><?php echo h(safe_value($child['comorbidities'])); ?></td>
+</tr>
                     </tbody>
                 </table>
             </div>

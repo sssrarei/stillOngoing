@@ -125,6 +125,58 @@ if (isset($payload['submitted_rows']) && is_array($payload['submitted_rows'])) {
     $rows = $payload['submitted_rows'];
 }
 
+if (!empty($rows)) {
+    $guardian_lookup_sql = "
+        SELECT
+            TRIM(
+                CONCAT(
+                    COALESCE(g.first_name, gu.first_name, ''),
+                    CASE
+                        WHEN COALESCE(g.first_name, gu.first_name, '') != ''
+                        AND COALESCE(g.last_name, gu.last_name, '') != ''
+                        THEN ' '
+                        ELSE ''
+                    END,
+                    COALESCE(g.last_name, gu.last_name, '')
+                )
+            ) AS guardian_name
+        FROM parent_child_links pcl
+        LEFT JOIN users gu
+            ON pcl.parent_id = gu.user_id
+        LEFT JOIN guardians g
+            ON gu.user_id = g.user_id
+        WHERE pcl.child_id = ?
+        LIMIT 1
+    ";
+
+    $guardian_lookup_stmt = mysqli_prepare($conn, $guardian_lookup_sql);
+
+    if ($guardian_lookup_stmt) {
+        foreach ($rows as $index => $row) {
+            $current_guardian = trim((string)($row['guardian_name'] ?? ''));
+
+            if (($current_guardian === '' || strtoupper($current_guardian) === 'N/A') && !empty($row['child_id'])) {
+                $lookup_child_id = (int)$row['child_id'];
+
+                mysqli_stmt_bind_param($guardian_lookup_stmt, "i", $lookup_child_id);
+                mysqli_stmt_execute($guardian_lookup_stmt);
+                $guardian_result = mysqli_stmt_get_result($guardian_lookup_stmt);
+
+                if ($guardian_result && mysqli_num_rows($guardian_result) > 0) {
+                    $guardian_row = mysqli_fetch_assoc($guardian_result);
+                    $linked_guardian_name = trim((string)($guardian_row['guardian_name'] ?? ''));
+
+                    if ($linked_guardian_name !== '') {
+                        $rows[$index]['guardian_name'] = $linked_guardian_name;
+                    }
+                }
+            }
+        }
+
+        mysqli_stmt_close($guardian_lookup_stmt);
+    }
+}
+
 $prepared_by = safe_value($payload['prepared_by'] ?? '', $report['submitted_by_name']);
 $total_records = isset($payload['total_records']) ? (int)$payload['total_records'] : count($rows);
 
@@ -208,15 +260,15 @@ if ($status === 'submitted') {
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(180px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
         }
 
         .summary-item {
-            background: #f8fbff;
-            border: 1px solid #e3edf8;
-            border-radius: 14px;
-            padding: 16px;
+            background: #ffffff;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+            padding: 14px;
         }
 
         .summary-label {
@@ -387,6 +439,149 @@ if ($status === 'submitted') {
                 grid-template-columns: 1fr;
             }
         }
+
+        .report-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.print-btn {
+    background: #163b68;
+    color: #ffffff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+
+.print-btn:hover {
+    background: #102f54;
+}
+
+@media print {
+    @page {
+        size: landscape;
+        margin: 12mm;
+    }
+
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    .no-print,
+    .sidebar,
+    #sidebar,
+    .sidebar-overlay,
+    #sidebarOverlay,
+    .topbar,
+    .admin-topbar,
+    header,
+    nav,
+    button,
+    .back-link {
+        display: none !important;
+    }
+
+    .main-content,
+    #mainContent {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .report-view-wrapper {
+        padding: 0 !important;
+    }
+
+    .report-header-card,
+    .summary-card,
+    .table-card {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin-bottom: 14px !important;
+        border: none !important;
+    }
+
+    .report-header-card {
+        padding: 0 0 10px 0 !important;
+    }
+
+    .summary-card {
+        padding: 10px 0 !important;
+    }
+
+    .summary-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .summary-item {
+        padding: 8px !important;
+        border: 1px solid #cccccc !important;
+        background: #ffffff !important;
+        min-height: 48px !important;
+    }
+
+    .report-header h1,
+    .report-header p,
+    .summary-label,
+    .summary-value,
+    .table-header h2,
+    .table-header p,
+    .record-count {
+        color: #000000 !important;
+    }
+
+    .report-header {
+    text-align: center !important;
+}
+
+.report-header h1 {
+    text-align: center !important;
+    width: 100% !important;
+}
+
+    .table-header {
+        padding: 8px 0 !important;
+        border-bottom: 1px solid #cccccc !important;
+    }
+
+    .table-wrap {
+        overflow: visible !important;
+    }
+
+    .report-table {
+        width: 100% !important;
+        min-width: 0 !important;
+        font-size: 10px !important;
+    }
+
+    .report-table thead th,
+    .report-table tbody td {
+        padding: 6px 5px !important;
+        font-size: 9px !important;
+        color: #000000 !important;
+        border: 1px solid #cccccc !important;
+        white-space: normal !important;
+    }
+
+    .report-table thead th {
+        background: #f2f2f2 !important;
+    }
+
+    .report-table tbody tr:hover {
+        background: transparent !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -398,12 +593,19 @@ if ($status === 'submitted') {
     <div class="report-view-wrapper">
 
         <div class="report-header-card">
-            <a href="monitoring_reports.php" class="back-link">← Back to Monitoring Reports</a>
-            <div class="report-header">
-                <h1>Masterlist of Beneficiaries</h1>
-                <p>Submitted report snapshot for CSWD review.</p>
-            </div>
-        </div>
+    <div class="report-actions no-print">
+        <a href="monitoring_reports.php" class="back-link">← Back to Monitoring Reports</a>
+
+        <button type="button" class="print-btn" onclick="window.print()">
+            Print / Save as PDF
+        </button>
+    </div>
+
+    <div class="report-header">
+        <h1>Masterlist of Beneficiaries</h1>
+       
+    </div>
+</div>
 
         <div class="summary-card">
             <div class="summary-grid">
@@ -412,15 +614,9 @@ if ($status === 'submitted') {
                     <div class="summary-value"><?php echo h(safe_value($payload['cdc_name'] ?? '', $report['cdc_name'])); ?></div>
                 </div>
 
-                <div class="summary-item">
-                    <div class="summary-label">Coverage</div>
-                    <div class="summary-value"><?php echo h($coverage_text); ?></div>
-                </div>
 
-                <div class="summary-item">
-                    <div class="summary-label">Submitted By</div>
-                    <div class="summary-value"><?php echo h(safe_value($report['submitted_by_name'])); ?></div>
-                </div>
+
+              
 
                 <div class="summary-item">
                     <div class="summary-label">Prepared By</div>
@@ -432,32 +628,21 @@ if ($status === 'submitted') {
                     <div class="summary-value"><?php echo h(format_datetime_value($report['submitted_at'])); ?></div>
                 </div>
 
-                <div class="summary-item">
-                    <div class="summary-label">Status</div>
-                    <div class="summary-value">
-                        <span class="status-badge <?php echo h($status_class); ?>">
-                            <?php echo h(safe_value($report['status'])); ?>
-                        </span>
-                    </div>
-                </div>
+                
 
                 <div class="summary-item">
                     <div class="summary-label">Barangay</div>
                     <div class="summary-value"><?php echo h(safe_value($report['barangay'])); ?></div>
                 </div>
 
-                <div class="summary-item">
-                    <div class="summary-label">Total Rows</div>
-                    <div class="summary-value"><?php echo (int)$total_records; ?></div>
-                </div>
-            </div>
+                
         </div>
 
         <div class="table-card">
             <div class="table-header">
                 <div>
                     <h2>Masterlist Table</h2>
-                    <p>Submitted beneficiary rows saved in this report snapshot.</p>
+                    
                 </div>
                 <span class="record-count"><?php echo (int)$total_records; ?> record(s)</span>
             </div>

@@ -37,6 +37,101 @@ function build_menu_key($food_group_id, $food_item_id){
     return $food_group_id . '_' . $food_item_id;
 }
 
+$serving_options = [
+    'Cup' => [
+        '1/4 cup',
+        '1/2 cup',
+        '3/4 cup',
+        '1 cup',
+        '2 cup',
+        '3 cup',
+        '4 cup',
+        '5 cup'
+    ],
+    'Piece' => [
+        '1 piece',
+        '2 pieces',
+        '3 pieces',
+        '4 pieces',
+        '5 pieces'
+    ],
+    'Matchbox' => [
+        '1/2 matchbox',
+        '1 matchbox',
+        '2 matchboxes',
+        '3 matchboxes',
+        '4 matchboxes',
+        '5 matchboxes'
+    ],
+    'Bowl' => [
+        '1/2 bowl',
+        '1 bowl',
+        '2 bowls',
+        '3 bowls',
+        '4 bowls',
+        '5 bowls'
+    ],
+    'Plate' => [
+        '1/4 plate',
+        '1/2 plate',
+        '1 plate'
+    ],
+    'Teaspoon' => [
+        '1 teaspoon',
+        '2 teaspoons',
+        '3 teaspoons',
+        '4 teaspoons',
+        '5 teaspoons'
+    ],
+    'Tablespoon' => [
+        '1 tablespoon',
+        '2 tablespoons',
+        '3 tablespoons',
+        '4 tablespoons',
+        '5 tablespoons'
+    ],
+    'Slice' => [
+        '1 slice',
+        '2 slices',
+        '3 slices',
+        '4 slices',
+        '5 slices'
+    ],
+    'Pack/Sachet' => [
+        '1 pack',
+        '2 packs',
+        '3 packs',
+        '4 packs',
+        '5 packs',
+        '1 sachet',
+        '2 sachets',
+        '3 sachets',
+        '4 sachets',
+        '5 sachets'
+    ],
+    'Glass' => [
+        '1/4 glass',
+        '1/2 glass',
+        '1 glass',
+        '2 glasses',
+        '3 glasses',
+        '4 glasses',
+        '5 glasses'
+    ]
+];
+
+function detect_serving_unit($measurement_value, $serving_options){
+    $measurement_value = trim((string)$measurement_value);
+
+    foreach($serving_options as $unit => $amounts){
+        if(in_array($measurement_value, $amounts, true)){
+            return $unit;
+        }
+    }
+
+    return '';
+}
+
 function build_feeding_summary($conn, $feeding_record_id){
     $summary_lines = [];
 
@@ -247,7 +342,8 @@ if(isset($_POST['save_feeding'])){
     $child_ids = isset($_POST['child_ids']) ? $_POST['child_ids'] : [];
     $attendance_list = isset($_POST['attendance']) ? $_POST['attendance'] : [];
     $remarks_list = isset($_POST['remarks']) ? $_POST['remarks'] : [];
-    $posted_measurements = isset($_POST['measurements']) ? $_POST['measurements'] : [];
+$remarks_other_list = isset($_POST['remarks_other']) ? $_POST['remarks_other'] : [];
+$posted_measurements = isset($_POST['measurements']) ? $_POST['measurements'] : [];
 
     $food_group_ids = isset($_POST['food_group_id']) ? $_POST['food_group_id'] : [];
     $food_item_ids = isset($_POST['food_item_id']) ? $_POST['food_item_id'] : [];
@@ -405,9 +501,16 @@ if(isset($_POST['save_feeding'])){
                     }
 
                     $attendance_value = isset($attendance_list[$child_id]) ? $attendance_list[$child_id] : 'Absent';
-                    $remarks_value = isset($remarks_list[$child_id]) ? trim($remarks_list[$child_id]) : '';
+                    $remarks_choice = isset($remarks_list[$child_id]) ? trim($remarks_list[$child_id]) : '';
+                    $remarks_other = isset($remarks_other_list[$child_id]) ? trim($remarks_other_list[$child_id]) : '';
 
-                    if($attendance_value === 'Absent' && $remarks_value === ''){
+                    if ($remarks_choice === 'Others') {
+                        $remarks_value = $remarks_other !== '' ? 'Others: ' . $remarks_other : 'Others';
+                    } else {
+                        $remarks_value = $remarks_choice;
+                    }
+
+                    if($attendance_value === 'Absent'){
                         $remarks_value = 'Absent';
                     }
 
@@ -501,9 +604,12 @@ $recent_stmt = $conn->prepare("
         fr.remarks,
         c.first_name,
         c.middle_name,
-        c.last_name
+        c.last_name,
+        u.first_name AS recorded_first_name,
+        u.last_name AS recorded_last_name
     FROM feeding_records fr
     INNER JOIN children c ON fr.child_id = c.child_id
+    LEFT JOIN users u ON fr.recorded_by = u.user_id
     WHERE c.cdc_id = ?
     ORDER BY fr.feeding_date DESC, fr.feeding_record_id DESC
     LIMIT 20
@@ -643,16 +749,46 @@ if($recent_result && $recent_result->num_rows > 0){
                                     </select>
                                 </div>
 
-                                <div class="form-group">
-                                    <label class="form-label">Default Measurement / Serving</label>
-                                    <input
-                                        type="text"
-                                        name="default_measurement_text[]"
-                                        class="form-control default-measurement-input"
-                                        value="<?php echo htmlspecialchars($default_value); ?>"
-                                        placeholder="Example: 2pcs, 1 cup, 1/2 cup"
-                                    >
-                                </div>
+                                <?php
+    $selected_serving_unit = detect_serving_unit($default_value, $serving_options);
+?>
+
+<div class="form-group">
+    <label class="form-label">Serving Unit</label>
+    <select class="form-control serving-unit-select">
+        <option value="">Select Unit</option>
+        <?php foreach($serving_options as $unit_name => $amounts){ ?>
+            <option value="<?php echo htmlspecialchars($unit_name); ?>" <?php echo ($selected_serving_unit === $unit_name) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($unit_name); ?>
+            </option>
+        <?php } ?>
+    </select>
+</div>
+
+<div class="form-group">
+    <label class="form-label">Serving Amount</label>
+    <select class="form-control serving-amount-select">
+        <option value="">Select Amount</option>
+        <?php
+            if($selected_serving_unit !== '' && isset($serving_options[$selected_serving_unit])){
+                foreach($serving_options[$selected_serving_unit] as $amount_option){
+        ?>
+            <option value="<?php echo htmlspecialchars($amount_option); ?>" <?php echo ($default_value === $amount_option) ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($amount_option); ?>
+            </option>
+        <?php
+                }
+            }
+        ?>
+    </select>
+
+    <input
+        type="hidden"
+        name="default_measurement_text[]"
+        class="default-measurement-input"
+        value="<?php echo htmlspecialchars($default_value); ?>"
+    >
+</div>
 
                                 <div class="form-group remove-col">
                                     <label class="form-label">&nbsp;</label>
@@ -675,70 +811,143 @@ if($recent_result && $recent_result->num_rows > 0){
                 </div>
             </div>
 
-            <div class="content-card">
-                <div class="card-header">Pupils Feeding Attendance and Editable Servings</div>
-                <div class="card-body">
-                    <?php if(!empty($children)){ ?>
-                        <div class="pupil-feed-list" id="pupilFeedList">
-                            <?php foreach($children as $child){ ?>
-                                <?php
-                                    $child_id = (int) $child['child_id'];
-                                    $child_full_name = format_child_name($child['first_name'], $child['middle_name'], $child['last_name']);
-                                    $saved_attendance = isset($existing_records[$child_id]['attendance']) ? $existing_records[$child_id]['attendance'] : 'Present';
-                                    $saved_remarks = isset($existing_records[$child_id]['remarks']) ? $existing_records[$child_id]['remarks'] : '';
-                                ?>
-                                <div class="pupil-feed-card" data-child-id="<?php echo $child_id; ?>" data-child-name="<?php echo htmlspecialchars(strtolower($child_full_name)); ?>">
+           <div class="content-card">
+    <div class="card-header">Supplementary Feeding Attendance</div>
+    <div class="card-body">
+        <?php if(!empty($children)){ ?>
+
+            <div class="remarks-all-row">
+    <div class="form-group remarks-all-group">
+        <label class="form-label">Remarks for All</label>
+        <select id="remarksForAllInput" class="form-control">
+            <option value="">Select remarks</option>
+            <option value="N/A">N/A</option>
+            <option value="Finished">Finished</option>
+            <option value="Half">Half</option>
+            <option value="Refused">Refused</option>
+            <option value="Vomited">Vomited</option>
+            <option value="Leftover">Leftover</option>
+            <option value="Others">Others</option>
+        </select>
+    </div>
+
+    <button type="button" id="applyRemarksToTableBtn" class="btn-secondary remarks-apply-btn">
+        Apply Remarks to Table
+    </button>
+</div>
+
+            <div class="table-responsive feeding-table-wrapper">
+                <table class="feeding-table">
+                    <thead>
+                        <tr>
+                            <th>Child Name</th>
+                            <th>Attendance</th>
+                            <th>Serving per Meal Item</th>
+                            <th>Remarks</th>
+                            <th>Recorded By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="pupilFeedList">
+                        <?php foreach($children as $child){ ?>
+                            <?php
+                                $child_id = (int) $child['child_id'];
+                                $child_full_name = format_child_name($child['first_name'], $child['middle_name'], $child['last_name']);
+                                $saved_attendance = isset($existing_records[$child_id]['attendance']) ? $existing_records[$child_id]['attendance'] : 'Present';
+                                $saved_remarks = isset($existing_records[$child_id]['remarks']) ? $existing_records[$child_id]['remarks'] : '';
+                                $recorded_by_name = trim($_SESSION['first_name'] . ' ' . $_SESSION['last_name']);
+                            ?>
+
+                            <tr
+                                class="pupil-feed-card feeding-row"
+                                data-child-id="<?php echo $child_id; ?>"
+                                data-child-name="<?php echo htmlspecialchars(strtolower($child_full_name)); ?>"
+                            >
+                                <td class="child-name-cell">
                                     <input type="hidden" name="child_ids[]" value="<?php echo $child_id; ?>">
+                                    <?php echo htmlspecialchars($child_full_name); ?>
+                                </td>
 
-                                    <div class="pupil-feed-top">
-                                        <div>
-                                            <div class="pupil-feed-name"><?php echo htmlspecialchars($child_full_name); ?></div>
-                                            <div class="pupil-feed-meta">Sex: <?php echo htmlspecialchars($child['sex']); ?></div>
-                                        </div>
+                                <td>
+                                    <select name="attendance[<?php echo $child_id; ?>]" class="table-select attendance-select">
+                                        <option value="Present" <?php echo $saved_attendance == 'Present' ? 'selected' : ''; ?>>Present</option>
+                                        <option value="Absent" <?php echo $saved_attendance == 'Absent' ? 'selected' : ''; ?>>Absent</option>
+                                    </select>
+                                </td>
 
-                                        <div class="attendance-wrap">
-                                            <label class="small-label">Attendance</label>
-                                            <select name="attendance[<?php echo $child_id; ?>]" class="table-select attendance-select">
-                                                <option value="Present" <?php echo $saved_attendance == 'Present' ? 'selected' : ''; ?>>Present</option>
-                                                <option value="Absent" <?php echo $saved_attendance == 'Absent' ? 'selected' : ''; ?>>Absent</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                <td>
+                                    <div class="meal-inputs-grid"></div>
+                                </td>
 
-                                    <div class="meal-inputs-block">
-                                        <div class="meal-inputs-title">Editable Serving per Meal Item</div>
-                                        <div class="meal-inputs-grid"></div>
-                                    </div>
+                                <td>
+                                    <select
+    name="remarks[<?php echo $child_id; ?>]"
+    class="table-select remarks-input remarks-select"
+>
+    <option value="N/A" <?php echo ($saved_remarks === 'N/A' || $saved_remarks === '') ? 'selected' : ''; ?>>N/A</option>
+    <option value="Finished" <?php echo ($saved_remarks === 'Finished') ? 'selected' : ''; ?>>Finished</option>
+    <option value="Half" <?php echo ($saved_remarks === 'Half') ? 'selected' : ''; ?>>Half</option>
+    <option value="Refused" <?php echo ($saved_remarks === 'Refused') ? 'selected' : ''; ?>>Refused</option>
+    <option value="Vomited" <?php echo ($saved_remarks === 'Vomited') ? 'selected' : ''; ?>>Vomited</option>
+    <option value="Leftover" <?php echo ($saved_remarks === 'Leftover') ? 'selected' : ''; ?>>Leftover</option>
+    <option value="Others" <?php echo (strpos($saved_remarks, 'Others:') === 0 || $saved_remarks === 'Others') ? 'selected' : ''; ?>>Others</option>
+</select>
 
-                                    <div class="remarks-block">
-                                        <label class="small-label">Remarks</label>
-                                        <input
-                                            type="text"
-                                            name="remarks[<?php echo $child_id; ?>]"
-                                            class="table-input remarks-input"
-                                            value="<?php echo htmlspecialchars($saved_remarks); ?>"
-                                            placeholder="Optional remarks"
-                                        >
-                                    </div>
-                                </div>
-                            <?php } ?>
-                        </div>
+<input
+    type="text"
+    name="remarks_other[<?php echo $child_id; ?>]"
+    class="table-input remarks-other-input"
+    value="<?php echo (strpos($saved_remarks, 'Others:') === 0) ? htmlspecialchars(trim(substr($saved_remarks, 7))) : ''; ?>"
+    placeholder="Please specify"
+    style="<?php echo (strpos($saved_remarks, 'Others:') === 0 || $saved_remarks === 'Others') ? 'margin-top:8px;' : 'display:none; margin-top:8px;'; ?>"
+>
+                                </td>
 
-                        <div class="form-actions">
-                            <button type="submit" name="save_feeding" class="btn-save">Save Feeding Records</button>
-                        </div>
-                    <?php } else { ?>
-                        <div class="no-records">No pupils found under the selected CDC.</div>
-                    <?php } ?>
-                </div>
+                                <td>
+                                    <input
+                                        type="text"
+                                        class="table-input recorded-by-input"
+                                        value="<?php echo htmlspecialchars($recorded_by_name); ?>"
+                                        readonly
+                                    >
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
             </div>
+
+            <div class="form-actions table-save-actions">
+                <button type="submit" name="save_feeding" class="btn-save">
+                    Add to Pupils Record
+                </button>
+            </div>
+
+        <?php } else { ?>
+            <div class="no-records">No pupils found under the selected CDC.</div>
+        <?php } ?>
+    </div>
+</div>
         </form>
 
         <div class="content-card">
-            <div class="card-header">Recent Feeding Records</div>
-            <div class="card-body">
-                <?php if(!empty($recent_records)){ ?>
-                    <div class="recent-records-list">
+    <div class="card-header">Recent Feeding Records</div>
+    <div class="card-body">
+        <?php if(!empty($recent_records)){ ?>
+            <div class="table-responsive recent-feeding-table-wrapper">
+                <table class="recent-feeding-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Child Name</th>
+                            <th>Attendance</th>
+                            <th>Feeding Summary</th>
+                            <th>Remarks</th>
+                            <th>Recorded By</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
                         <?php foreach($recent_records as $record){ ?>
                             <?php
                                 $recent_full_name = format_child_name(
@@ -746,48 +955,63 @@ if($recent_result && $recent_result->num_rows > 0){
                                     $record['middle_name'],
                                     $record['last_name']
                                 );
-                                $summary_lines = build_feeding_summary($conn, $record['feeding_record_id']);
-                            ?>
-                            <div class="recent-record-card">
-                                <div class="recent-record-top">
-                                    <div>
-                                        <div class="recent-record-name"><?php echo htmlspecialchars($recent_full_name); ?></div>
-                                        <div class="recent-record-date"><?php echo date("F d, Y", strtotime($record['feeding_date'])); ?></div>
-                                    </div>
-                                    <div>
-                                        <span class="status-badge <?php echo strtolower(str_replace(' ', '-', $record['attendance'])); ?>">
-                                            <?php echo htmlspecialchars($record['attendance']); ?>
-                                        </span>
-                                    </div>
-                                </div>
 
-                                <div class="recent-record-section">
-                                    <div class="recent-section-title">Feeding Summary</div>
+                                $summary_lines = build_feeding_summary($conn, $record['feeding_record_id']);
+
+                                $recorded_by_name = trim(
+                                    ($record['recorded_first_name'] ?? '') . ' ' .
+                                    ($record['recorded_last_name'] ?? '')
+                                );
+
+                                if($recorded_by_name == ''){
+                                    $recorded_by_name = 'N/A';
+                                }
+                            ?>
+
+                            <tr>
+                                <td>
+                                    <?php echo date("M d, Y", strtotime($record['feeding_date'])); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars($recent_full_name); ?>
+                                </td>
+
+                                <td>
+                                    <span class="status-badge <?php echo strtolower($record['attendance']); ?>">
+                                        <?php echo htmlspecialchars($record['attendance']); ?>
+                                    </span>
+                                </td>
+
+                                <td>
                                     <?php if(!empty($summary_lines)){ ?>
-                                        <ul class="summary-list">
+                                        <ul class="table-summary-list">
                                             <?php foreach($summary_lines as $line){ ?>
                                                 <li><?php echo htmlspecialchars($line); ?></li>
                                             <?php } ?>
                                         </ul>
                                     <?php } else { ?>
-                                        <div class="no-summary">No feeding summary available.</div>
+                                        -
                                     <?php } ?>
-                                </div>
+                                </td>
 
-                                <div class="recent-record-section">
-                                    <div class="recent-section-title">Remarks</div>
-                                    <div class="remarks-text">
-                                        <?php echo !empty($record['remarks']) ? htmlspecialchars($record['remarks']) : 'No remarks'; ?>
-                                    </div>
-                                </div>
-                            </div>
+                                <td>
+                                    <?php echo !empty($record['remarks']) ? htmlspecialchars($record['remarks']) : '-'; ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars($recorded_by_name); ?>
+                                </td>
+                            </tr>
                         <?php } ?>
-                    </div>
-                <?php } else { ?>
-                    <div class="no-records">No feeding records found yet.</div>
-                <?php } ?>
+                    </tbody>
+                </table>
             </div>
-        </div>
+        <?php } else { ?>
+            <div class="no-records">No feeding records found yet.</div>
+        <?php } ?>
+    </div>
+</div>
 
     </div>
 </div>
@@ -795,9 +1019,39 @@ if($recent_result && $recent_result->num_rows > 0){
 <script>
 const foodItemsByGroup = <?php echo json_encode($food_items_by_group); ?>;
 const existingMeasurements = <?php echo json_encode($existing_measurements); ?>;
+const servingAmountOptions = <?php echo json_encode($serving_options); ?>;
 
 function buildMenuKey(groupId, itemId) {
     return String(groupId) + "_" + String(itemId);
+}
+
+function populateServingAmounts(unitSelect, amountSelect, selectedValue = "") {
+    const selectedUnit = unitSelect.value;
+
+    amountSelect.innerHTML = '<option value="">Select Amount</option>';
+
+    if (selectedUnit && servingAmountOptions[selectedUnit]) {
+        servingAmountOptions[selectedUnit].forEach(function(amount) {
+            const option = document.createElement('option');
+            option.value = amount;
+            option.textContent = amount;
+
+            if (String(selectedValue) === String(amount)) {
+                option.selected = true;
+            }
+
+            amountSelect.appendChild(option);
+        });
+    }
+}
+
+function syncDefaultMeasurement(row) {
+    const amountSelect = row.querySelector('.serving-amount-select');
+    const hiddenInput = row.querySelector('.default-measurement-input');
+
+    if (amountSelect && hiddenInput) {
+        hiddenInput.value = amountSelect.value;
+    }
 }
 
 function populateFoodItems(groupSelect, foodItemSelect, selectedValue = "") {
@@ -829,13 +1083,16 @@ function getSelectedMealRows() {
     rows.forEach(function(row) {
         const groupSelect = row.querySelector('.food-group-select');
         const foodItemSelect = row.querySelector('.food-item-select');
+        const servingUnitSelect = row.querySelector('.serving-unit-select');
+        const servingAmountSelect = row.querySelector('.serving-amount-select');
         const defaultMeasurementInput = row.querySelector('.default-measurement-input');
 
         const groupId = groupSelect.value;
         const itemId = foodItemSelect.value;
+        const servingUnit = servingUnitSelect.value;
         const defaultMeasurement = defaultMeasurementInput.value.trim();
 
-        if (groupId !== '' && itemId !== '') {
+        if (groupId !== '' && itemId !== '' && servingUnit !== '' && defaultMeasurement !== '') {
             const menuKey = buildMenuKey(groupId, itemId);
 
             if (!usedKeys[menuKey]) {
@@ -847,6 +1104,8 @@ function getSelectedMealRows() {
                     itemId: itemId,
                     groupText: groupSelect.options[groupSelect.selectedIndex].text,
                     itemText: foodItemSelect.options[foodItemSelect.selectedIndex].text,
+                    servingUnit: servingUnit,
+                    amountOptions: servingAmountOptions[servingUnit] || [],
                     defaultMeasurement: defaultMeasurement
                 });
             }
@@ -883,6 +1142,7 @@ function renderMealInputsForAllChildren() {
         const container = card.querySelector('.meal-inputs-grid');
         const attendanceSelect = card.querySelector('.attendance-select');
         const remarksInput = card.querySelector('.remarks-input');
+        const remarksOtherInput = card.querySelector('.remarks-other-input');
         const isAbsent = attendanceSelect.value === 'Absent';
 
         const oldInputs = container.querySelectorAll('.measurement-input');
@@ -909,12 +1169,22 @@ function renderMealInputsForAllChildren() {
                 label.className = 'small-label';
                 label.textContent = meal.groupText + ': ' + meal.itemText;
 
-                const input = document.createElement('input');
-                input.type = 'text';
+                const input = document.createElement('select');
                 input.name = `measurements[${childId}][${meal.key}]`;
-                input.className = 'table-input measurement-input';
+                input.className = 'table-select measurement-input';
                 input.setAttribute('data-menu-key', meal.key);
-                input.placeholder = 'Example: 2pcs, 1 cup, 1/2 cup';
+
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.textContent = 'Select Amount';
+                input.appendChild(emptyOption);
+
+                meal.amountOptions.forEach(function(amount) {
+                    const option = document.createElement('option');
+                    option.value = amount;
+                    option.textContent = amount;
+                    input.appendChild(option);
+                });
 
                 let inputValue = meal.defaultMeasurement;
                 let isCustom = false;
@@ -933,7 +1203,7 @@ function renderMealInputsForAllChildren() {
                 input.value = inputValue;
                 input.setAttribute('data-custom', isCustom ? '1' : '0');
 
-                input.addEventListener('input', function() {
+                input.addEventListener('change', function() {
                     if (input.value === meal.defaultMeasurement) {
                         input.setAttribute('data-custom', '0');
                     } else {
@@ -953,22 +1223,46 @@ function renderMealInputsForAllChildren() {
         }
 
         if (isAbsent) {
-            remarksInput.value = 'Absent';
-            remarksInput.disabled = true;
-        } else {
-            if (remarksInput.value === 'Absent') {
-                remarksInput.value = '';
-            }
-            remarksInput.disabled = false;
+    remarksInput.value = 'N/A';
+    remarksInput.disabled = true;
+
+    if (remarksOtherInput) {
+        remarksOtherInput.style.display = 'none';
+        remarksOtherInput.value = '';
+        remarksOtherInput.disabled = true;
+    }
+
+    card.classList.add('row-absent');
+} else {
+    remarksInput.disabled = false;
+
+    if (remarksOtherInput) {
+        remarksOtherInput.disabled = false;
+    }
+
+    card.classList.remove('row-absent');
+
+    if (remarksInput.value === 'Others') {
+        if (remarksOtherInput) {
+            remarksOtherInput.style.display = 'block';
         }
+    } else {
+        if (remarksOtherInput) {
+            remarksOtherInput.style.display = 'none';
+            remarksOtherInput.value = '';
+        }
+    }
+}
     });
 
     updateSummaryPreview();
 }
-
+//
 function attachFoodRowEvents(row) {
     const groupSelect = row.querySelector('.food-group-select');
     const foodItemSelect = row.querySelector('.food-item-select');
+    const servingUnitSelect = row.querySelector('.serving-unit-select');
+    const servingAmountSelect = row.querySelector('.serving-amount-select');
     const defaultMeasurementInput = row.querySelector('.default-measurement-input');
     const removeBtn = row.querySelector('.remove-food-btn');
 
@@ -981,7 +1275,14 @@ function attachFoodRowEvents(row) {
         renderMealInputsForAllChildren();
     });
 
-    defaultMeasurementInput.addEventListener('input', function() {
+    servingUnitSelect.addEventListener('change', function() {
+        populateServingAmounts(servingUnitSelect, servingAmountSelect);
+        defaultMeasurementInput.value = '';
+        renderMealInputsForAllChildren();
+    });
+
+    servingAmountSelect.addEventListener('change', function() {
+        syncDefaultMeasurement(row);
         renderMealInputsForAllChildren();
     });
 
@@ -994,6 +1295,8 @@ function attachFoodRowEvents(row) {
         } else {
             groupSelect.value = '';
             foodItemSelect.innerHTML = '<option value="">Select Food Item</option>';
+            servingUnitSelect.value = '';
+            servingAmountSelect.innerHTML = '<option value="">Select Amount</option>';
             defaultMeasurementInput.value = '';
         }
 
@@ -1031,8 +1334,24 @@ document.getElementById('add-food-row-btn').addEventListener('click', function()
         </div>
 
         <div class="form-group">
-            <label class="form-label">Default Measurement / Serving</label>
-            <input type="text" name="default_measurement_text[]" class="form-control default-measurement-input" placeholder="Example: 2pcs, 1 cup, 1/2 cup">
+            <label class="form-label">Serving Unit</label>
+            <select class="form-control serving-unit-select">
+                <option value="">Select Unit</option>
+                <?php foreach($serving_options as $unit_name => $amounts){ ?>
+                    <option value="<?php echo htmlspecialchars($unit_name, ENT_QUOTES); ?>">
+                        <?php echo htmlspecialchars($unit_name, ENT_QUOTES); ?>
+                    </option>
+                <?php } ?>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Serving Amount</label>
+            <select class="form-control serving-amount-select">
+                <option value="">Select Amount</option>
+            </select>
+
+            <input type="hidden" name="default_measurement_text[]" class="default-measurement-input">
         </div>
 
         <div class="form-group remove-col">
@@ -1053,6 +1372,7 @@ document.querySelectorAll('.attendance-select').forEach(function(select) {
 });
 
 const searchPupilInput = document.getElementById('searchPupilInput');
+
 if (searchPupilInput) {
     searchPupilInput.addEventListener('input', function() {
         const keyword = this.value.toLowerCase().trim();
@@ -1069,6 +1389,77 @@ if (searchPupilInput) {
         });
     });
 }
+
+function toggleRemarksOtherInput(select) {
+    const row = select.closest('tr');
+    const otherInput = row ? row.querySelector('.remarks-other-input') : null;
+
+    if (!otherInput) return;
+
+    if (select.value === 'Others') {
+        otherInput.style.display = 'block';
+    } else {
+        otherInput.style.display = 'none';
+        otherInput.value = '';
+    }
+}
+
+document.querySelectorAll('.remarks-select').forEach(function(select) {
+    select.addEventListener('change', function() {
+        toggleRemarksOtherInput(select);
+    });
+
+    toggleRemarksOtherInput(select);
+});
+
+function toggleRemarksOtherInput(select) {
+    const row = select.closest('tr');
+    const otherInput = row ? row.querySelector('.remarks-other-input') : null;
+
+    if (!otherInput) return;
+
+    if (select.value === 'Others') {
+        otherInput.style.display = 'block';
+    } else {
+        otherInput.style.display = 'none';
+        otherInput.value = '';
+    }
+}
+
+document.querySelectorAll('.remarks-select').forEach(function(select) {
+    select.addEventListener('change', function() {
+        toggleRemarksOtherInput(select);
+    });
+
+    toggleRemarksOtherInput(select);
+});
+
+const remarksForAllInput = document.getElementById('remarksForAllInput');
+const applyRemarksToTableBtn = document.getElementById('applyRemarksToTableBtn');
+
+if (applyRemarksToTableBtn && remarksForAllInput) {
+    applyRemarksToTableBtn.addEventListener('click', function () {
+        const remarksValue = remarksForAllInput.value;
+
+        if (remarksValue === '') {
+            alert('Please select remarks first.');
+            return;
+        }
+
+        document.querySelectorAll('.pupil-feed-card').forEach(function (row) {
+            const attendanceSelect = row.querySelector('.attendance-select');
+            const remarksSelect = row.querySelector('.remarks-select');
+
+            if (attendanceSelect.value === 'Present') {
+                remarksSelect.disabled = false;
+                remarksSelect.value = remarksValue;
+                toggleRemarksOtherInput(remarksSelect);
+            }
+        });
+    });
+}
+
+renderMealInputsForAllChildren();
 
 function toggleSidebar() {
     var sidebar = document.getElementById('sidebar');

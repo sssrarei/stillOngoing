@@ -6,6 +6,83 @@ checkRole(1);
 $success = "";
 $error = "";
 
+$barangay_list = [
+    "Alima",
+    "Aniban I",
+    "Aniban II",
+    "Aniban III",
+    "Aniban IV",
+    "Aniban V",
+    "Banalo",
+    "Bayanan",
+    "Campo Santo",
+    "Daang Bukid",
+    "Digman",
+    "Dulong Bayan",
+    "Habay I",
+    "Habay II",
+    "Kaingin",
+    "Ligas I",
+    "Ligas II",
+    "Ligas III",
+    "Mabolo I",
+    "Mabolo II",
+    "Mabolo III",
+    "Maliksi I",
+    "Maliksi II",
+    "Maliksi III",
+    "Mambog I",
+    "Mambog II",
+    "Mambog III",
+    "Mambog IV",
+    "Mambog V",
+    "Molino I",
+    "Molino II",
+    "Molino III",
+    "Molino IV",
+    "Molino V",
+    "Molino VI",
+    "Molino VII",
+    "Niog I",
+    "Niog II",
+    "Niog III",
+    "P. F. Espiritu I",
+    "P. F. Espiritu II",
+    "P. F. Espiritu III",
+    "P. F. Espiritu IV",
+    "P. F. Espiritu V",
+    "P. F. Espiritu VI",
+    "P. F. Espiritu VII",
+    "P. F. Espiritu VIII",
+    "Queens Row Central",
+    "Queens Row East",
+    "Queens Row West",
+    "Real I",
+    "Real II",
+    "Salinas I",
+    "Salinas II",
+    "Salinas III",
+    "Salinas IV",
+    "San Nicolas I",
+    "San Nicolas II",
+    "San Nicolas III",
+    "Sineguelasan",
+    "Tabing Dagat",
+    "Talaba I",
+    "Talaba II",
+    "Talaba III",
+    "Talaba IV",
+    "Talaba V",
+    "Talaba VI",
+    "Talaba VII",
+    "Zapote I",
+    "Zapote II",
+    "Zapote III",
+    "Zapote IV",
+    "Zapote V"
+];
+
+
 // Add CDC
 // Add CDC
 if (isset($_POST['add_cdc'])) {
@@ -170,12 +247,18 @@ if ($summary_result && $summary_result->num_rows > 0) {
 
                 <div class="form-group">
                     <label for="barangay">Barangay</label>
-                <input 
-                    type="text" 
-                    id="barangay"
-                    name="barangay" 
-                    value="<?php echo isset($_POST['barangay']) ? htmlspecialchars($_POST['barangay']) : ''; ?>"
-                >
+                    <select id="barangay" name="barangay">
+                        <option value="">Select Barangay</option>
+
+                        <?php foreach ($barangay_list as $barangay_option) { ?>
+                            <option 
+                                value="<?php echo htmlspecialchars($barangay_option); ?>"
+                                <?php echo (isset($_POST['barangay']) && $_POST['barangay'] === $barangay_option) ? 'selected' : ''; ?>
+                            >
+                                <?php echo htmlspecialchars($barangay_option); ?>
+                            </option>
+                        <?php } ?>
+                    </select>
                 </div>
 
                 <div class="form-group">
