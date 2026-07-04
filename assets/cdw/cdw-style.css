@@ -158,7 +158,15 @@ a{
     font-size:13px;
     font-weight:600;
     color:var(--text-color);
+    transition:all .2s ease;
 }
+
+.logout-btn:hover{
+    background:var(--danger-bg);
+    border-color:var(--danger-border);
+    color:var(--danger-text);
+}
+
 
 /* =========================
    SIDEBAR

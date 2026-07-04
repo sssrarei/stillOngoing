@@ -25,6 +25,9 @@
     --green-soft:#dce6da;
     --red-soft:#eadcdc;
     --orange-soft:#f4e2d3;
+    --danger-bg:#fdeaea;
+    --danger-text:#b42318;
+    --danger-border:#f2b8b5;
 }
 
 body{
@@ -108,10 +111,13 @@ a{
     font-size:13px;
     font-weight:600;
     color:var(--text-color);
+    transition:all .2s ease;
 }
 
 .logout-btn:hover{
-    background:#f7f7f7;
+    background:var(--danger-bg);
+    border-color:var(--danger-border);
+    color:var(--danger-text);
 }
 
 /* SIDEBAR */

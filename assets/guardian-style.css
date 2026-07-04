@@ -116,9 +116,9 @@ a{
 }
 
 .logout-btn:hover{
-    background:#fff4e6;
-    border-color:var(--guardian-accent-border);
-    color:var(--guardian-accent-dark);
+    background:var(--danger-bg);
+    border-color:var(--danger-border);
+    color:var(--danger-text);
 }
 
 /* =========================
