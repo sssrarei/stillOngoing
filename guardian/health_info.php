@@ -86,6 +86,7 @@ if(!empty($child['birthdate']) && $child['birthdate'] != '0000-00-00'){
 
 $sex = !empty($child['sex']) ? $child['sex'] : 'N/A';
 $child_address = !empty($child['address']) ? $child['address'] : 'N/A';
+$religion = !empty($child['religion']) ? $child['religion']: 'N/A';
 $cdc_name = !empty($child['cdc_name']) ? $child['cdc_name'] : 'N/A';
 $cdc_address = !empty($child['cdc_address']) ? $child['cdc_address'] : 'N/A';
 
@@ -679,6 +680,14 @@ if ($comorbidity_status === 'No') {
                         <span class="info-label">Address</span>
                         <div class="info-value"><?php echo htmlspecialchars($child_address); ?></div>
                     </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Religion</span>
+                        <div class="info-value">
+                            <?php echo htmlspecialchars($religion); ?>
+                        </div>
+                    </div>
+
                 </div>
 
                 <h3 class="sub-section-title">Current Health Information</h3>

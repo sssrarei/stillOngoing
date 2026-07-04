@@ -51,6 +51,7 @@ if(isset($_POST['update'])){
     $birthdate = trim($_POST['birthdate']);
     $sex = trim($_POST['sex']);
     $address = trim($_POST['address']);
+    $religion = trim($_POST['religion']);
     $allergies = trim($_POST['allergies']);
     $comorbidities = trim($_POST['comorbidities']);
 
@@ -85,6 +86,7 @@ if(isset($_POST['update'])){
             birthdate = '$birthdate',
             sex = '$sex',
             address = '$address'
+            religion = '$religion'
             WHERE child_id = '$child_id'
             AND cdc_id = '$active_cdc_id'";
 
@@ -353,6 +355,54 @@ if(isset($_POST['update'])){
                         <label class="form-label">Address</label>
                         <input type="text" name="address" class="form-control" value="<?php echo htmlspecialchars($child['address']); ?>">
                     </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Religion</label>
+                        <select name="religion" class="form-select">
+                            <option value="">-- Select Religion --</option>
+
+                            <option value="Roman Catholic" <?= ($child['religion'] == 'Roman Catholic') ? 'selected' : ''; ?>>
+                                Roman Catholic
+                            </option>
+
+                            <option value="Christian" <?= ($child['religion'] == 'Christian') ? 'selected' : ''; ?>>
+                                Christian
+                            </option>
+
+                            <option value="Islam" <?= ($child['religion'] == 'Islam') ? 'selected' : ''; ?>>
+                                Islam (Muslim)
+                            </option>
+
+                            <option value="Iglesia ni Cristo" <?= ($child['religion'] == 'Iglesia ni Cristo') ? 'selected' : ''; ?>>
+                                Iglesia ni Cristo
+                            </option>
+
+                            <option value="Seventh-day Adventist" <?= ($child['religion'] == 'Seventh-day Adventist') ? 'selected' : ''; ?>>
+                                Seventh-day Adventist
+                            </option>
+
+                            <option value="Jehovah's Witnesses" <?= ($child['religion'] == "Jehovah's Witnesses") ? 'selected' : ''; ?>>
+                                Jehovah's Witnesses
+                            </option>
+
+                            <option value="Baptist" <?= ($child['religion'] == 'Baptist') ? 'selected' : ''; ?>>
+                                Baptist
+                            </option>
+
+                            <option value="Methodist" <?= ($child['religion'] == 'Methodist') ? 'selected' : ''; ?>>
+                                Methodist
+                            </option>
+
+                            <option value="Born Again Christian" <?= ($child['religion'] == 'Born Again Christian') ? 'selected' : ''; ?>>
+                                Born Again Christian
+                            </option>
+
+                            <option value="Others" <?= ($child['religion'] == 'Others') ? 'selected' : ''; ?>>
+                                Others
+                            </option>
+                        </select>
+                    </div>
+
                 </div>
 
                 <h4 class="sub-section-title">Child Health Information</h4>

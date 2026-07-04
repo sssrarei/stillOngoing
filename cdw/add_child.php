@@ -495,7 +495,18 @@ if(isset($_POST['save'])){
 
                 <div class="form-row">
                     <label class="form-label">Religion</label>
-                    <input type="text" name="religion" class="form-control">
+                    <select name="religion" class="form-select">
+                        <option value="">-- Select Religion --</option>
+                        <option value="Roman Catholic">Roman Catholic</option>
+                        <option value="Christian">Christian</option>
+                        <option value="Islam">Islam (Muslim)</option>
+                        <option value="Iglesia ni Cristo">Iglesia ni Cristo</option>
+                        <option value="Born Again Christian">Born Again Christian</option>
+                        <option value="Seventh-day Adventist">Seventh-day Adventist</option>
+                        <option value="Jehovah's Witnesses">Jehovah's Witnesses</option>
+                        <option value="Baptist">Baptist</option>
+                        <option value="Methodist">Methodist</option>
+                    </select>
                 </div>
                 
 

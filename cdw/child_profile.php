@@ -522,6 +522,17 @@ if ($guardian_submission_feature_enabled) {
                     <span class="info-label">Address</span>
                     <div class="info-value"><?php echo htmlspecialchars($child_address); ?></div>
                 </div>
+
+                <div class="info-row">
+                    <span class="info-label">Religion</span>
+                    <div class="info-value">
+                        <?php
+                        echo !empty($child['religion'])
+                            ? htmlspecialchars($child['religion'])
+                            : 'N/A';
+                        ?>
+                    </div>
+                </div>
             </div>
 
             <h4 class="sub-section-title">Child Health Information</h4>
