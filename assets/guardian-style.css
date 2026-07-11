@@ -25,7 +25,22 @@
     --danger-text:#b42318;
     --danger-border:#f2b8b5;
 
-    --shadow:0 14px 34px rgba(15, 23, 42, 0.08);
+    /* Shared status colors (same across all roles) */
+    --success:#43A047;
+    --success-hover:#2E7D32;
+    --danger:#D32F2F;
+    --danger-hover:#B71C1C;
+    --warning-status:#F9A825;
+    --warning-status-hover:#F57F17;
+    --info:#29B6F6;
+    --disabled:#BDBDBD;
+
+    --table-head:#F8FAFC;
+    --table-border:#E8EDF4;
+    --table-row-hover:#F9FBFD;
+
+    --shadow:0 6px 20px rgba(0,0,0,.06);
+    --shadow-hover:0 12px 30px rgba(0,0,0,.08);
 }
 
 body{
@@ -260,10 +275,16 @@ a{
 ========================= */
 .card{
     background:rgba(255, 255, 255, 0.97);
-    border:1px solid var(--border-color);
-    border-radius:24px;
+    border:1px solid #EAEAEA;
+    border-radius:16px;
     overflow:hidden;
     box-shadow:var(--shadow);
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-hover);
 }
 
 .card-header{
@@ -467,14 +488,14 @@ a{
 .measurements-table th,
 .measurements-table td{
     padding:16px 18px;
-    border-bottom:1px solid #e7ebf0;
+    border-bottom:2px solid var(--table-border);
     font-size:14px;
     text-align:left;
 }
 
 .measurements-table th{
-    background:#fff4e6;
-    color:#8a550d;
+    background:var(--table-head);
+    color:var(--guardian-accent-dark);
     font-weight:800;
 }
 
@@ -483,7 +504,7 @@ a{
 }
 
 .measurements-table tbody tr:hover{
-    background:#fffaf3;
+    background:var(--table-row-hover);
 }
 
 .table-status{
@@ -638,7 +659,7 @@ a{
 
 .form-text-input{
     width:100%;
-    border:1px solid #d7dce3;
+    border:1px solid #D9DEE8;
     border-radius:16px;
     padding:13px 15px;
     font-family:'Inter', sans-serif;

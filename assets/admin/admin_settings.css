@@ -22,7 +22,7 @@ body{
     font-family:'Poppins', sans-serif;
     font-size:24px;
     font-weight:700;
-    color:#1e3a8a;
+    color:#2C5EAD;
     margin-bottom:6px;
 }
 
@@ -53,8 +53,8 @@ body{
 
 .profile-card{
     background:#ffffff;
-    border-radius:18px;
-    box-shadow:0 10px 30px rgba(15, 23, 42, 0.06);
+    border-radius:16px;
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
     padding:24px;
 }
 
@@ -98,13 +98,20 @@ body{
 }
 
 .form-group input{
-    border:1px solid #d1d5db;
+    border:1px solid #D9DEE8;
     border-radius:10px;
     padding:12px;
     font-size:14px;
     font-family:'Inter', sans-serif;
     background:#ffffff;
     color:#111827;
+    outline:none;
+    transition:border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus{
+    border-color:#2C5EAD;
+    box-shadow:0 0 0 3px rgba(44, 94, 173, 0.15);
 }
 
 .form-actions{
@@ -130,12 +137,12 @@ body{
 }
 
 .btn-primary{
-    background:#2563eb;
+    background:#2C5EAD;
     color:#ffffff;
 }
 
 .btn-primary:hover{
-    background:#1d4ed8;
+    background:#234D8F;
 }
 
 .btn-light{

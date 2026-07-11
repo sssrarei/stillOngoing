@@ -168,6 +168,9 @@ $severely_wasted_count = 0;
 */
 $referral_assigned = 0;
 $referral_cdw_pending = 0;
+$referral_cdw_sent = 0;
+$referral_cdw_viewed = 0;
+$referral_cdw_inprogress = 0;
 $referral_cdw_completed = 0;
 $referral_awaiting_response = 0;
 
@@ -340,11 +343,19 @@ if($summary_result){
     $referral_cdw_status_result = mysqli_query($conn, $referral_cdw_status_sql);
     if ($referral_cdw_status_result) {
         while ($referral_cdw_status_row = mysqli_fetch_assoc($referral_cdw_status_result)) {
-            if ($referral_cdw_status_row['status'] === 'Pending') {
-                $referral_cdw_pending = (int) $referral_cdw_status_row['total'];
-            }
-            if ($referral_cdw_status_row['status'] === 'Completed') {
-                $referral_cdw_completed = (int) $referral_cdw_status_row['total'];
+            $rp_status = $referral_cdw_status_row['status'];
+            $rp_total = (int) $referral_cdw_status_row['total'];
+
+            if ($rp_status === 'Pending') {
+                $referral_cdw_pending = $rp_total;
+            } elseif ($rp_status === 'Sent') {
+                $referral_cdw_sent = $rp_total;
+            } elseif ($rp_status === 'Viewed') {
+                $referral_cdw_viewed = $rp_total;
+            } elseif ($rp_status === 'In Progress') {
+                $referral_cdw_inprogress = $rp_total;
+            } elseif ($rp_status === 'Completed') {
+                $referral_cdw_completed = $rp_total;
             }
         }
     }
@@ -354,8 +365,7 @@ if($summary_result){
         FROM referrals r
         INNER JOIN children c ON c.child_id = r.child_id
         WHERE c.cdc_id = '$active_cdc_id'
-          AND r.status != 'Completed'
-          AND r.status != 'Pending'
+          AND r.status IN ('Sent', 'Viewed')
           AND NOT EXISTS (
               SELECT 1 FROM referral_comments rc
               WHERE rc.referral_id = r.referral_id
@@ -480,9 +490,12 @@ $is_dark_mode = ($theme_mode === 'dark');
         }
 
         .rp-stat-assigned .rp-stat-icon { background: #dbeafe; color: #1d4ed8; }
-        .rp-stat-pending .rp-stat-icon { background: #fef3c7; color: #b45309; }
+        .rp-stat-pending .rp-stat-icon { background: #f1f5f9; color: #64748b; }
+        .rp-stat-sent .rp-stat-icon { background: #dbeafe; color: #1d4ed8; }
+        .rp-stat-viewed .rp-stat-icon { background: #ede9fe; color: #6d28d9; }
+        .rp-stat-inprogress .rp-stat-icon { background: #ffedd5; color: #c2410c; }
         .rp-stat-completed .rp-stat-icon { background: #dcfce7; color: #15803d; }
-        .rp-stat-awaiting .rp-stat-icon { background: #ede9fe; color: #6d28d9; }
+        .rp-stat-awaiting .rp-stat-icon { background: #fce7f3; color: #be185d; }
 
         .rp-stat-label {
             font-size: 12.5px;
@@ -635,22 +648,39 @@ $is_dark_mode = ($theme_mode === 'dark');
 
     <div class="page-card rp-section">
         <h2 class="rp-section-header">📋 Referral Program Summary</h2>
-        <p class="rp-section-subtitle">Referral cases for children under your active CDC.</p>
+        <p class="rp-section-subtitle">Referral cases for children under your active CDC, by status.</p>
 
         <div class="rp-stat-grid">
             <div class="rp-stat rp-stat-assigned">
                 <div class="rp-stat-icon">📁</div>
                 <div>
-                    <div class="rp-stat-label">Referrals Assigned</div>
+                    <div class="rp-stat-label">Total Assigned</div>
                     <div class="rp-stat-value"><?php echo $referral_assigned; ?></div>
                 </div>
             </div>
 
-            <div class="rp-stat rp-stat-pending">
-                <div class="rp-stat-icon">⏳</div>
+            
+            <div class="rp-stat rp-stat-sent">
+                <div class="rp-stat-icon">📤</div>
                 <div>
-                    <div class="rp-stat-label">Pending</div>
-                    <div class="rp-stat-value"><?php echo $referral_cdw_pending; ?></div>
+                    <div class="rp-stat-label">Sent</div>
+                    <div class="rp-stat-value"><?php echo $referral_cdw_sent; ?></div>
+                </div>
+            </div>
+
+            <div class="rp-stat rp-stat-viewed">
+                <div class="rp-stat-icon">👁️</div>
+                <div>
+                    <div class="rp-stat-label">Viewed</div>
+                    <div class="rp-stat-value"><?php echo $referral_cdw_viewed; ?></div>
+                </div>
+            </div>
+
+            <div class="rp-stat rp-stat-inprogress">
+                <div class="rp-stat-icon">🔄</div>
+                <div>
+                    <div class="rp-stat-label">In Progress</div>
+                    <div class="rp-stat-value"><?php echo $referral_cdw_inprogress; ?></div>
                 </div>
             </div>
 

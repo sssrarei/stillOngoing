@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 11, 2026 at 04:48 PM
+-- Generation Time: Jul 11, 2026 at 07:21 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -74,8 +74,8 @@ INSERT INTO `anthropometric_records` (`record_id`, `child_id`, `height`, `weight
 (69, 58, 90.18, 12.60, 14.00, 'Absent', NULL, 'Normal', '2026-05-21', 47, NULL, 'baseline', 1, '2026-05-26 01:20:50', 'Normal', 'Severely Stunted', 'Normal', 29, 0),
 (70, 59, 90.00, 19.00, 14.00, 'Absent', NULL, 'Normal', '2026-05-21', 44, NULL, 'baseline', 1, '2026-05-26 01:20:50', 'Normal', 'Stunted', 'Obese', 29, 0),
 (71, 60, 100.00, 19.00, 14.00, 'Absent', NULL, 'Normal', '2026-05-21', 41, NULL, 'baseline', 1, '2026-05-26 01:20:50', 'Normal', 'Normal', 'Overweight', 29, 0),
-(72, 61, 95.00, 9.00, 15.00, 'Absent', NULL, 'Normal', '2026-06-07', 36, NULL, 'baseline', 1, '2026-06-07 22:30:27', 'Severely Underweight', 'Normal', 'Severely Wasted', 44, 0),
-(73, 62, 95.00, 9.00, 14.00, 'Absent', NULL, 'Normal', '2026-06-07', 31, NULL, 'baseline', 1, '2026-06-07 22:30:27', 'Severely Underweight', 'Normal', 'Severely Wasted', 44, 0),
+(72, 61, 95.00, 9.00, 15.00, 'Absent', NULL, 'Normal', '2026-06-07', 36, NULL, 'baseline', 1, '2026-07-10 16:26:51', 'Severely Underweight', 'Normal', 'Severely Wasted', 44, 0),
+(73, 62, 95.00, 9.00, 14.00, 'Absent', NULL, 'Normal', '2026-06-07', 31, NULL, 'baseline', 1, '2026-07-10 16:26:51', 'Severely Underweight', 'Normal', 'Severely Wasted', 44, 0),
 (74, 61, 95.00, 9.00, 14.00, 'Absent', NULL, 'Normal', '2026-07-07', 37, NULL, 'midline', 1, '2026-06-07 22:32:02', 'Severely Underweight', 'Normal', 'Severely Wasted', 44, 0),
 (75, 62, 95.00, 10.00, 15.00, 'Absent', NULL, 'Normal', '2026-07-07', 32, NULL, 'midline', 1, '2026-06-07 22:32:02', 'Underweight', 'Normal', 'Severely Wasted', 44, 0),
 (76, 63, 85.00, 11.00, 15.00, 'Absent', NULL, 'Normal', '2026-06-08', 35, NULL, 'baseline', 1, '2026-06-10 23:16:47', 'Normal', 'Stunted', 'Normal', 46, 0),
@@ -83,7 +83,18 @@ INSERT INTO `anthropometric_records` (`record_id`, `child_id`, `height`, `weight
 (78, 63, 95.00, 9.00, 15.00, 'Absent', NULL, 'Normal', '2026-07-08', 36, NULL, 'midline', 0, NULL, 'Severely Underweight', 'Normal', 'Severely Wasted', 46, 0),
 (79, 64, 95.00, 9.00, 15.00, 'Absent', NULL, 'Normal', '2026-07-08', 37, NULL, 'midline', 0, NULL, 'Severely Underweight', 'Normal', 'Severely Wasted', 46, 0),
 (80, 64, 95.00, 9.00, 15.00, 'Absent', NULL, 'Normal', '2026-08-08', 38, NULL, 'endline', 0, NULL, 'Severely Underweight', 'Normal', 'Severely Wasted', 46, 0),
-(81, 63, 100.00, 18.00, 15.00, 'Absent', NULL, 'Normal', '2026-08-08', 37, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Normal', 46, 0);
+(81, 63, 100.00, 18.00, 15.00, 'Absent', NULL, 'Normal', '2026-08-08', 37, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Normal', 46, 0),
+(82, 65, 99.00, 11.00, 12.00, 'Absent', NULL, 'Moderate Acute Malnutrition', '2026-06-30', 37, NULL, 'baseline', 1, '2026-07-10 16:26:51', 'Normal', 'Normal', 'Severely Wasted', 49, 0),
+(83, 65, 99.00, 11.00, 12.00, 'Absent', NULL, 'Moderate Acute Malnutrition', '2026-07-01', 37, NULL, 'midline', 0, NULL, 'Normal', 'Normal', 'Severely Wasted', 49, 0),
+(84, 65, 99.00, 11.00, 12.00, 'Absent', NULL, 'Moderate Acute Malnutrition', '2026-07-02', 37, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Severely Wasted', 49, 0),
+(85, 61, 99.00, 11.00, 12.00, 'Absent', NULL, 'Moderate Acute Malnutrition', '2026-07-02', 36, NULL, 'endline', 0, NULL, 'Underweight', 'Normal', 'Severely Wasted', 49, 0),
+(86, 62, 99.00, 11.00, 12.00, 'Absent', NULL, 'Moderate Acute Malnutrition', '2026-07-02', 32, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Severely Wasted', 49, 0),
+(87, 68, 99.00, 12.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-04', 34, NULL, 'baseline', 1, '2026-07-10 16:26:51', 'Normal', 'Normal', 'Wasted', 49, 0),
+(88, 68, 99.00, 12.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-09', 36, NULL, 'midline', 0, NULL, 'Normal', 'Normal', 'Wasted', 49, 0),
+(89, 68, 99.00, 12.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-09', 37, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Wasted', 49, 0),
+(90, 67, 99.00, 12.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-09', 23, NULL, 'baseline', 1, '2026-07-10 16:26:51', 'Normal', 'Tall', 'Wasted', 49, 0),
+(91, 67, 99.00, 12.00, 14.00, 'Absent', NULL, 'Normal', '2026-06-09', 24, NULL, 'midline', 0, NULL, 'Normal', 'Tall', 'Wasted', 49, 0),
+(92, 67, 99.00, 12.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-09', 25, NULL, 'endline', 0, NULL, 'Normal', 'Tall', 'Wasted', 49, 0);
 
 -- --------------------------------------------------------
 
@@ -132,7 +143,9 @@ INSERT INTO `cdw_assignments` (`assignment_id`, `user_id`, `cdc_id`, `assigned_a
 (24, 29, 20, '2026-05-20 20:42:46'),
 (25, 29, 21, '2026-05-20 20:42:46'),
 (26, 44, 22, '2026-06-07 14:23:43'),
-(27, 46, 23, '2026-06-08 01:05:56');
+(27, 46, 23, '2026-06-08 01:05:56'),
+(28, 49, 22, '2026-06-30 02:58:42'),
+(29, 49, 23, '2026-06-30 02:58:42');
 
 -- --------------------------------------------------------
 
@@ -175,7 +188,11 @@ INSERT INTO `children` (`child_id`, `first_name`, `middle_name`, `last_name`, `b
 (61, 'Gian', '', 'Oliver', '2023-06-06', 'Male', 'Molino I, Bacoor', 'Catholic', NULL, NULL, '2026-06-07 14:24:39', 22, 'CH-7726', 0),
 (62, 'Rachel', 'De', 'Leon', '2023-10-23', 'Female', 'Molino I, Bacoor', 'Catholic', NULL, NULL, '2026-06-07 14:25:17', 22, 'CH-3603', 0),
 (63, 'Angela', 'Reyes', 'Santos', '2023-06-14', 'Female', 'Niog 1', 'Catholic', NULL, NULL, '2026-06-08 01:07:17', 23, 'CH-9582', 0),
-(64, 'Trisha', 'Mae', 'Gutierrez', '2023-06-08', 'Female', 'Niog 1', 'Catholic', NULL, NULL, '2026-06-08 01:07:42', 23, 'CH-3776', 0);
+(64, 'Trisha', 'Mae', 'Gutierrez', '2023-06-08', 'Female', 'Niog 1', 'Catholic', NULL, NULL, '2026-06-08 01:07:42', 23, 'CH-3776', 0),
+(65, 'Angelica', 'Joy', 'Santos', '2023-05-30', 'Female', 'Bacoor', 'Catholic', NULL, NULL, '2026-06-30 03:00:12', 22, 'CH-1971', 0),
+(66, 'Jr', '', 'Lino', '2025-05-04', 'Male', 'Aniban II, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-04 10:34:26', 21, 'CH-5925', 0),
+(67, 'Oliver', '', 'Velazquez', '2024-06-09', 'Male', 'Aniban II, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-09 11:08:55', 22, 'CH-7290', 0),
+(68, 'Luke', '', 'Perez', '2023-06-09', 'Male', 'Molino I, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-09 11:09:30', 22, 'CH-3728', 0);
 
 -- --------------------------------------------------------
 
@@ -233,7 +250,9 @@ INSERT INTO `child_health_information_requests` (`request_id`, `child_id`, `guar
 (5, 51, 30, '../uploads/1779310809_vacc_example_of_vaccination_card.jpg', '', '../uploads/1779310809_med_example_of_medical_history.jpg', 'Peanut', '', 'Approved', '2026-05-20 21:00:09', 29, '2026-05-21 05:00:31', NULL),
 (6, 61, 45, '../uploads/1780842987_vacc_example_of_vaccination_card.jpg', '', '../uploads/1780842987_med_example_of_medical_history.jpg', 'Peanut', '', 'Approved', '2026-06-07 14:36:27', 44, '2026-06-07 22:37:00', NULL),
 (7, 64, 47, '../uploads/1780882349_vacc_example_of_vaccination_card.jpg', '', '../uploads/1780882349_med_example_of_medical_history.jpg', 'Peanut', '', 'Approved', '2026-06-08 01:32:29', 46, '2026-06-08 09:33:14', NULL),
-(8, 63, 48, '../uploads/1781175778_vacc_example_of_vaccination_card.jpg', '', '../uploads/1781175778_med_example_of_medical_history.jpg', 'Yes - Seafood', 'Yes - Asthma', 'Approved', '2026-06-11 11:02:58', 46, '2026-06-11 19:03:22', NULL);
+(8, 63, 48, '../uploads/1781175778_vacc_example_of_vaccination_card.jpg', '', '../uploads/1781175778_med_example_of_medical_history.jpg', 'Yes - Seafood', 'Yes - Asthma', 'Approved', '2026-06-11 11:02:58', 46, '2026-06-11 19:03:22', NULL),
+(9, 68, 51, '../uploads/1783600550_vacc_example_of_vaccination_card.jpg', '', '../uploads/1783600550_med_example_of_medical_history.jpg', 'No', 'No', 'Rejected', '2026-07-09 12:35:50', 49, '2026-07-10 18:50:45', 'wala lang'),
+(10, 68, 51, '', '', '', 'No', 'No', 'Rejected', '2026-07-10 08:32:30', 49, '2026-07-10 18:49:45', 'ala lang');
 
 -- --------------------------------------------------------
 
@@ -329,7 +348,12 @@ INSERT INTO `feeding_records` (`feeding_record_id`, `child_id`, `feeding_date`, 
 (138, 63, '2026-06-11', 'Present', 'Finished', 46, '2026-06-11 14:05:20', '2026-06-11 14:05:20', 0),
 (139, 64, '2026-06-11', 'Present', 'Finished', 46, '2026-06-11 14:05:20', '2026-06-11 14:05:20', 0),
 (140, 63, '2026-06-10', 'Present', 'Half', 46, '2026-06-11 14:06:18', '2026-06-11 14:06:18', 0),
-(141, 64, '2026-06-10', 'Present', 'Finished', 46, '2026-06-11 14:06:18', '2026-06-11 14:06:18', 0);
+(141, 64, '2026-06-10', 'Present', 'Finished', 46, '2026-06-11 14:06:18', '2026-06-11 14:06:18', 0),
+(142, 51, '2026-06-29', 'Present', 'Finished', 29, '2026-06-29 13:45:42', '2026-06-29 13:45:59', 0),
+(143, 52, '2026-06-29', 'Present', 'Finished', 29, '2026-06-29 13:45:42', '2026-06-29 13:45:59', 0),
+(144, 54, '2026-06-29', 'Present', 'Finished', 29, '2026-06-29 13:45:42', '2026-06-29 13:45:59', 0),
+(145, 53, '2026-06-29', 'Present', 'Finished', 29, '2026-06-29 13:45:42', '2026-06-29 13:45:59', 0),
+(146, 55, '2026-06-29', 'Present', 'Finished', 29, '2026-06-29 13:45:42', '2026-06-29 13:45:59', 0);
 
 -- --------------------------------------------------------
 
@@ -379,7 +403,17 @@ INSERT INTO `feeding_record_items` (`feeding_item_id`, `feeding_record_id`, `foo
 (541, 140, 2, 20, '1 cup', 1.00, '2026-06-11 14:06:18'),
 (542, 140, 3, 78, '3 pieces', 1.00, '2026-06-11 14:06:18'),
 (543, 141, 2, 20, '1 cup', 1.00, '2026-06-11 14:06:18'),
-(544, 141, 3, 78, '3 pieces', 1.00, '2026-06-11 14:06:18');
+(544, 141, 3, 78, '3 pieces', 1.00, '2026-06-11 14:06:18'),
+(555, 142, 5, 120, '1 matchbox', 1.00, '2026-06-29 13:45:59'),
+(556, 142, 1, 1, '1 cup', 1.00, '2026-06-29 13:45:59'),
+(557, 143, 5, 120, '1 matchbox', 1.00, '2026-06-29 13:45:59'),
+(558, 143, 1, 1, '1 cup', 1.00, '2026-06-29 13:45:59'),
+(559, 144, 5, 120, '1 matchbox', 1.00, '2026-06-29 13:45:59'),
+(560, 144, 1, 1, '1 cup', 1.00, '2026-06-29 13:45:59'),
+(561, 145, 5, 120, '1 matchbox', 1.00, '2026-06-29 13:45:59'),
+(562, 145, 1, 1, '1 cup', 1.00, '2026-06-29 13:45:59'),
+(563, 146, 5, 120, '1 matchbox', 1.00, '2026-06-29 13:45:59'),
+(564, 146, 1, 1, '1 cup', 1.00, '2026-06-29 13:45:59');
 
 -- --------------------------------------------------------
 
@@ -1227,7 +1261,9 @@ INSERT INTO `guardians` (`guardian_id`, `child_id`, `user_id`, `first_name`, `mi
 (23, 52, 43, 'Ian', NULL, 'Mendoza', 'Father', '09123456789', 'ianmendoza@gmai.com', 'Aniban II, Bacoor', NULL, '2026-05-24 16:41:00', '2026-05-24 16:41:00'),
 (24, 61, 45, 'Nate', NULL, 'Oliver', 'Uncle', '09173451122', 'nateoliver@gmail.com', 'Molino I, Bacoor', NULL, '2026-06-07 14:28:26', '2026-06-07 14:28:26'),
 (25, 64, 47, 'Allaiza', NULL, 'raut-raut', 'Aunt', '09285567789', 'allaizaherboso@gmail.com', 'Talaba IV', NULL, '2026-06-08 01:27:52', '2026-06-08 01:27:52'),
-(26, 63, 48, 'Regine', NULL, 'Santos', 'Mother', '09181234562', 'reginesantos@gmail.com', 'Molino I, Bacoor', NULL, '2026-06-09 20:23:07', '2026-06-09 20:23:07');
+(26, 63, 48, 'Regine', NULL, 'Santos', 'Mother', '09181234562', 'reginesantos@gmail.com', 'Molino I, Bacoor', NULL, '2026-06-09 20:23:07', '2026-06-09 20:23:07'),
+(27, 65, 50, 'Mary Joy', NULL, 'Santos', 'Mother', '09050349865', 'maryjoysantos@gmail.com', 'Bacoor', NULL, '2026-06-30 03:13:23', '2026-06-30 03:13:23'),
+(28, 68, 51, 'leo', NULL, 'perez', 'Father', '09098847800', 'leoperez@gmail.com', 'Aniban II, Bacoor', NULL, '2026-07-09 11:34:33', '2026-07-09 11:34:33');
 
 -- --------------------------------------------------------
 
@@ -1295,7 +1331,28 @@ INSERT INTO `intervention_guidance` (`guidance_id`, `child_id`, `source_submitte
 (82, 61, NULL, 74, 66, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', 'masustansyang pagkain ya', 1, 1, 0, 1, 1, 1, '2026-06-07 22:32:26', 'Follow-up Reminder: Child still needs nutritional attention based on Midline assessment.', '2026-06-07 14:32:26', '2026-06-07 14:32:26', NULL, 0),
 (83, 64, NULL, 77, 67, 'Severely Underweight', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', 'kumain ng masustansyang pagkain', 1, 0, 0, 1, 1, 1, '2026-06-08 09:22:54', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-06-08 01:22:54', '2026-06-08 01:22:54', NULL, 0),
 (84, 64, NULL, 0, 71, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', 'masustansyang pagkain', 1, 1, 1, 1, 1, 1, '2026-06-08 10:10:01', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-06-08 02:10:01', '2026-06-08 02:10:01', NULL, 0),
-(85, 63, NULL, 0, 71, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', 'masustansyang pagkain', 1, 1, 1, 1, 1, 1, '2026-06-08 10:10:01', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-06-08 02:10:01', '2026-06-08 02:10:01', NULL, 0);
+(85, 63, NULL, 0, 71, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', 'masustansyang pagkain', 1, 1, 1, 1, 1, 1, '2026-06-08 10:10:01', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-06-08 02:10:01', '2026-06-08 02:10:01', NULL, 0),
+(86, 62, NULL, 73, 77, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-06-30 11:04:34', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-06-30 03:04:34', '2026-06-30 03:04:34', NULL, 0),
+(87, 61, NULL, 72, 77, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-06-30 11:04:34', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-06-30 03:04:34', '2026-06-30 03:04:34', NULL, 0),
+(88, 65, NULL, 82, 77, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-06-30 11:04:34', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-06-30 03:04:34', '2026-06-30 03:04:34', NULL, 0),
+(89, 62, NULL, 0, 78, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 1, 1, 1, 1, 1, '2026-06-30 11:20:25', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-06-30 03:20:25', '2026-06-30 03:20:25', NULL, 0),
+(90, 61, NULL, 0, 78, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 1, 1, 1, 1, 1, '2026-06-30 11:20:25', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-06-30 03:20:25', '2026-06-30 03:20:25', NULL, 0),
+(91, 65, NULL, 0, 78, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 1, 1, 1, 1, 1, '2026-06-30 11:20:25', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-06-30 03:20:25', '2026-06-30 03:20:25', NULL, 0),
+(92, 62, NULL, 73, 81, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-07-09 19:16:20', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-09 11:16:20', '2026-07-09 11:16:20', NULL, 0),
+(93, 61, NULL, 72, 81, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-07-09 19:16:20', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-09 11:16:20', '2026-07-09 11:16:20', NULL, 0),
+(94, 68, NULL, 87, 81, 'Wasted', 'Moderately Wasted', 'Ensure the child eats 3 meals daily at the same time (no skipping)\nGive small but frequent meals if the child has a poor appetite\nAvoid distractions during meals (no gadgets or playing)\nEncourage daily active play to improve appetite\nObserve for signs of illness (fever, diarrhea, cough)', '', 1, 0, 0, 1, 1, 1, '2026-07-09 19:16:20', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-09 11:16:20', '2026-07-09 11:16:20', NULL, 0),
+(95, 65, NULL, 82, 81, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-07-09 19:16:20', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-09 11:16:20', '2026-07-09 11:16:20', NULL, 0),
+(96, 67, NULL, 90, 81, 'Wasted', 'Moderately Wasted', 'Ensure the child eats 3 meals daily at the same time (no skipping)\nGive small but frequent meals if the child has a poor appetite\nAvoid distractions during meals (no gadgets or playing)\nEncourage daily active play to improve appetite\nObserve for signs of illness (fever, diarrhea, cough)', '', 1, 0, 0, 1, 1, 1, '2026-07-09 19:16:20', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-09 11:16:20', '2026-07-09 11:16:20', NULL, 0),
+(97, 62, NULL, 0, 82, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 1, 1, 1, 1, 1, '2026-07-09 19:18:34', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-07-09 11:18:34', '2026-07-09 11:18:34', NULL, 0),
+(98, 61, NULL, 0, 82, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 1, 1, 1, 1, 1, '2026-07-09 19:18:34', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-07-09 11:18:34', '2026-07-09 11:18:34', NULL, 0),
+(99, 68, NULL, 0, 82, 'Wasted', 'Moderately Wasted', 'Ensure the child eats 3 meals daily at the same time (no skipping)\nGive small but frequent meals if the child has a poor appetite\nAvoid distractions during meals (no gadgets or playing)\nEncourage daily active play to improve appetite\nObserve for signs of illness (fever, diarrhea, cough)', '', 1, 1, 1, 1, 1, 1, '2026-07-09 19:18:34', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-07-09 11:18:34', '2026-07-09 11:18:34', NULL, 0),
+(100, 65, NULL, 0, 82, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 1, 1, 1, 1, 1, '2026-07-09 19:18:34', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-07-09 11:18:34', '2026-07-09 11:18:34', NULL, 0),
+(101, 67, NULL, 0, 82, 'Wasted', 'Moderately Wasted', 'Ensure the child eats 3 meals daily at the same time (no skipping)\nGive small but frequent meals if the child has a poor appetite\nAvoid distractions during meals (no gadgets or playing)\nEncourage daily active play to improve appetite\nObserve for signs of illness (fever, diarrhea, cough)', '', 1, 1, 1, 1, 1, 1, '2026-07-09 19:18:34', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', '2026-07-09 11:18:34', '2026-07-09 11:18:34', NULL, 0),
+(102, 62, NULL, 73, 83, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-07-10 16:30:39', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-10 08:30:39', '2026-07-10 08:30:39', NULL, 0),
+(103, 61, NULL, 72, 83, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-07-10 16:30:39', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-10 08:30:39', '2026-07-10 08:30:39', NULL, 0),
+(104, 68, NULL, 87, 83, 'Wasted', 'Moderately Wasted', 'Ensure the child eats 3 meals daily at the same time (no skipping)\nGive small but frequent meals if the child has a poor appetite\nAvoid distractions during meals (no gadgets or playing)\nEncourage daily active play to improve appetite\nObserve for signs of illness (fever, diarrhea, cough)', '', 1, 0, 0, 1, 1, 1, '2026-07-10 16:30:39', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-10 08:30:39', '2026-07-10 08:30:39', NULL, 0),
+(105, 65, NULL, 82, 83, 'Severely Wasted', 'Severely Wasted', 'Ensure the child eats every meal on time (never skip meals)\nGive small but frequent meals throughout the day\nEnsure adequate water intake daily\nMonitor closely for weakness or signs of illness\nSeek immediate care if the child becomes very weak or condition worsens', '', 1, 0, 0, 1, 1, 1, '2026-07-10 16:30:39', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-10 08:30:39', '2026-07-10 08:30:39', NULL, 0),
+(106, 67, NULL, 90, 83, 'Wasted', 'Moderately Wasted', 'Ensure the child eats 3 meals daily at the same time (no skipping)\nGive small but frequent meals if the child has a poor appetite\nAvoid distractions during meals (no gadgets or playing)\nEncourage daily active play to improve appetite\nObserve for signs of illness (fever, diarrhea, cough)', '', 1, 0, 0, 1, 1, 1, '2026-07-10 16:30:39', 'Nutritional Alert: Child identified as at-risk based on Baseline assessment.', '2026-07-10 08:30:39', '2026-07-10 08:30:39', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -1387,7 +1444,73 @@ INSERT INTO `parent_child_links` (`link_id`, `parent_id`, `child_id`, `linked_at
 (20, 43, 52, '2026-05-24 16:41:00'),
 (21, 45, 61, '2026-06-07 14:28:26'),
 (22, 47, 64, '2026-06-08 01:27:52'),
-(23, 48, 63, '2026-06-09 20:23:07');
+(23, 48, 63, '2026-06-09 20:23:07'),
+(24, 50, 65, '2026-06-30 03:13:23'),
+(25, 51, 68, '2026-07-09 11:34:33');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `referrals`
+--
+
+CREATE TABLE `referrals` (
+  `referral_id` int(11) NOT NULL,
+  `guidance_id` int(11) NOT NULL,
+  `child_id` int(11) NOT NULL,
+  `generated_by` int(11) NOT NULL,
+  `final_category` varchar(50) NOT NULL,
+  `reason_for_referral` text NOT NULL,
+  `recommended_facility` varchar(255) DEFAULT NULL,
+  `remarks` text DEFAULT NULL,
+  `date_to_send` date DEFAULT NULL,
+  `status` enum('Pending','Sent','Viewed','In Progress','Completed') NOT NULL DEFAULT 'Pending',
+  `sent_at` datetime DEFAULT NULL,
+  `viewed_at` datetime DEFAULT NULL,
+  `in_progress_at` datetime DEFAULT NULL,
+  `completed_at` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `referrals`
+--
+
+INSERT INTO `referrals` (`referral_id`, `guidance_id`, `child_id`, `generated_by`, `final_category`, `reason_for_referral`, `recommended_facility`, `remarks`, `date_to_send`, `status`, `sent_at`, `viewed_at`, `in_progress_at`, `completed_at`, `created_at`, `updated_at`) VALUES
+(1, 71, 57, 29, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', 'asdasdasdasdasdas', '2026-07-08', 'Pending', NULL, NULL, NULL, NULL, '2026-07-08 08:01:11', '2026-07-08 08:01:11'),
+(2, 91, 65, 49, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', 'hellow', '2026-07-08', 'Viewed', '2026-07-08 22:04:22', '2026-07-08 22:05:17', NULL, NULL, '2026-07-08 13:38:55', '2026-07-08 14:05:17'),
+(3, 89, 62, 49, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', '', '2026-07-08', 'Sent', '2026-07-08 22:04:56', NULL, NULL, NULL, '2026-07-08 14:04:45', '2026-07-08 14:04:56'),
+(4, 90, 61, 49, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Social Welfare Office', '', '2026-07-08', 'Sent', '2026-07-08 22:10:34', NULL, NULL, NULL, '2026-07-08 14:08:42', '2026-07-08 14:10:34'),
+(5, 98, 61, 49, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', '', '2026-07-09', 'Sent', '2026-07-09 19:26:15', NULL, NULL, NULL, '2026-07-09 11:26:15', '2026-07-09 11:26:15'),
+(6, 99, 68, 49, 'Moderately Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', 'pumunta na po agad kayo lalo na kung may napapansin kayong unusual sa bata', '2026-07-09', 'In Progress', '2026-07-09 19:35:51', '2026-07-09 19:36:24', '2026-07-09 19:50:36', NULL, '2026-07-09 11:35:51', '2026-07-09 11:50:36'),
+(7, 97, 62, 49, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', '', '2026-07-09', 'Sent', '2026-07-09 19:52:21', NULL, NULL, NULL, '2026-07-09 11:52:21', '2026-07-09 11:52:21'),
+(8, 100, 65, 49, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Social Welfare Office', '', '2026-07-09', 'Sent', '2026-07-09 19:52:26', NULL, NULL, NULL, '2026-07-09 11:52:26', '2026-07-09 11:52:26'),
+(9, 101, 67, 49, 'Moderately Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', '', '2026-07-09', 'Sent', '2026-07-09 19:52:32', NULL, NULL, NULL, '2026-07-09 11:52:32', '2026-07-09 11:52:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `referral_comments`
+--
+
+CREATE TABLE `referral_comments` (
+  `comment_id` int(11) NOT NULL,
+  `referral_id` int(11) NOT NULL,
+  `sender_user_id` int(11) NOT NULL,
+  `sender_role` enum('CDW','Guardian') NOT NULL,
+  `message` text NOT NULL,
+  `attachment_path` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `referral_comments`
+--
+
+INSERT INTO `referral_comments` (`comment_id`, `referral_id`, `sender_user_id`, `sender_role`, `message`, `attachment_path`, `created_at`) VALUES
+(1, 2, 50, 'Guardian', 'halur', NULL, '2026-07-08 19:19:42'),
+(2, 2, 49, 'CDW', 'hi po!', 'uploads/referral_comments/refcom_6a4ea5027954e_1783538946.png', '2026-07-08 19:29:06');
 
 -- --------------------------------------------------------
 
@@ -1509,7 +1632,15 @@ INSERT INTO `submitted_reports` (`submitted_report_id`, `report_type`, `cdc_id`,
 (73, 'wmr', 23, 46, NULL, NULL, '2026-06-10 23:16:47', 'submitted', '{\"report_type\":\"wmr\",\"assessment_scope\":\"baseline_only\",\"cdc_id\":23,\"cdc_name\":\"Niog 1 Child Development Center\",\"prepared_by\":\"roseanne sandilantan\",\"date_from\":null,\"date_to\":null,\"submitted_rows\":[{\"record_id\":77,\"child_id\":64,\"child_name\":\"Trisha Gutierrez\",\"cdc_name\":\"Niog 1 Child Development Center\",\"date_recorded\":\"2026-06-08\",\"assessment_type\":\"baseline\",\"age_in_months\":36,\"height\":\"85.00\",\"weight\":\"9.00\",\"muac\":\"15.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Severely Underweight\",\"hfa_status\":\"Stunted\",\"wflh_status\":\"Wasted\",\"recorded_by_name\":\"roseanne sandilantan\"},{\"record_id\":76,\"child_id\":63,\"child_name\":\"Angela Santos\",\"cdc_name\":\"Niog 1 Child Development Center\",\"date_recorded\":\"2026-06-08\",\"assessment_type\":\"baseline\",\"age_in_months\":35,\"height\":\"85.00\",\"weight\":\"11.00\",\"muac\":\"15.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Normal\",\"hfa_status\":\"Stunted\",\"wflh_status\":\"Normal\",\"recorded_by_name\":\"roseanne sandilantan\"}],\"total_records\":2}'),
 (74, 'nutritional_status_summary', 23, 46, '2026-06-01', '2026-06-30', '2026-06-10 23:20:34', 'submitted', '{\"report_type\":\"nutritional_status_summary\",\"cdc_id\":23,\"cdc_name\":\"Niog 1 Child Development Center\",\"prepared_by\":\"roseanne sandilantan\",\"reporting_month\":\"2026-06\",\"reporting_month_display\":\"June 2026\",\"summary_text\":\"Most children are in Normal status (50%).\",\"highest_label\":\"Severely Wasted\",\"highest_value\":1,\"highest_pct\":50,\"submitted_rows\":[{\"total\":2,\"normal\":1,\"normal_pct\":50,\"underweight\":0,\"underweight_pct\":0,\"severely_underweight\":0,\"severely_underweight_pct\":0,\"overweight\":0,\"overweight_pct\":0,\"obese\":0,\"obese_pct\":0,\"stunted\":0,\"stunted_pct\":0,\"severely_stunted\":0,\"severely_stunted_pct\":0,\"moderately_wasted\":0,\"moderately_wasted_pct\":0,\"severely_wasted\":1,\"severely_wasted_pct\":50}]}'),
 (75, 'individual_child', 23, 46, NULL, NULL, '2026-06-11 19:05:58', 'saved_to_child_profile', '{\"report_type\":\"individual_child\",\"child_id\":63,\"child_name\":\"Angela Reyes Santos\",\"sex\":\"Female\",\"cdc_id\":23,\"cdc_name\":\"Niog 1 Child Development Center\",\"submitted_by\":46,\"submitted_at\":\"2026-06-11 13:05:58\"}'),
-(76, 'individual_child', 23, 46, NULL, NULL, '2026-06-11 22:07:44', 'submitted', '{\"report_type\":\"individual_child\",\"child_id\":64,\"child_name\":\"Trisha Mae Gutierrez\",\"sex\":\"Female\",\"cdc_id\":23,\"cdc_name\":\"Niog 1 Child Development Center\",\"submitted_by\":46,\"submitted_at\":\"2026-06-11 16:07:44\"}');
+(76, 'individual_child', 23, 46, NULL, NULL, '2026-06-11 22:07:44', 'submitted', '{\"report_type\":\"individual_child\",\"child_id\":64,\"child_name\":\"Trisha Mae Gutierrez\",\"sex\":\"Female\",\"cdc_id\":23,\"cdc_name\":\"Niog 1 Child Development Center\",\"submitted_by\":46,\"submitted_at\":\"2026-06-11 16:07:44\"}'),
+(77, 'wmr', 22, 49, NULL, NULL, '2026-06-30 11:02:58', 'submitted', '{\"report_type\":\"wmr\",\"assessment_scope\":\"baseline_only\",\"cdc_id\":22,\"cdc_name\":\"MOLINO I ANNEX\",\"prepared_by\":\"thea mepania\",\"date_from\":null,\"date_to\":null,\"submitted_rows\":[{\"record_id\":73,\"child_id\":62,\"child_name\":\"Rachel Leon\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-07\",\"assessment_type\":\"baseline\",\"age_in_months\":31,\"height\":\"95.00\",\"weight\":\"9.00\",\"muac\":\"14.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Severely Underweight\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"Princess Buenaventura\"},{\"record_id\":72,\"child_id\":61,\"child_name\":\"Gian Oliver\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-07\",\"assessment_type\":\"baseline\",\"age_in_months\":36,\"height\":\"95.00\",\"weight\":\"9.00\",\"muac\":\"15.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Severely Underweight\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"Princess Buenaventura\"},{\"record_id\":82,\"child_id\":65,\"child_name\":\"Angelica Santos\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-30\",\"assessment_type\":\"baseline\",\"age_in_months\":37,\"height\":\"99.00\",\"weight\":\"11.00\",\"muac\":\"12.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Moderate Acute Malnutrition\",\"wfa_status\":\"Normal\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"thea mepania\"}],\"total_records\":3}'),
+(78, 'terminal_report', 22, 49, '2026-06-07', '2026-07-02', '2026-06-30 11:19:54', 'submitted', '{\"program_title\":\"Nutritional Monitoring Terminal Report\",\"program_description\":\"The report is designed to provide a clear comparison of the children\'s nutritional status at the start, middle, and end of the program, based on the specific assessment types recorded in the system. Only records that are explicitly marked as Baseline, Midline, or Endline will be included in this report to ensure consistency and accuracy in tracking the progress of each child throughout the program duration.\",\"program_duration\":\"180 Days (6 Months)\",\"cdc_name\":\"MOLINO I ANNEX\",\"prepared_by\":\"thea mepania\",\"generated_at\":\"2026-06-30 05:19:54\",\"generated_at_display\":\"June 30, 2026 05:19 AM\",\"total_children\":3,\"with_baseline_count\":3,\"with_midline_count\":3,\"with_endline_count\":3,\"submitted_rows\":[{\"child_id\":62,\"child_name\":\"Rachel De Leon\",\"sex\":\"Female\",\"baseline_date\":\"2026-06-07\",\"baseline_date_display\":\"June 07, 2026\",\"baseline_wfa\":\"Severely Underweight\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-07\",\"midline_date_display\":\"July 07, 2026\",\"midline_wfa\":\"Underweight\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Normal\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"},{\"child_id\":61,\"child_name\":\"Gian Oliver\",\"sex\":\"Male\",\"baseline_date\":\"2026-06-07\",\"baseline_date_display\":\"June 07, 2026\",\"baseline_wfa\":\"Severely Underweight\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-07\",\"midline_date_display\":\"July 07, 2026\",\"midline_wfa\":\"Severely Underweight\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Underweight\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"},{\"child_id\":65,\"child_name\":\"Angelica Joy Santos\",\"sex\":\"Female\",\"baseline_date\":\"2026-06-30\",\"baseline_date_display\":\"June 30, 2026\",\"baseline_wfa\":\"Normal\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-01\",\"midline_date_display\":\"July 01, 2026\",\"midline_wfa\":\"Normal\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Normal\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"}]}'),
+(79, 'individual_child', 21, 29, NULL, NULL, '2026-07-04 18:36:26', 'submitted', '{\"report_type\":\"individual_child\",\"child_id\":66,\"child_name\":\"Jr Lino\",\"sex\":\"Male\",\"cdc_id\":21,\"cdc_name\":\"Aniban II\",\"submitted_by\":29,\"submitted_at\":\"2026-07-04 12:36:26\"}');
+INSERT INTO `submitted_reports` (`submitted_report_id`, `report_type`, `cdc_id`, `submitted_by`, `date_from`, `date_to`, `submitted_at`, `status`, `report_payload`) VALUES
+(80, 'terminal_report', 22, 49, '2026-06-07', '2026-07-02', '2026-07-08 01:20:45', 'submitted', '{\"program_title\":\"Nutritional Monitoring Terminal Report\",\"program_description\":\"The report is designed to provide a clear comparison of the children\'s nutritional status at the start, middle, and end of the program, based on the specific assessment types recorded in the system. Only records that are explicitly marked as Baseline, Midline, or Endline will be included in this report to ensure consistency and accuracy in tracking the progress of each child throughout the program duration.\",\"program_duration\":\"180 Days (6 Months)\",\"cdc_name\":\"MOLINO I ANNEX\",\"prepared_by\":\"thea mepania\",\"generated_at\":\"2026-07-07 19:20:45\",\"generated_at_display\":\"July 07, 2026 07:20 PM\",\"total_children\":3,\"with_baseline_count\":3,\"with_midline_count\":3,\"with_endline_count\":3,\"submitted_rows\":[{\"child_id\":62,\"child_name\":\"Rachel De Leon\",\"sex\":\"Female\",\"baseline_date\":\"2026-06-07\",\"baseline_date_display\":\"June 07, 2026\",\"baseline_wfa\":\"Severely Underweight\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-07\",\"midline_date_display\":\"July 07, 2026\",\"midline_wfa\":\"Underweight\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Normal\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"},{\"child_id\":61,\"child_name\":\"Gian Oliver\",\"sex\":\"Male\",\"baseline_date\":\"2026-06-07\",\"baseline_date_display\":\"June 07, 2026\",\"baseline_wfa\":\"Severely Underweight\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-07\",\"midline_date_display\":\"July 07, 2026\",\"midline_wfa\":\"Severely Underweight\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Underweight\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"},{\"child_id\":65,\"child_name\":\"Angelica Joy Santos\",\"sex\":\"Female\",\"baseline_date\":\"2026-06-30\",\"baseline_date_display\":\"June 30, 2026\",\"baseline_wfa\":\"Normal\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-01\",\"midline_date_display\":\"July 01, 2026\",\"midline_wfa\":\"Normal\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Normal\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"}]}'),
+(81, 'wmr', 22, 49, NULL, NULL, '2026-07-09 19:15:26', 'submitted', '{\"report_type\":\"wmr\",\"assessment_scope\":\"baseline_only\",\"cdc_id\":22,\"cdc_name\":\"MOLINO I ANNEX\",\"prepared_by\":\"thea mepania\",\"date_from\":null,\"date_to\":null,\"submitted_rows\":[{\"record_id\":73,\"child_id\":62,\"child_name\":\"Rachel Leon\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-07\",\"assessment_type\":\"baseline\",\"age_in_months\":31,\"height\":\"95.00\",\"weight\":\"9.00\",\"muac\":\"14.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Severely Underweight\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"Princess Buenaventura\"},{\"record_id\":72,\"child_id\":61,\"child_name\":\"Gian Oliver\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-07\",\"assessment_type\":\"baseline\",\"age_in_months\":36,\"height\":\"95.00\",\"weight\":\"9.00\",\"muac\":\"15.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Severely Underweight\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"Princess Buenaventura\"},{\"record_id\":87,\"child_id\":68,\"child_name\":\"Luke Perez\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-05-04\",\"assessment_type\":\"baseline\",\"age_in_months\":34,\"height\":\"99.00\",\"weight\":\"12.00\",\"muac\":\"13.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Normal\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Wasted\",\"recorded_by_name\":\"thea mepania\"},{\"record_id\":82,\"child_id\":65,\"child_name\":\"Angelica Santos\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-30\",\"assessment_type\":\"baseline\",\"age_in_months\":37,\"height\":\"99.00\",\"weight\":\"11.00\",\"muac\":\"12.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Moderate Acute Malnutrition\",\"wfa_status\":\"Normal\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"thea mepania\"},{\"record_id\":90,\"child_id\":67,\"child_name\":\"Oliver Velazquez\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-05-09\",\"assessment_type\":\"baseline\",\"age_in_months\":23,\"height\":\"99.00\",\"weight\":\"12.00\",\"muac\":\"13.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Normal\",\"hfa_status\":\"Tall\",\"wflh_status\":\"Wasted\",\"recorded_by_name\":\"thea mepania\"}],\"total_records\":5}'),
+(82, 'terminal_report', 22, 49, '2026-05-04', '2026-07-09', '2026-07-09 19:17:23', 'submitted', '{\"program_title\":\"Nutritional Monitoring Terminal Report\",\"program_description\":\"The report is designed to provide a clear comparison of the children\'s nutritional status at the start, middle, and end of the program, based on the specific assessment types recorded in the system. Only records that are explicitly marked as Baseline, Midline, or Endline will be included in this report to ensure consistency and accuracy in tracking the progress of each child throughout the program duration.\",\"program_duration\":\"180 Days (6 Months)\",\"cdc_name\":\"MOLINO I ANNEX\",\"prepared_by\":\"thea mepania\",\"generated_at\":\"2026-07-09 13:17:23\",\"generated_at_display\":\"July 09, 2026 01:17 PM\",\"total_children\":5,\"with_baseline_count\":5,\"with_midline_count\":5,\"with_endline_count\":5,\"submitted_rows\":[{\"child_id\":62,\"child_name\":\"Rachel De Leon\",\"sex\":\"Female\",\"baseline_date\":\"2026-06-07\",\"baseline_date_display\":\"June 07, 2026\",\"baseline_wfa\":\"Severely Underweight\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-07\",\"midline_date_display\":\"July 07, 2026\",\"midline_wfa\":\"Underweight\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Normal\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"},{\"child_id\":61,\"child_name\":\"Gian Oliver\",\"sex\":\"Male\",\"baseline_date\":\"2026-06-07\",\"baseline_date_display\":\"June 07, 2026\",\"baseline_wfa\":\"Severely Underweight\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-07\",\"midline_date_display\":\"July 07, 2026\",\"midline_wfa\":\"Severely Underweight\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Underweight\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"},{\"child_id\":68,\"child_name\":\"Luke Perez\",\"sex\":\"Male\",\"baseline_date\":\"2026-05-04\",\"baseline_date_display\":\"May 04, 2026\",\"baseline_wfa\":\"Normal\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Wasted\",\"midline_date\":\"2026-06-09\",\"midline_date_display\":\"June 09, 2026\",\"midline_wfa\":\"Normal\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Wasted\",\"endline_date\":\"2026-07-09\",\"endline_date_display\":\"July 09, 2026\",\"endline_wfa\":\"Normal\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Wasted\"},{\"child_id\":65,\"child_name\":\"Angelica Joy Santos\",\"sex\":\"Female\",\"baseline_date\":\"2026-06-30\",\"baseline_date_display\":\"June 30, 2026\",\"baseline_wfa\":\"Normal\",\"baseline_hfa\":\"Normal\",\"baseline_wflh\":\"Severely Wasted\",\"midline_date\":\"2026-07-01\",\"midline_date_display\":\"July 01, 2026\",\"midline_wfa\":\"Normal\",\"midline_hfa\":\"Normal\",\"midline_wflh\":\"Severely Wasted\",\"endline_date\":\"2026-07-02\",\"endline_date_display\":\"July 02, 2026\",\"endline_wfa\":\"Normal\",\"endline_hfa\":\"Normal\",\"endline_wflh\":\"Severely Wasted\"},{\"child_id\":67,\"child_name\":\"Oliver Velazquez\",\"sex\":\"Male\",\"baseline_date\":\"2026-05-09\",\"baseline_date_display\":\"May 09, 2026\",\"baseline_wfa\":\"Normal\",\"baseline_hfa\":\"Tall\",\"baseline_wflh\":\"Wasted\",\"midline_date\":\"2026-06-09\",\"midline_date_display\":\"June 09, 2026\",\"midline_wfa\":\"Normal\",\"midline_hfa\":\"Tall\",\"midline_wflh\":\"Wasted\",\"endline_date\":\"2026-07-09\",\"endline_date_display\":\"July 09, 2026\",\"endline_wfa\":\"Normal\",\"endline_hfa\":\"Tall\",\"endline_wflh\":\"Wasted\"}]}'),
+(83, 'wmr', 22, 49, NULL, NULL, '2026-07-10 16:26:51', 'submitted', '{\"report_type\":\"wmr\",\"assessment_scope\":\"baseline_only\",\"cdc_id\":22,\"cdc_name\":\"MOLINO I ANNEX\",\"prepared_by\":\"thea mepania\",\"date_from\":null,\"date_to\":null,\"submitted_rows\":[{\"record_id\":73,\"child_id\":62,\"child_name\":\"Rachel Leon\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-07\",\"assessment_type\":\"baseline\",\"age_in_months\":31,\"height\":\"95.00\",\"weight\":\"9.00\",\"muac\":\"14.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Severely Underweight\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"Princess Buenaventura\"},{\"record_id\":72,\"child_id\":61,\"child_name\":\"Gian Oliver\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-07\",\"assessment_type\":\"baseline\",\"age_in_months\":36,\"height\":\"95.00\",\"weight\":\"9.00\",\"muac\":\"15.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Severely Underweight\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"Princess Buenaventura\"},{\"record_id\":87,\"child_id\":68,\"child_name\":\"Luke Perez\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-05-04\",\"assessment_type\":\"baseline\",\"age_in_months\":34,\"height\":\"99.00\",\"weight\":\"12.00\",\"muac\":\"13.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Normal\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Wasted\",\"recorded_by_name\":\"thea mepania\"},{\"record_id\":82,\"child_id\":65,\"child_name\":\"Angelica Santos\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-06-30\",\"assessment_type\":\"baseline\",\"age_in_months\":37,\"height\":\"99.00\",\"weight\":\"11.00\",\"muac\":\"12.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Moderate Acute Malnutrition\",\"wfa_status\":\"Normal\",\"hfa_status\":\"Normal\",\"wflh_status\":\"Severely Wasted\",\"recorded_by_name\":\"thea mepania\"},{\"record_id\":90,\"child_id\":67,\"child_name\":\"Oliver Velazquez\",\"cdc_name\":\"MOLINO I ANNEX\",\"date_recorded\":\"2026-05-09\",\"assessment_type\":\"baseline\",\"age_in_months\":23,\"height\":\"99.00\",\"weight\":\"12.00\",\"muac\":\"13.00\",\"edema_status\":\"Absent\",\"edema_grade\":null,\"muac_status\":\"Normal\",\"wfa_status\":\"Normal\",\"hfa_status\":\"Tall\",\"wflh_status\":\"Wasted\",\"recorded_by_name\":\"thea mepania\"}],\"total_records\":5}');
 
 -- --------------------------------------------------------
 
@@ -1535,9 +1666,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `role_id`, `first_name`, `last_name`, `email`, `password`, `contact_number`, `address`, `created_at`, `last_active`) VALUES
-(1, 1, 'Admin', 'User', 'admin@gmail.com', '1234', '09285567789', 'Niog II', '2026-03-25 22:04:10', '2026-06-11 22:35:30'),
-(29, 2, 'Anna', 'Natividad', 'annanatividad@gmail.com', 'annanatividad', '09285567789', 'Aniban II, Bacoor', '2026-05-20 20:42:46', '2026-05-26 01:20:50'),
-(30, 3, 'Michelle', 'Santos', 'michellesantos@gmail.com', 'michellesantos', NULL, NULL, '2026-05-20 20:56:04', '2026-05-24 17:39:48'),
+(1, 1, 'Admin', 'User', 'admin@gmail.com', '1234', '09285567789', 'Niog II', '2026-03-25 22:04:10', '2026-07-10 16:30:38'),
+(29, 2, 'Anna', 'Natividad', 'annanatividad@gmail.com', 'annanatividad', '09285567789', 'Aniban II, Bacoor', '2026-05-20 20:42:46', '2026-07-08 16:01:11'),
+(30, 3, 'Michelle', 'Santos', 'michellesantos@gmail.com', 'michellesantos', NULL, NULL, '2026-05-20 20:56:04', '2026-07-08 14:15:44'),
 (31, 3, 'Leo', 'Noveda', 'leonoveda@gmail.com', 'leonoveda', NULL, NULL, '2026-05-24 13:53:41', '2026-05-24 23:51:23'),
 (33, 3, 'agnes', 'Gutierrez', 'agnesgutierrez@gmail.com', 'agnesgutierrez', NULL, NULL, '2026-05-24 14:40:02', '2026-05-24 22:40:38'),
 (37, 3, 'Marilou', 'Rodriguez', 'marilourodriguez@gmail.com', 'marilourodriguez', NULL, NULL, '2026-05-24 15:24:04', '2026-05-25 00:19:20'),
@@ -1548,7 +1679,10 @@ INSERT INTO `users` (`user_id`, `role_id`, `first_name`, `last_name`, `email`, `
 (45, 3, 'Nate', 'Oliver', 'nateoliver@gmail.com', 'nateoliver', '09173451122', 'Molino I, Bacoor', '2026-06-07 14:28:26', '2026-06-09 01:31:01'),
 (46, 2, 'roseanne', 'sandilantan', 'roseannesandilantan@gmail.com', 'roseannesandilantan', '09181234565', 'pulang lupa uno', '2026-06-08 01:05:56', '2026-06-11 22:07:44'),
 (47, 3, 'Allaiza', 'raut-raut', 'allaizaherboso@gmail.com', 'allaizaherboso', '09285567789', 'Talaba IV', '2026-06-08 01:27:52', '2026-06-08 10:10:20'),
-(48, 3, 'Regine', 'Santos', 'reginesantos@gmail.com', 'reginesantos', '09181234562', 'Molino I, Bacoor', '2026-06-09 20:23:07', '2026-06-11 19:02:58');
+(48, 3, 'Regine', 'Santos', 'reginesantos@gmail.com', 'reginesantos', '09181234562', 'Molino I, Bacoor', '2026-06-09 20:23:07', '2026-06-11 19:02:58'),
+(49, 2, 'thea', 'mepania', 'theamepania@gmail.com', 'theamepania', '09050349845', 'Cavite, Imus', '2026-06-30 02:58:42', '2026-07-10 18:50:45'),
+(50, 3, 'Mary Joy', 'Santos', 'maryjoysantos@gmail.com', 'maryjoysantos', '09050349865', 'Bacoor', '2026-06-30 03:13:23', '2026-07-09 19:16:42'),
+(51, 3, 'leo', 'perez', 'leoperez@gmail.com', 'leoperez', '09098847800', 'Aniban II, Bacoor', '2026-07-09 11:34:33', '2026-07-10 18:50:57');
 
 --
 -- Indexes for dumped tables
@@ -1703,6 +1837,24 @@ ALTER TABLE `parent_child_links`
   ADD KEY `parent_id` (`parent_id`);
 
 --
+-- Indexes for table `referrals`
+--
+ALTER TABLE `referrals`
+  ADD PRIMARY KEY (`referral_id`),
+  ADD UNIQUE KEY `uniq_guidance_id` (`guidance_id`),
+  ADD KEY `idx_child_id` (`child_id`),
+  ADD KEY `idx_generated_by` (`generated_by`),
+  ADD KEY `idx_status` (`status`);
+
+--
+-- Indexes for table `referral_comments`
+--
+ALTER TABLE `referral_comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `referral_id` (`referral_id`),
+  ADD KEY `sender_user_id` (`sender_user_id`);
+
+--
 -- Indexes for table `reminders`
 --
 ALTER TABLE `reminders`
@@ -1744,7 +1896,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `anthropometric_records`
 --
 ALTER TABLE `anthropometric_records`
-  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
 
 --
 -- AUTO_INCREMENT for table `cdc`
@@ -1756,13 +1908,13 @@ ALTER TABLE `cdc`
 -- AUTO_INCREMENT for table `cdw_assignments`
 --
 ALTER TABLE `cdw_assignments`
-  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `children`
 --
 ALTER TABLE `children`
-  MODIFY `child_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `child_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `child_health_information`
@@ -1774,7 +1926,7 @@ ALTER TABLE `child_health_information`
 -- AUTO_INCREMENT for table `child_health_information_requests`
 --
 ALTER TABLE `child_health_information_requests`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `deworming_records`
@@ -1792,13 +1944,13 @@ ALTER TABLE `events`
 -- AUTO_INCREMENT for table `feeding_records`
 --
 ALTER TABLE `feeding_records`
-  MODIFY `feeding_record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
+  MODIFY `feeding_record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=147;
 
 --
 -- AUTO_INCREMENT for table `feeding_record_items`
 --
 ALTER TABLE `feeding_record_items`
-  MODIFY `feeding_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=545;
+  MODIFY `feeding_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=565;
 
 --
 -- AUTO_INCREMENT for table `food_groups`
@@ -1834,13 +1986,13 @@ ALTER TABLE `growth_wflh`
 -- AUTO_INCREMENT for table `guardians`
 --
 ALTER TABLE `guardians`
-  MODIFY `guardian_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `guardian_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `intervention_guidance`
 --
 ALTER TABLE `intervention_guidance`
-  MODIFY `guidance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `guidance_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
 
 --
 -- AUTO_INCREMENT for table `milk_feeding_records`
@@ -1858,7 +2010,19 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `parent_child_links`
 --
 ALTER TABLE `parent_child_links`
-  MODIFY `link_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `link_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT for table `referrals`
+--
+ALTER TABLE `referrals`
+  MODIFY `referral_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `referral_comments`
+--
+ALTER TABLE `referral_comments`
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `reminders`
@@ -1882,13 +2046,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `submitted_reports`
 --
 ALTER TABLE `submitted_reports`
-  MODIFY `submitted_report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+  MODIFY `submitted_report_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- Constraints for dumped tables
@@ -1962,6 +2126,21 @@ ALTER TABLE `milk_feeding_records`
 ALTER TABLE `parent_child_links`
   ADD CONSTRAINT `parent_child_links_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `parent_child_links_ibfk_2` FOREIGN KEY (`child_id`) REFERENCES `children` (`child_id`);
+
+--
+-- Constraints for table `referrals`
+--
+ALTER TABLE `referrals`
+  ADD CONSTRAINT `fk_referrals_child` FOREIGN KEY (`child_id`) REFERENCES `children` (`child_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_referrals_generated_by` FOREIGN KEY (`generated_by`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_referrals_guidance` FOREIGN KEY (`guidance_id`) REFERENCES `intervention_guidance` (`guidance_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `referral_comments`
+--
+ALTER TABLE `referral_comments`
+  ADD CONSTRAINT `referral_comments_referral_fk` FOREIGN KEY (`referral_id`) REFERENCES `referrals` (`referral_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `referral_comments_user_fk` FOREIGN KEY (`sender_user_id`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `submitted_reports`

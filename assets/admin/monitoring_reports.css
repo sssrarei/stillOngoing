@@ -1,10 +1,9 @@
-
-        .reports-wrapper { padding: 24px; }
+.reports-wrapper { padding: 24px; }
         .reports-header-card {
             background: #ffffff;
-            border-radius: 18px;
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            box-shadow: 0 6px 20px rgba(0,0,0,.06);
             margin-bottom: 24px;
         }
         .reports-header h1 {
@@ -12,7 +11,7 @@
             font-family: 'Poppins', sans-serif;
             font-size: 28px;
             font-weight: 700;
-            color: #163b68;
+            color: #2C5EAD;
         }
         .reports-header p {
             margin: 8px 0 0;
@@ -21,8 +20,8 @@
         }
         .filter-card, .table-card {
             background: #ffffff;
-            border-radius: 18px;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.06);
         }
         .filter-card {
             padding: 20px;
@@ -46,7 +45,7 @@
         .form-control {
             width: 100%;
             padding: 11px 12px;
-            border: 1px solid #dbe2ea;
+            border: 1px solid #D9DEE8;
             border-radius: 10px;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
@@ -56,8 +55,8 @@
             transition: 0.2s ease;
         }
         .form-control:focus {
-            border-color: #163b68;
-            box-shadow: 0 0 0 3px rgba(22, 59, 104, 0.10);
+            border-color: #2C5EAD;
+            box-shadow: 0 0 0 3px rgba(44, 94, 173, 0.15);
         }
         .filter-actions {
             display: flex;
@@ -80,11 +79,11 @@
             transition: 0.2s ease;
         }
         .filter-btn.primary {
-            background: #163b68;
+            background: #2C5EAD;
             color: #fff;
         }
         .filter-btn.primary:hover {
-            background: #102f54;
+            background: #234D8F;
         }
         .filter-btn.secondary {
             background: #eef2f7;
@@ -107,7 +106,7 @@
             font-family: 'Poppins', sans-serif;
             font-size: 20px;
             font-weight: 700;
-            color: #163b68;
+            color: #2C5EAD;
         }
         .table-header p {
             margin: 6px 0 0;
@@ -121,7 +120,7 @@
             padding: 7px 12px;
             border-radius: 999px;
             background: #edf4ff;
-            color: #163b68;
+            color: #2C5EAD;
             font-size: 12px;
             font-weight: 700;
         }
@@ -160,7 +159,7 @@
             justify-content: center;
             padding: 9px 14px;
             border-radius: 10px;
-            background: #163b68;
+            background: #2C5EAD;
             color: #fff;
             text-decoration: none;
             font-size: 13px;
@@ -168,7 +167,7 @@
             transition: 0.2s ease;
         }
         .view-btn:hover {
-            background: #102f54;
+            background: #234D8F;
         }
         .empty-state {
             padding: 56px 24px;
@@ -180,7 +179,7 @@
             margin: 0 0 8px;
             font-family: 'Poppins', sans-serif;
             font-size: 20px;
-            color: #163b68;
+            color: #2C5EAD;
         }
         .error-message {
             margin: 18px 22px 0;
@@ -193,7 +192,7 @@
         }
         .child-name-cell {
             font-weight: 700;
-            color: #163b68;
+            color: #2C5EAD;
         }
         .sex-badge {
             display: inline-flex;

@@ -26,10 +26,12 @@ a{
 
 .page-card{
     background:#ffffff;
-    border:1px solid #dcdcdc;
-    border-radius:14px;
+    border:1px solid #EAEAEA;
+    border-radius:16px;
     padding:24px;
     margin-bottom:18px;
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .error-msg{
@@ -76,12 +78,18 @@ a{
     padding:10px 16px;
     border:none;
     border-radius:8px;
-    background:#2e7d32;
+    background:#4CAF50;
     color:#fff;
     font-family:'Inter', sans-serif;
     font-size:13px;
     font-weight:600;
     cursor:pointer;
+    transition:background 0.2s ease, transform 0.2s ease;
+}
+
+.cdc-form button:hover{
+    background:#388E3C;
+    transform:translateY(-1px);
 }
 
 .active-cdc-text{
@@ -98,13 +106,20 @@ a{
 }
 
 .card{
-    border:1.5px solid #b8b8b8;
+    border:1.5px solid #EAEAEA;
     background:#fff;
     min-height:112px;
     display:flex;
     flex-direction:column;
-    border-radius:8px;
+    border-radius:16px;
     overflow:hidden;
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
 
 .card-title{
@@ -143,7 +158,7 @@ a{
 }
 
 .title-normal{
-    color:#2e7d32;
+    color:#2E7D32;
     background:#dfe8de;
 }
 
@@ -164,7 +179,13 @@ a{
     border-radius:18px;
     min-height:420px;
     padding:20px 18px 16px;
-    box-shadow:0 10px 24px rgba(15, 23, 42, 0.05);
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chart-box:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
 
 .chart-title{
@@ -383,7 +404,7 @@ body.dark-mode .chart-title{
     font-family:'Poppins', sans-serif;
     font-size:20px;
     font-weight:700;
-    color: #2e7d32;
+    color: #388E3C;
 }
 
 .cdw-event-list{
@@ -438,12 +459,12 @@ body.dark-mode .chart-title{
     font-family:'Poppins', sans-serif;
     font-size:20px;
     font-weight:700;
-    color:#2e7d32;
+    color:#388E3C;
 }
 
 .cdw-event-status{
     background:#dcfce7;
-    color:#2e7d32;
+    color:#2E7D32;
     padding:9px 18px;
     border-radius:999px;
     font-size:14px;

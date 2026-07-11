@@ -22,7 +22,7 @@ body{
     font-family:'Poppins', sans-serif;
     font-size:24px;
     font-weight:700;
-    color:#1e3a8a;
+    color:#2C5EAD;
     margin-bottom:6px;
 }
 
@@ -60,9 +60,15 @@ body{
 
 .summary-card{
     background:#ffffff;
-    border-radius:18px;
-    box-shadow:0 10px 30px rgba(15, 23, 42, 0.06);
+    border-radius:16px;
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
     padding:20px;
+    transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
 
 .summary-label{
@@ -76,15 +82,15 @@ body{
     font-family:'Poppins', sans-serif;
     font-size:28px;
     font-weight:700;
-    color:#1e3a8a;
+    color:#2C5EAD;
 }
 
 .toolbar-card,
 .form-card,
 .table-card{
     background:#ffffff;
-    border-radius:18px;
-    box-shadow:0 10px 30px rgba(15, 23, 42, 0.06);
+    border-radius:16px;
+    box-shadow:0 6px 20px rgba(0,0,0,.06);
     margin-bottom:24px;
 }
 
@@ -132,12 +138,12 @@ body{
 }
 
 .btn-primary{
-    background:#2563eb;
+    background:#2C5EAD;
     color:#ffffff;
 }
 
 .btn-primary:hover{
-    background:#1d4ed8;
+    background:#234D8F;
 }
 
 .btn-secondary{
@@ -210,7 +216,7 @@ body{
 .form-group input,
 .form-group select{
     height:44px;
-    border:1px solid #d1d5db;
+    border:1px solid #D9DEE8;
     border-radius:10px;
     padding:0 12px;
     font-size:14px;
@@ -218,6 +224,14 @@ body{
     background:#ffffff;
     color:#111827;
     outline:none;
+    transition:border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.search-input:focus{
+    border-color:#2C5EAD;
+    box-shadow:0 0 0 3px rgba(44, 94, 173, 0.15);
 }
 
 .form-actions{
@@ -242,13 +256,13 @@ table{
 }
 
 thead th{
-    background:#eff6ff;
-    color:#1e3a8a;
+    background:#F8FAFC;
+    color:#2C5EAD;
     font-size:13px;
     font-weight:600;
     text-align:left;
     padding:14px 12px;
-    border-bottom:1px solid #dbeafe;
+    border-bottom:2px solid #E8EDF4;
     white-space:nowrap;
 }
 
@@ -277,7 +291,7 @@ tbody tr:hover{
     padding:6px 10px;
     border-radius:999px;
     background:#dbeafe;
-    color:#1d4ed8;
+    color:#234D8F;
     font-size:12px;
     font-weight:600;
 }
@@ -334,7 +348,7 @@ body.dark-mode .form-group select{
 }
 
 body.dark-mode thead th{
-    background:#163b68;
+    background:#2C5EAD;
     color:#ffffff;
     border-bottom:1px solid #3b82f6;
 }
@@ -360,7 +374,7 @@ body.dark-mode .btn-light:hover{
 }
 
 body.dark-mode .status-badge{
-    background:#163b68;
+    background:#2C5EAD;
     color:#ffffff;
 }
 
