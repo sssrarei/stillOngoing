@@ -178,6 +178,64 @@ if ($submitted_reports_result && mysqli_num_rows($submitted_reports_result) > 0)
 
 /*
 |--------------------------------------------------------------------------
+| PART 9: Referral Program Summary (CSWD Dashboard widget)
+| Additive only — read-only counts across ALL CDCs.
+| Does not modify any of the logic above or below.
+|--------------------------------------------------------------------------
+*/
+$referral_total = 0;
+$referral_pending = 0;
+$referral_completed = 0;
+$referral_with_feedback = 0;
+$referral_no_response = 0;
+
+$referral_total_query = "SELECT COUNT(*) AS total FROM referrals";
+$referral_total_result = mysqli_query($conn, $referral_total_query);
+if ($referral_total_result && mysqli_num_rows($referral_total_result) > 0) {
+    $referral_total_row = mysqli_fetch_assoc($referral_total_result);
+    $referral_total = (int) $referral_total_row['total'];
+}
+
+$referral_status_query = "SELECT status, COUNT(*) AS total FROM referrals GROUP BY status";
+$referral_status_result = mysqli_query($conn, $referral_status_query);
+if ($referral_status_result) {
+    while ($referral_status_row = mysqli_fetch_assoc($referral_status_result)) {
+        if ($referral_status_row['status'] === 'Pending') {
+            $referral_pending = (int) $referral_status_row['total'];
+        }
+        if ($referral_status_row['status'] === 'Completed') {
+            $referral_completed = (int) $referral_status_row['total'];
+        }
+    }
+}
+
+$referral_feedback_query = "
+    SELECT COUNT(DISTINCT r.referral_id) AS total
+    FROM referrals r
+    INNER JOIN referral_comments rc ON rc.referral_id = r.referral_id
+";
+$referral_feedback_result = mysqli_query($conn, $referral_feedback_query);
+if ($referral_feedback_result && mysqli_num_rows($referral_feedback_result) > 0) {
+    $referral_feedback_row = mysqli_fetch_assoc($referral_feedback_result);
+    $referral_with_feedback = (int) $referral_feedback_row['total'];
+}
+
+$referral_no_response_query = "
+    SELECT COUNT(*) AS total
+    FROM referrals r
+    WHERE r.status != 'Pending'
+      AND NOT EXISTS (
+          SELECT 1 FROM referral_comments rc WHERE rc.referral_id = r.referral_id
+      )
+";
+$referral_no_response_result = mysqli_query($conn, $referral_no_response_query);
+if ($referral_no_response_result && mysqli_num_rows($referral_no_response_result) > 0) {
+    $referral_no_response_row = mysqli_fetch_assoc($referral_no_response_result);
+    $referral_no_response = (int) $referral_no_response_row['total'];
+}
+
+/*
+|--------------------------------------------------------------------------
 | At-Risk Children
 | Source: latest submitted WMR per CDC only
 | Do NOT depend on intervention_guidance sending status
@@ -447,6 +505,37 @@ if ($intervention_alerts_result) {
         .alert-action-link:hover {
             opacity: 0.92;
         }
+
+        .rp-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .rp-summary-item {
+            background: #fffdf9;
+            border: 1px solid #edf0f4;
+            border-radius: 14px;
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        .rp-summary-label {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .rp-summary-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            font-family: 'Poppins', sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -706,6 +795,37 @@ if ($intervention_alerts_result) {
             </div>
 
          
+
+            <div class="panel-card">
+                <h2 class="panel-title">Referral Program Summary</h2>
+
+                <div class="rp-summary-grid">
+                    <div class="rp-summary-item">
+                        <div class="rp-summary-label">Total</div>
+                        <div class="rp-summary-value"><?php echo $referral_total; ?></div>
+                    </div>
+                    <div class="rp-summary-item">
+                        <div class="rp-summary-label">Pending</div>
+                        <div class="rp-summary-value"><?php echo $referral_pending; ?></div>
+                    </div>
+                    <div class="rp-summary-item">
+                        <div class="rp-summary-label">Completed</div>
+                        <div class="rp-summary-value"><?php echo $referral_completed; ?></div>
+                    </div>
+                    <div class="rp-summary-item">
+                        <div class="rp-summary-label">With Feedback</div>
+                        <div class="rp-summary-value"><?php echo $referral_with_feedback; ?></div>
+                    </div>
+                    <div class="rp-summary-item">
+                        <div class="rp-summary-label">No Response</div>
+                        <div class="rp-summary-value"><?php echo $referral_no_response; ?></div>
+                    </div>
+                </div>
+
+                <div class="alert-actions">
+                    <a href="view_referral_monitoring.php" class="alert-action-link">View Referral Monitoring →</a>
+                </div>
+            </div>
 
             <div class="panel-card">
                 <h2 class="panel-title">Admin Quick Access</h2>

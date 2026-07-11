@@ -203,6 +203,7 @@ $html .= '<a href="' . $safe_file_path . '" target="_blank" class="file-link">' 
 
 $guardian_submission = null;
 $guardian_submission_message = '';
+$guardian_submission_message_type = 'success';
 $guardian_submission_feature_enabled = false;
 
 $table_check_sql = "SHOW TABLES LIKE 'child_health_information_requests'";
@@ -317,17 +318,25 @@ if ($guardian_submission_feature_enabled && $_SERVER['REQUEST_METHOD'] === 'POST
             }
 
             if ($action === 'reject') {
+                $reject_reason = trim($_POST['reject_reason'] ?? '');
+
+                if ($reject_reason === '') {
+                    header("Location: child_profile.php?child_id=" . $child_id . "&guardian_submission=reject_error");
+                    exit();
+                }
+
                 $reject_sql = "
                     UPDATE child_health_information_requests
                     SET status = 'Rejected',
                         reviewed_by = ?,
-                        reviewed_at = NOW()
+                        reviewed_at = NOW(),
+                        review_remarks = ?
                     WHERE request_id = ?
                 ";
                 $reject_stmt = $conn->prepare($reject_sql);
 
                 if ($reject_stmt) {
-                    $reject_stmt->bind_param("ii", $reviewed_by, $request_id);
+                    $reject_stmt->bind_param("isi", $reviewed_by, $reject_reason, $request_id);
                     $reject_stmt->execute();
                     $reject_stmt->close();
                 }
@@ -344,6 +353,9 @@ if ($guardian_submission_feature_enabled && isset($_GET['guardian_submission']))
         $guardian_submission_message = "Guardian health information was approved and applied to the child's official health record.";
     } elseif ($_GET['guardian_submission'] === 'rejected') {
         $guardian_submission_message = "Guardian health information submission was rejected.";
+    } elseif ($_GET['guardian_submission'] === 'reject_error') {
+        $guardian_submission_message = "Rejection was not saved. A reason is required before you can reject a submission.";
+        $guardian_submission_message_type = 'error';
     }
 }
 
@@ -560,7 +572,7 @@ if ($guardian_submission_feature_enabled) {
             </div>
 
             <?php if (!empty($guardian_submission_message)) { ?>
-                <div class="guardian-submission-message success">
+                <div class="guardian-submission-message <?php echo htmlspecialchars($guardian_submission_message_type); ?>">
                     <?php echo htmlspecialchars($guardian_submission_message); ?>
                 </div>
             <?php } ?>
@@ -622,12 +634,38 @@ if ($guardian_submission_feature_enabled) {
             </button>
         </form>
 
-        <form method="POST" class="guardian-submission-form">
+        <form method="POST" class="guardian-submission-form" id="rejectSubmissionForm">
             <input type="hidden" name="request_id" value="<?php echo (int)$guardian_submission['request_id']; ?>">
-            <button type="submit" name="guardian_submission_action" value="reject" class="btn-guardian-reject">
+            <input type="hidden" name="guardian_submission_action" value="reject">
+            <input type="hidden" name="reject_reason" id="rejectReasonInput">
+            <button type="button" class="btn-guardian-reject" onclick="openRejectModal()">
                 Reject
             </button>
         </form>
+                    </div>
+                </div>
+
+                <div class="reject-modal-overlay" id="rejectModalOverlay">
+                    <div class="reject-modal-box">
+                        <h4 class="reject-modal-title">Reject Health Information Submission</h4>
+                        <p class="reject-modal-text">Please select a reason for rejecting this submission. The guardian will see this reason and can resubmit.</p>
+
+                        <select id="rejectReasonSelect" class="reject-modal-select" onchange="toggleRejectOtherField()">
+                            <option value="">Select reason</option>
+                            <option value="Incomplete or missing required information">Incomplete or missing required information</option>
+                            <option value="Vaccination card image is unclear or unreadable">Vaccination card image is unclear or unreadable</option>
+                            <option value="Medical history document is unclear or unreadable">Medical history document is unclear or unreadable</option>
+                            <option value="Submitted information does not match the child's records">Submitted information does not match the child's records</option>
+                            <option value="Others">Others (please specify)</option>
+                        </select>
+
+                        <textarea id="rejectReasonOther" class="reject-modal-textarea" rows="3" placeholder="Type specific reason..." style="display:none; margin-top:10px;"></textarea>
+
+                        <div class="reject-modal-error" id="rejectReasonError">Reason is required before you can reject.</div>
+                        <div class="reject-modal-actions">
+                            <button type="button" class="btn-reject-cancel" onclick="closeRejectModal()">Cancel</button>
+                            <button type="button" class="btn-reject-confirm" onclick="confirmRejectSubmission()">Confirm Reject</button>
+                        </div>
                     </div>
                 </div>
             <?php } ?>
@@ -728,6 +766,80 @@ function toggleSidebar() {
 function closeSidebar() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+function openRejectModal() {
+    var select = document.getElementById('rejectReasonSelect');
+    var otherBox = document.getElementById('rejectReasonOther');
+    var errorText = document.getElementById('rejectReasonError');
+    var overlay = document.getElementById('rejectModalOverlay');
+
+    if (!select || !otherBox || !errorText || !overlay) {
+        return;
+    }
+
+    select.value = '';
+    otherBox.value = '';
+    otherBox.style.display = 'none';
+    errorText.textContent = 'Reason is required before you can reject.';
+    errorText.style.display = 'none';
+    overlay.classList.add('show');
+}
+
+function toggleRejectOtherField() {
+    var select = document.getElementById('rejectReasonSelect');
+    var otherBox = document.getElementById('rejectReasonOther');
+
+    if (!select || !otherBox) {
+        return;
+    }
+
+    otherBox.style.display = (select.value === 'Others') ? 'block' : 'none';
+}
+
+function closeRejectModal() {
+    var overlay = document.getElementById('rejectModalOverlay');
+
+    if (overlay) {
+        overlay.classList.remove('show');
+    }
+}
+
+function confirmRejectSubmission() {
+    var select = document.getElementById('rejectReasonSelect');
+    var otherBox = document.getElementById('rejectReasonOther');
+    var errorText = document.getElementById('rejectReasonError');
+    var reasonInput = document.getElementById('rejectReasonInput');
+    var form = document.getElementById('rejectSubmissionForm');
+
+    if (!select || !otherBox || !errorText || !reasonInput || !form) {
+        return;
+    }
+
+    var selectedReason = select.value;
+    var finalReason = '';
+
+    if (selectedReason === '') {
+        errorText.style.display = 'block';
+        return;
+    }
+
+    if (selectedReason === 'Others') {
+        var otherText = otherBox.value.trim();
+
+        if (otherText === '') {
+            errorText.textContent = 'Please specify the reason.';
+            errorText.style.display = 'block';
+            return;
+        }
+
+        finalReason = otherText;
+    } else {
+        finalReason = selectedReason;
+    }
+
+    reasonInput.value = finalReason;
+    form.submit();
 }
 </script>
 

@@ -135,11 +135,11 @@ if($table_check && $table_check->num_rows > 0){
 if($submission_table_exists){
     $pending_sql = "
         SELECT *
-        FROM guardian_health_submissions
+        FROM child_health_information_requests
         WHERE child_id = ?
-          AND guardian_user_id = ?
+          AND guardian_id = ?
           AND status = 'Pending'
-        ORDER BY submitted_at DESC, submission_id DESC
+        ORDER BY submitted_at DESC, request_id DESC
         LIMIT 1
     ";
 
@@ -151,6 +151,30 @@ if($submission_table_exists){
         $pending_result = $pending_stmt->get_result();
         $pending_submission = $pending_result->fetch_assoc();
         $pending_stmt->close();
+    }
+}
+
+$rejected_submission = null;
+
+if($submission_table_exists && !$pending_submission){
+    $rejected_sql = "
+        SELECT *
+        FROM child_health_information_requests
+        WHERE child_id = ?
+          AND guardian_id = ?
+          AND status = 'Rejected'
+        ORDER BY submitted_at DESC, request_id DESC
+        LIMIT 1
+    ";
+
+    $rejected_stmt = $conn->prepare($rejected_sql);
+
+    if($rejected_stmt){
+        $rejected_stmt->bind_param("ii", $child_id, $guardian_user_id);
+        $rejected_stmt->execute();
+        $rejected_result = $rejected_stmt->get_result();
+        $rejected_submission = $rejected_result->fetch_assoc();
+        $rejected_stmt->close();
     }
 }
 
@@ -444,6 +468,28 @@ if ($comorbidity_status === 'No') {
         line-height:1.6;
     }
 
+    .rejected-box{
+        padding:18px;
+        border:1px solid #f2b8b5;
+        background:linear-gradient(135deg, #fdeaea 0%, #fff5f5 100%);
+        border-radius:18px;
+        margin-bottom:18px;
+    }
+
+    .rejected-title{
+        font-family:'Poppins', sans-serif;
+        font-size:17px;
+        font-weight:800;
+        color:#b42318;
+        margin-bottom:8px;
+    }
+
+    .rejected-text{
+        font-size:14px;
+        color:#8a2e26;
+        line-height:1.6;
+    }
+
     .health-form{
         display:grid;
         grid-template-columns:1fr 1fr;
@@ -578,6 +624,16 @@ if ($comorbidity_status === 'No') {
     body.dark-mode .pending-title,
     body.dark-mode .pending-text{
         color:#fde68a;
+    }
+
+    body.dark-mode .rejected-box{
+        background:#3b1a1a;
+        border-color:#7f1d1d;
+    }
+
+    body.dark-mode .rejected-title,
+    body.dark-mode .rejected-text{
+        color:#fca5a5;
     }
 
     body.dark-mode .file-link{
@@ -733,6 +789,22 @@ if ($comorbidity_status === 'No') {
                         </div>
                     </div>
                 <?php } else { ?>
+                    <?php if($rejected_submission) { ?>
+                        <div class="rejected-box">
+                            <div class="rejected-title">Submission Rejected</div>
+                            <div class="rejected-text">
+                                Your previous health information submission was rejected by the Child Development Worker.
+                                <br><br>
+                                <strong>Reason:</strong>
+                                <?php echo nl2br(htmlspecialchars(!empty($rejected_submission['review_remarks']) ? $rejected_submission['review_remarks'] : 'No reason provided.')); ?>
+                                <br><br>
+                                <strong>Reviewed on:</strong>
+                                <?php echo htmlspecialchars(!empty($rejected_submission['reviewed_at']) ? date("F d, Y g:i A", strtotime($rejected_submission['reviewed_at'])) : 'N/A'); ?>
+                                <br><br>
+                                You may update and resubmit the form below.
+                            </div>
+                        </div>
+                    <?php } ?>
                     <form method="POST" enctype="multipart/form-data" class="health-form">
 
                         <div class="form-group">

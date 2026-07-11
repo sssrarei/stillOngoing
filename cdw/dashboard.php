@@ -161,6 +161,18 @@ $severely_wasted_count = 0;
 
 /*
 |--------------------------------------------------------------------------
+| PART 9: Referral Program Summary (CDW Dashboard widget)
+| Additive only — scoped to the active CDC. Defaults defined here so the
+| page still renders safely if no active CDC is selected.
+|--------------------------------------------------------------------------
+*/
+$referral_assigned = 0;
+$referral_cdw_pending = 0;
+$referral_cdw_completed = 0;
+$referral_awaiting_response = 0;
+
+/*
+|--------------------------------------------------------------------------
 | FOOD GROUP GRAPH DATA
 |--------------------------------------------------------------------------
 */
@@ -298,6 +310,62 @@ if($summary_result){
             $food_group_data[] = $row;
         }
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PART 9: Referral Program Summary queries (CDW Dashboard widget)
+    | Additive only — scoped to the active CDC, same pattern as the counts
+    | above. Does not touch any existing query or variable.
+    |--------------------------------------------------------------------------
+    */
+    $referral_assigned_sql = "
+        SELECT COUNT(*) AS total
+        FROM referrals r
+        INNER JOIN children c ON c.child_id = r.child_id
+        WHERE c.cdc_id = '$active_cdc_id'
+    ";
+    $referral_assigned_result = mysqli_query($conn, $referral_assigned_sql);
+    if ($referral_assigned_result && mysqli_num_rows($referral_assigned_result) > 0) {
+        $referral_assigned_row = mysqli_fetch_assoc($referral_assigned_result);
+        $referral_assigned = (int) $referral_assigned_row['total'];
+    }
+
+    $referral_cdw_status_sql = "
+        SELECT r.status, COUNT(*) AS total
+        FROM referrals r
+        INNER JOIN children c ON c.child_id = r.child_id
+        WHERE c.cdc_id = '$active_cdc_id'
+        GROUP BY r.status
+    ";
+    $referral_cdw_status_result = mysqli_query($conn, $referral_cdw_status_sql);
+    if ($referral_cdw_status_result) {
+        while ($referral_cdw_status_row = mysqli_fetch_assoc($referral_cdw_status_result)) {
+            if ($referral_cdw_status_row['status'] === 'Pending') {
+                $referral_cdw_pending = (int) $referral_cdw_status_row['total'];
+            }
+            if ($referral_cdw_status_row['status'] === 'Completed') {
+                $referral_cdw_completed = (int) $referral_cdw_status_row['total'];
+            }
+        }
+    }
+
+    $referral_awaiting_sql = "
+        SELECT r.referral_id
+        FROM referrals r
+        INNER JOIN children c ON c.child_id = r.child_id
+        WHERE c.cdc_id = '$active_cdc_id'
+          AND r.status != 'Completed'
+          AND r.status != 'Pending'
+          AND NOT EXISTS (
+              SELECT 1 FROM referral_comments rc
+              WHERE rc.referral_id = r.referral_id
+                AND rc.sender_role = 'Guardian'
+          )
+    ";
+    $referral_awaiting_result = mysqli_query($conn, $referral_awaiting_sql);
+    if ($referral_awaiting_result) {
+        $referral_awaiting_response = mysqli_num_rows($referral_awaiting_result);
+    }
 }
 
 /*
@@ -365,6 +433,72 @@ $is_dark_mode = ($theme_mode === 'dark');
     <link rel="stylesheet" href="../assets/cdw/cdw-style.css">
     <link rel="stylesheet" href="../assets/cdw/cdw-dashboard.css">
     <link rel="stylesheet" href="../assets/cdw/cdw-topbar-notification.css">
+    <style>
+        .rp-section {
+            margin-top: 4px;
+        }
+
+        .rp-section-header {
+            font-family: 'Poppins', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 4px 0;
+        }
+
+        .rp-section-subtitle {
+            font-size: 12.5px;
+            color: #94a3b8;
+            margin: 0 0 16px 0;
+        }
+
+        .rp-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+        }
+
+        .rp-stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+
+        .rp-stat-icon {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .rp-stat-assigned .rp-stat-icon { background: #dbeafe; color: #1d4ed8; }
+        .rp-stat-pending .rp-stat-icon { background: #fef3c7; color: #b45309; }
+        .rp-stat-completed .rp-stat-icon { background: #dcfce7; color: #15803d; }
+        .rp-stat-awaiting .rp-stat-icon { background: #ede9fe; color: #6d28d9; }
+
+        .rp-stat-label {
+            font-size: 12.5px;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 2px;
+        }
+
+        .rp-stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.1;
+        }
+    </style>
 </head>
 <body class="<?php echo ($theme_mode === 'dark') ? 'dark-mode' : ''; ?>">
 <?php include '../includes/cdw_topbar.php'; ?>
@@ -494,6 +628,45 @@ $is_dark_mode = ($theme_mode === 'dark');
                 <div class="card-title title-alert">Severely Wasted</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $severely_wasted_count; ?></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-card rp-section">
+        <h2 class="rp-section-header">📋 Referral Program Summary</h2>
+        <p class="rp-section-subtitle">Referral cases for children under your active CDC.</p>
+
+        <div class="rp-stat-grid">
+            <div class="rp-stat rp-stat-assigned">
+                <div class="rp-stat-icon">📁</div>
+                <div>
+                    <div class="rp-stat-label">Referrals Assigned</div>
+                    <div class="rp-stat-value"><?php echo $referral_assigned; ?></div>
+                </div>
+            </div>
+
+            <div class="rp-stat rp-stat-pending">
+                <div class="rp-stat-icon">⏳</div>
+                <div>
+                    <div class="rp-stat-label">Pending</div>
+                    <div class="rp-stat-value"><?php echo $referral_cdw_pending; ?></div>
+                </div>
+            </div>
+
+            <div class="rp-stat rp-stat-completed">
+                <div class="rp-stat-icon">✅</div>
+                <div>
+                    <div class="rp-stat-label">Completed</div>
+                    <div class="rp-stat-value"><?php echo $referral_cdw_completed; ?></div>
+                </div>
+            </div>
+
+            <div class="rp-stat rp-stat-awaiting">
+                <div class="rp-stat-icon">💬</div>
+                <div>
+                    <div class="rp-stat-label">Awaiting Guardian Response</div>
+                    <div class="rp-stat-value"><?php echo $referral_awaiting_response; ?></div>
                 </div>
             </div>
         </div>

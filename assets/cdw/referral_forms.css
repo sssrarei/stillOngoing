@@ -1,0 +1,375 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--page-bg);
+    color: var(--text-color);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* MAIN */
+.main-content {
+    margin-left: 260px;
+    padding: 112px 24px 30px;
+    transition: margin-left 0.25s ease;
+}
+
+.main-content.full {
+    margin-left: 0;
+}
+
+/* HEADER */
+.page-header {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2E7D32;
+}
+
+.page-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 6px;
+}
+
+.page-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.8;
+}
+
+/* CARD */
+.content-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+}
+
+/* BUTTON (for later parts: Generate / Send Referral) */
+.btn {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-submit {
+    background: #2E7D32;
+    color: #fff;
+}
+
+.btn-submit:hover {
+    background: #256628;
+}
+
+.btn-disabled,
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.top-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+/* ALERTS (DARKMODE FIXED) */
+.error-message {
+    background: rgba(198,40,40,0.15);
+    color: #ff6b6b;
+    border: 1px solid rgba(198,40,40,0.4);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+}
+
+.success-message {
+    background: rgba(46,125,50,0.15);
+    color: #7dff9a;
+    border: 1px solid rgba(46,125,50,0.4);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+}
+
+.warning-message {
+    background: rgba(255,152,0,0.15);
+    color: #ffcc80;
+    border: 1px solid rgba(255,152,0,0.4);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+}
+
+/* META */
+.meta-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+}
+
+.meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 20px;
+}
+
+.meta-item {
+    font-size: 13px;
+    color: var(--text-color);
+}
+
+/* PROGRAM (used here for the official Intervention Guidance box) */
+.program-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.program-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.program-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    white-space: pre-line;
+}
+
+/* SUMMARY */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.summary-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.summary-label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.summary-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+/* TABLE FIX DARKMODE */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--card-bg);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+th {
+    background: var(--table-header);
+    color: var(--text-color);
+    padding: 13px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+    text-align: left;
+}
+
+td {
+    padding: 13px 12px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 13px;
+    color: var(--text-color);
+    background: var(--card-bg);
+    white-space: nowrap;
+}
+
+tbody tr:nth-child(even) td {
+    background: rgba(255,255,255,0.03);
+}
+
+/* STATUS */
+.status-chip {
+    display: inline-flex;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--chip-bg);
+    color: var(--text-color);
+}
+
+/* Referral-specific status colors (override the generic chip background) */
+.status-not-generated {
+    background-color: #f1f2f6;
+    color: #636e72;
+    border: 1px solid #dcdde1;
+}
+
+.status-pending {
+    background-color: #fff6e0;
+    color: #b8860b;
+    border: 1px solid #ffe29a;
+}
+
+.status-sent {
+    background-color: #e6f0ff;
+    color: #1b5fd6;
+    border: 1px solid #b9d3ff;
+}
+
+.status-viewed {
+    background-color: #eae6ff;
+    color: #5a3ec8;
+    border: 1px solid #d1c4ff;
+}
+
+.status-in-progress {
+    background-color: #fff0e0;
+    color: #c26a00;
+    border: 1px solid #ffd6a3;
+}
+
+.status-completed {
+    background-color: #e3f9e5;
+    color: #1e8a3c;
+    border: 1px solid #b7ecc0;
+}
+
+/* NO DATA */
+.no-data {
+    padding: 14px 2px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.action-placeholder {
+    color: var(--text-muted);
+}
+
+/* FORM (Generate Referral / later parts) */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 6px;
+}
+
+.form-group .required {
+    color: #ff6b6b;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text-color);
+    background: var(--page-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    resize: vertical;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #2E7D32;
+}
+
+.btn-cancel {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    display: inline-flex;
+    align-items: center;
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.field-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 991px) {
+    .main-content {
+        margin-left: 0;
+        padding: 104px 16px 24px;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .meta-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}

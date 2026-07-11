@@ -24,6 +24,11 @@
            Intervention Guidance
         </a>
 
+        <a href="view_referral_monitoring.php"
+           class="sidebar-link <?php echo in_array($current_page, ['view_referral_monitoring.php']) ? 'active' : ''; ?>">
+           Referral Monitoring
+        </a>
+
         <div class="sidebar-title">Management</div>
 
         <a href="add_cdc.php"

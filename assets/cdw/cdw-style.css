@@ -325,6 +325,112 @@ table td{
     border:1px solid var(--success-border);
 }
 
+.guardian-submission-message.error{
+    background:var(--danger-bg);
+    color:var(--danger-text);
+    border:1px solid var(--danger-border);
+}
+
+/* =========================
+   REJECT CONFIRMATION MODAL
+========================= */
+.reject-modal-overlay{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.35);
+    z-index:1200;
+    align-items:center;
+    justify-content:center;
+}
+
+.reject-modal-overlay.show{
+    display:flex;
+}
+
+.reject-modal-box{
+    background:var(--card-bg);
+    border:1px solid var(--border-color);
+    border-radius:14px;
+    padding:22px;
+    width:90%;
+    max-width:420px;
+}
+
+.reject-modal-title{
+    font-weight:700;
+    color:var(--text-color);
+    margin-bottom:8px;
+}
+
+.reject-modal-text{
+    font-size:13px;
+    color:var(--muted-text);
+    margin-bottom:12px;
+    line-height:1.5;
+}
+
+.reject-modal-textarea{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid var(--input-border);
+    background:var(--input-bg);
+    color:var(--text-color);
+    font-family:'Inter', sans-serif;
+    resize:vertical;
+}
+
+.reject-modal-select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid var(--input-border);
+    background:var(--input-bg);
+    color:var(--text-color);
+    font-family:'Inter', sans-serif;
+    height:44px;
+}
+
+.reject-modal-error{
+    display:none;
+    color:var(--danger-text);
+    font-size:12px;
+    margin-top:6px;
+}
+
+.reject-modal-actions{
+    margin-top:16px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+}
+
+.btn-reject-cancel{
+    background:var(--card-bg);
+    color:var(--text-color);
+    border:1px solid var(--border-color);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.btn-reject-confirm{
+    background:var(--danger-text);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+}
+
 .pending-status{
     color:var(--warning-text);
     font-weight:700;
@@ -605,4 +711,48 @@ body.sidebar-collapsed .main-content{
     margin-left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+}
+
+
+/* =========================
+   Referral forms */
+
+   /* Referral Forms - page specific styles */
+/* Base layout (page-header, content-card, table, summary-grid, status-chip)
+   already come from cdw-style.css. This file only adds referral-status colors. */
+
+.status-not-generated {
+    background-color: #f1f2f6;
+    color: #636e72;
+    border: 1px solid #dcdde1;
+}
+
+.status-pending {
+    background-color: #fff6e0;
+    color: #b8860b;
+    border: 1px solid #ffe29a;
+}
+
+.status-sent {
+    background-color: #e6f0ff;
+    color: #1b5fd6;
+    border: 1px solid #b9d3ff;
+}
+
+.status-viewed {
+    background-color: #eae6ff;
+    color: #5a3ec8;
+    border: 1px solid #d1c4ff;
+}
+
+.status-in-progress {
+    background-color: #fff0e0;
+    color: #c26a00;
+    border: 1px solid #ffd6a3;
+}
+
+.status-completed {
+    background-color: #e3f9e5;
+    color: #1e8a3c;
+    border: 1px solid #b7ecc0;
 }

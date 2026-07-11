@@ -104,6 +104,50 @@ if ($child && isset($child['child_id'])) {
 
         $stmt->close();
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PART 9: Referral Update (Guardian Dashboard widget)
+    | Additive only — latest referral status + latest 2 messages.
+    | Reuses $latest_guidance already fetched above; does not touch it.
+    |--------------------------------------------------------------------------
+    */
+    $latest_referral = null;
+    $latest_referral_comments = [];
+
+    $latest_referral_sql = "
+        SELECT referral_id, status, sent_at
+        FROM referrals
+        WHERE child_id = ?
+        ORDER BY sent_at DESC, referral_id DESC
+        LIMIT 1
+    ";
+    if ($stmt = $conn->prepare($latest_referral_sql)) {
+        $stmt->bind_param("i", $child_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $latest_referral = $result->fetch_assoc();
+        $stmt->close();
+    }
+
+    if ($latest_referral) {
+        $latest_comments_sql = "
+            SELECT sender_role, message, created_at
+            FROM referral_comments
+            WHERE referral_id = ?
+            ORDER BY created_at DESC
+            LIMIT 2
+        ";
+        if ($stmt = $conn->prepare($latest_comments_sql)) {
+            $stmt->bind_param("i", $latest_referral['referral_id']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) {
+                $latest_referral_comments[] = $row;
+            }
+            $stmt->close();
+        }
+    }
 }
 
 function formatChildName($child) {
@@ -569,6 +613,44 @@ else{
                     No upcoming community events.
                 </div>
             <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Referral Update</h2>
+        </div>
+        <div class="card-body">
+            <?php if ($latest_referral) { ?>
+                <div class="status-badge <?php echo (strtolower($latest_referral['status']) === 'completed') ? 'status-normal' : 'status-alert'; ?>">
+                    <?php echo htmlspecialchars($latest_referral['status']); ?>
+                </div>
+
+                <?php if (!empty($latest_referral_comments)) { ?>
+                    <div style="margin-top:14px;">
+                        <?php foreach ($latest_referral_comments as $c) { ?>
+                            <div style="margin-bottom:10px; font-size:14px; color:#374151;">
+                                <strong><?php echo ($c['sender_role'] === 'Guardian') ? 'You' : 'CDW'; ?>:</strong>
+                                <?php echo htmlspecialchars($c['message']); ?>
+                            </div>
+                        <?php } ?>
+                    </div>
+                <?php } else { ?>
+                    <div class="empty-state" style="margin-top:10px;">No messages yet on this referral.</div>
+                <?php } ?>
+
+                <?php if ($latest_guidance) { ?>
+                    <div style="margin-top:14px; font-size:13px; color:#6b7280;">
+                        <strong>Latest Guidance:</strong> <?php echo htmlspecialchars(getGuardianAlertTitle($latest_guidance)); ?>
+                    </div>
+                <?php } ?>
+
+                <a href="referral.php" class="guardian-nutri-alert-btn" style="margin-top:14px;">
+                    View Referral
+                </a>
+            <?php } else { ?>
+                <div class="empty-state">No referral on record yet.</div>
+            <?php } ?>
         </div>
     </div>
 

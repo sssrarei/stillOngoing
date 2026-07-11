@@ -108,6 +108,38 @@ if($child){
 }
 
 /* --------------------------------------------------------------------------
+   CHECK FOR AN OFFICIALLY-SENT REFERRAL
+   Only referrals that are already Sent/Viewed/In Progress/Completed
+   (never Pending) may be shown/linked to the guardian.
+-------------------------------------------------------------------------- */
+$sent_referral_id = null;
+
+if ($child) {
+    $referral_check_sql = "
+        SELECT referral_id
+        FROM referrals
+        WHERE child_id = ?
+          AND status != 'Pending'
+        ORDER BY created_at DESC
+        LIMIT 1
+    ";
+    $referral_check_stmt = $conn->prepare($referral_check_sql);
+
+    if ($referral_check_stmt) {
+        $referral_check_stmt->bind_param("i", $child['child_id']);
+        $referral_check_stmt->execute();
+        $referral_check_result = $referral_check_stmt->get_result();
+        $referral_check_row = $referral_check_result->fetch_assoc();
+
+        if ($referral_check_row) {
+            $sent_referral_id = (int) $referral_check_row['referral_id'];
+        }
+
+        $referral_check_stmt->close();
+    }
+}
+
+/* --------------------------------------------------------------------------
    GET GUARDIAN NOTIFICATIONS / REMINDERS
 -------------------------------------------------------------------------- */
 $notif_sql = "
@@ -580,6 +612,44 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
         border:1px solid #93c5fd;
     }
 
+    .notif-badge-link{
+        text-decoration:none;
+        cursor:pointer;
+        transition:transform 0.15s ease, box-shadow 0.15s ease;
+        position:relative;
+        padding-right:20px;
+    }
+
+    .notif-badge-link:hover{
+        transform:translateY(-1px);
+        box-shadow:0 4px 12px rgba(29, 78, 216, 0.25);
+    }
+
+    .notif-badge-link::after{
+        content:"→";
+        margin-left:6px;
+        font-weight:900;
+    }
+
+    .notif-badge-dot{
+        position:absolute;
+        top:-6px;
+        right:-6px;
+        width:14px;
+        height:14px;
+        background:#ef4444;
+        border:2px solid #fff;
+        border-radius:50%;
+        box-shadow:0 0 0 rgba(239, 68, 68, 0.6);
+        animation:notifPulse 1.6s infinite;
+    }
+
+    @keyframes notifPulse{
+        0%{ box-shadow:0 0 0 0 rgba(239, 68, 68, 0.55); }
+        70%{ box-shadow:0 0 0 8px rgba(239, 68, 68, 0); }
+        100%{ box-shadow:0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
     body.dark-mode .ir-card{
         background:#111827;
         border-color:#334155;
@@ -834,9 +904,16 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
                         </span>
 
                         <?php if(isset($official_guidance['needs_referral']) && (int)$official_guidance['needs_referral'] === 1) { ?>
-                            <span class="notif-badge unread">
-                                Possible Further Assessment
-                            </span>
+                            <?php if($sent_referral_id) { ?>
+                                <a href="referral.php" class="notif-badge unread notif-badge-link">
+                                    <span class="notif-badge-dot"></span>
+                                    Possible Further Assessment — View Referral
+                                </a>
+                            <?php } else { ?>
+                                <span class="notif-badge unread">
+                                    Possible Further Assessment
+                                </span>
+                            <?php } ?>
                         <?php } else { ?>
                             <span class="notif-badge unread">
                                 Counseling / Nutrition Education
