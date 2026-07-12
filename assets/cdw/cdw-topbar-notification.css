@@ -63,7 +63,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: #1e3a5f;
+    color: #388E3C;
     background: #f4f7fb;
     border-bottom: 1px solid #e5ecf6;
 }
@@ -103,7 +103,7 @@
 
 .notif-read-btn {
     border: none;
-    background: #1e3a5f;
+    background: #388E3C;
     color: #ffffff;
     font-size: 12px;
     font-weight: 500;
@@ -114,7 +114,7 @@
 }
 
 .notif-read-btn:hover {
-    background: #16314f;
+    background: #2E7D32;
 }
 .notif-dropdown {
     position: absolute;

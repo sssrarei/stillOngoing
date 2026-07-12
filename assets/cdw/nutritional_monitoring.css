@@ -41,12 +41,12 @@
 }
 
 .btn-primary {
-    background: #2f80ed;
+    background: #4CAF50;
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    background: #1f6fd2;
+    background: #388E3C;
 }
 
 .btn-secondary {
@@ -62,7 +62,7 @@
 .child-info-card,
 .section-card {
     background: #ffffff;
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
@@ -142,7 +142,7 @@
 }
 
 .status-card {
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 18px;
     color: #ffffff;
     min-height: 90px;

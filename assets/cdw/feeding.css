@@ -5,7 +5,7 @@
 .page-header{
    background:#ffffff;
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     padding:22px 24px;
     margin-bottom:18px;
 }
@@ -35,7 +35,7 @@
 .cdc-banner{
     background:var(--card-bg);
     border:1px solid var(--border-color);
-    border-radius:14px;
+    border-radius:16px;
     padding:20px 24px;
     margin-bottom:18px;
     text-align:center;
@@ -58,7 +58,7 @@
 .content-card{
     background:var(--card-bg);
     border:1px solid var(--border-color);
-    border-radius:14px;
+    border-radius:16px;
     margin-bottom:18px;
     overflow:hidden;
 }

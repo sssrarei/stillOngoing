@@ -21,7 +21,7 @@ a{
     align-items:center;
     gap:8px;
     margin-bottom:16px;
-    color:#2E7D32;
+    color:#4CAF50;
     font-size:13px;
     font-weight:600;
 }
@@ -263,7 +263,7 @@ a{
 }
 
 .status-pill{
-    border-radius:14px;
+    border-radius:16px;
     padding:18px;
     color:#ffffff;
     min-height:96px;
@@ -365,7 +365,7 @@ a{
 }
 
 .btn-primary{
-    background:#2E7D32;
+    background:#4CAF50;
     color:#ffffff;
 }
 
@@ -765,7 +765,7 @@ body.dark-mode .empty-state{
 
 .health-info-group{
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     background:#ffffff;
     overflow:hidden;
     min-height:170px;

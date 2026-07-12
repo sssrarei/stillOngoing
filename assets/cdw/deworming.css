@@ -41,7 +41,7 @@
 .recent-records-card {
     background: #ffffff;
     padding: 20px;
-    border-radius: 14px;
+    border-radius: 16px;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -390,7 +390,7 @@ body.dark-mode .mini-status.not-taken {
 .page-header {
     background: #ffffff;
     border: 1px solid #dcdcdc;
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 22px 24px;
     margin-bottom: 20px;
 }

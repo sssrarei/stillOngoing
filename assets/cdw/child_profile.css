@@ -30,7 +30,7 @@ a{
     gap:8px;
     margin-bottom:16px;
     text-decoration:none;
-    color:#2E7D32;
+    color:#4CAF50;
     font-size:13px;
     font-weight:600;
 }
@@ -38,7 +38,7 @@ a{
 .profile-header{
     background:#ffffff;
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     padding:22px 24px;
     display:flex;
     justify-content:space-between;
@@ -94,7 +94,7 @@ a{
 .side-action-card{
     background:#ffffff;
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     padding:20px;
 }
 
@@ -148,7 +148,7 @@ a{
 }
 
 .btn-edit{
-    background:#2E7D32;
+    background:#4CAF50;
     color:#fff;
     border:none;
     border-radius:8px;
@@ -185,7 +185,7 @@ a{
 
 .btn-monitoring{
     width:100%;
-    background:#2E7D32;
+    background:#4CAF50;
     color:#fff;
     border:none;
     border-radius:10px;

@@ -6,7 +6,7 @@
 .page-header{
     background:#ffffff;
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     padding:22px 24px;
     margin-bottom:18px;
 }
@@ -18,7 +18,7 @@
     margin-bottom:10px;
     font-size:13px;
     font-weight:600;
-    color:#2E7D32;
+    color:#4CAF50;
 }
 
 .page-title{
@@ -59,7 +59,7 @@
 .search-card{
     background:#ffffff;
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     padding:24px;
 }
 
@@ -92,14 +92,14 @@
 }
 
 .search-input:focus{
-    border-color:#2E7D32;
-    box-shadow:0 0 0 3px rgba(46,125,50,0.08);
+    border-color:#4CAF50;
+    box-shadow:0 0 0 3px rgba(76, 175, 80, 0.15);
 }
 
 .search-btn{
     border:none;
     border-radius:10px;
-    background:#2E7D32;
+    background:#4CAF50;
     color:#fff;
     padding:12px 18px;
     font-size:13px;
@@ -145,7 +145,7 @@
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    background:#2E7D32;
+    background:#4CAF50;
     color:#fff;
     border:none;
     border-radius:8px;
@@ -165,7 +165,7 @@
 .child-summary{
     background:#ffffff;
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     padding:18px 22px;
     margin-bottom:18px;
     display:grid;
@@ -186,7 +186,7 @@
 .content-card{
     background:#ffffff;
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     overflow:hidden;
     margin-bottom:18px;
 }
@@ -236,8 +236,8 @@
 }
 
 .form-control:focus{
-    border-color:#2E7D32;
-    box-shadow:0 0 0 3px rgba(46,125,50,0.08);
+    border-color:#4CAF50;
+    box-shadow:0 0 0 3px rgba(76, 175, 80, 0.15);
 }
 
 .form-actions{
@@ -250,7 +250,7 @@
 
 .btn-save{
     border:none;
-    background:#2E7D32;
+    background:#4CAF50;
     color:#fff;
     border-radius:8px;
     padding:11px 18px;
@@ -508,7 +508,7 @@ body.dark-mode td{
     justify-content:center;
     width:30px;
     height:30px;
-    background:#2E7D32;
+    background:#4CAF50;
     color:#ffffff;
     border-radius:50%;
     text-decoration:none;
@@ -519,7 +519,7 @@ body.dark-mode td{
 }
 
 .view-arrow-btn:hover{
-    background:#256628;
+    background:#388E3C;
     transform:scale(1.06);
 }
 

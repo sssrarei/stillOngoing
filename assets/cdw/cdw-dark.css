@@ -1,4 +1,3 @@
-
 body.dark-mode{
     background:#121212;
     color:#e5e5e5;
@@ -63,7 +62,7 @@ body.dark-mode .status-badge.absent{
 /* BUTTONS */
 body.dark-mode .btn-save,
 body.dark-mode .search-btn{
-    background:#2E7D32;
+    background:#22c55e;
     color:#fff;
 }
 

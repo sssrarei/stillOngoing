@@ -8,7 +8,7 @@
 .page-header h2 {
    background:#ffffff;
     border:1px solid #dcdcdc;
-    border-radius:14px;
+    border-radius:16px;
     padding:22px 24px;
     margin-bottom:18px;
 }
@@ -46,7 +46,7 @@
 .recent-records-card {
     background: #ffffff;
     padding: 20px;
-    border-radius: 14px;
+    border-radius: 16px;
     margin-bottom: 20px;
 }
 
@@ -384,7 +384,7 @@ body.dark-mode .mini-status.absent {
 .page-header {
     background: #ffffff;
     border: 1px solid #dcdcdc;
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 22px 24px;
     margin-bottom: 20px;
 }

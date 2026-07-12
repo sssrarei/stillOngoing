@@ -30,7 +30,7 @@ a {
 .page-header {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 22px 24px;
     margin-bottom: 18px;
 }
@@ -42,7 +42,7 @@ a {
     margin-bottom: 10px;
     font-size: 13px;
     font-weight: 600;
-    color: #2E7D32;
+    color: #4CAF50;
 }
 
 .page-title {
@@ -63,7 +63,7 @@ a {
 .content-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 14px;
+    border-radius: 16px;
     padding: 20px;
 }
 
@@ -78,12 +78,12 @@ a {
 }
 
 .btn-submit {
-    background: #2E7D32;
+    background: #4CAF50;
     color: #fff;
 }
 
 .btn-submit:hover {
-    background: #256628;
+    background: #388E3C;
 }
 
 .btn-disabled,
@@ -112,9 +112,9 @@ a {
 }
 
 .success-message {
-    background: rgba(46,125,50,0.15);
+    background: rgba(67,160,71,0.15);
     color: #7dff9a;
-    border: 1px solid rgba(46,125,50,0.4);
+    border: 1px solid rgba(67,160,71,0.4);
     border-radius: 10px;
     padding: 14px 16px;
     margin-bottom: 16px;
@@ -331,7 +331,7 @@ tbody tr:nth-child(even) td {
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #2E7D32;
+    border-color: #4CAF50;
 }
 
 .btn-cancel {
