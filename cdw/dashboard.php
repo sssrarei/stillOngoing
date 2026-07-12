@@ -102,6 +102,25 @@ function getFinalNutritionalStatus($wfa_status, $hfa_status, $wflh_status) {
     return 'Normal';
 }
 
+function getChildAge($birthdate) {
+    if (empty($birthdate)) {
+        return '';
+    }
+    try {
+        $bd = new DateTime($birthdate);
+        $now = new DateTime();
+        $diff = $bd->diff($now);
+        $years = $diff->y;
+        $months = $diff->m;
+        if ($years > 0) {
+            return $years . "y " . $months . "m";
+        }
+        return $months . "m";
+    } catch (Exception $e) {
+        return '';
+    }
+}
+
 
 // Kunin lahat ng assigned CDC ng logged-in CDW
 $cdc_result = $conn->query("
@@ -161,6 +180,26 @@ $severely_wasted_count = 0;
 
 /*
 |--------------------------------------------------------------------------
+| PART 10: Children list per status (for clickable dashboard cards)
+| Additive only. Each key maps to an array of child rows so the dashboard
+| modal can show who belongs to a given status / the full roster.
+|--------------------------------------------------------------------------
+*/
+$children_by_status = array(
+    'Total'                 => array(),
+    'Normal'                => array(),
+    'Underweight'           => array(),
+    'Severely Underweight'  => array(),
+    'Overweight'            => array(),
+    'Obese'                 => array(),
+    'Stunted'               => array(),
+    'Severely Stunted'      => array(),
+    'Moderately Wasted'     => array(),
+    'Severely Wasted'       => array(),
+);
+
+/*
+|--------------------------------------------------------------------------
 | PART 9: Referral Program Summary (CDW Dashboard widget)
 | Additive only — scoped to the active CDC. Defaults defined here so the
 | page still renders safely if no active CDC is selected.
@@ -203,11 +242,34 @@ if(isset($_SESSION['active_cdc_id']) && !empty($_SESSION['active_cdc_id'])){
         $total_children_count = $total_row['total_children_count'] ?? 0;
     }
 
+    // Full roster of the active CDC, used by the "Total Child Enrolled" modal
+    $roster_sql = "
+        SELECT child_id, first_name, middle_name, last_name, birthdate
+        FROM children
+        WHERE cdc_id = '$active_cdc_id'
+          AND is_deleted = 0
+        ORDER BY last_name ASC, first_name ASC
+    ";
+    $roster_result = mysqli_query($conn, $roster_sql);
+    if ($roster_result) {
+        while ($roster_row = mysqli_fetch_assoc($roster_result)) {
+            $children_by_status['Total'][] = array(
+                'child_id'   => (int) $roster_row['child_id'],
+                'name'       => trim($roster_row['first_name'] . ' ' . $roster_row['middle_name'] . ' ' . $roster_row['last_name']),
+                'age'        => getChildAge($roster_row['birthdate']),
+            );
+        }
+    }
+
    // Latest nutritional status counts per child under active CDC only
 // One child = one final nutritional status only
 $summary_sql = "
     SELECT
         ar.child_id,
+        c.first_name,
+        c.middle_name,
+        c.last_name,
+        c.birthdate,
         ar.wfa_status,
         ar.hfa_status,
         ar.wflh_status
@@ -261,6 +323,16 @@ if($summary_result){
             $row['hfa_status'] ?? '',
             $row['wflh_status'] ?? ''
         );
+
+        $child_entry = array(
+            'child_id' => (int) $row['child_id'],
+            'name'     => trim($row['first_name'] . ' ' . $row['middle_name'] . ' ' . $row['last_name']),
+            'age'      => getChildAge($row['birthdate']),
+        );
+
+        if (isset($children_by_status[$final_status])) {
+            $children_by_status[$final_status][] = $child_entry;
+        }
 
         if ($final_status === 'Normal') {
             $normal_count++;
@@ -511,6 +583,117 @@ $is_dark_mode = ($theme_mode === 'dark');
             font-family: 'Poppins', sans-serif;
             line-height: 1.1;
         }
+
+        /* Clickable dashboard status cards */
+        .card.clickable-card {
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .card.clickable-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
+        }
+
+        /* Children list modal */
+        .cdw-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.55);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .cdw-modal-overlay.active {
+            display: flex;
+        }
+        .cdw-modal-box {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        }
+        .cdw-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .cdw-modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .cdw-modal-subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        .cdw-modal-close {
+            background: #f1f5f9;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 16px;
+            color: #64748b;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .cdw-modal-close:hover {
+            background: #e2e8f0;
+        }
+        .cdw-modal-body {
+            padding: 8px 12px;
+            overflow-y: auto;
+        }
+        .cdw-modal-child-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 8px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .cdw-modal-child-row:last-child {
+            border-bottom: none;
+        }
+        .cdw-modal-child-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+        .cdw-modal-child-name {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+        }
+        .cdw-modal-child-age {
+            font-size: 11.5px;
+            color: #94a3b8;
+        }
+        .cdw-modal-empty {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+            padding: 30px 10px;
+        }
     </style>
 </head>
 <body class="<?php echo ($theme_mode === 'dark') ? 'dark-mode' : ''; ?>">
@@ -574,70 +757,70 @@ $is_dark_mode = ($theme_mode === 'dark');
 
     <div class="page-card">
         <div class="cards-grid">
-            <div class="card">
+            <div class="card clickable-card" data-status="Total" onclick="openChildModal('Total', 'Total Child Enrolled')">
                 <div class="card-title title-blue">Total Child Enrolled in</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $total_children_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Normal" onclick="openChildModal('Normal', 'Normal')">
                 <div class="card-title title-normal">Normal</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $normal_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Underweight" onclick="openChildModal('Underweight', 'Underweight')">
                 <div class="card-title title-alert">Underweight</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $underweight_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Severely Underweight" onclick="openChildModal('Severely Underweight', 'Severely Underweight')">
                 <div class="card-title title-alert">Severely Underweight</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $severely_underweight_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Overweight" onclick="openChildModal('Overweight', 'Overweight')">
                 <div class="card-title title-alert">Overweight</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $overweight_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Obese" onclick="openChildModal('Obese', 'Obese')">
                 <div class="card-title title-alert">Obese</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $obese_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Stunted" onclick="openChildModal('Stunted', 'Stunted')">
                 <div class="card-title title-alert">Stunted</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $stunted_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Severely Stunted" onclick="openChildModal('Severely Stunted', 'Severely Stunted')">
                 <div class="card-title title-alert">Severely Stunted</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $severely_stunted_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Moderately Wasted" onclick="openChildModal('Moderately Wasted', 'Moderately Wasted')">
                 <div class="card-title title-alert">Moderately Wasted</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $moderately_wasted_count; ?></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card clickable-card" data-status="Severely Wasted" onclick="openChildModal('Severely Wasted', 'Severely Wasted')">
                 <div class="card-title title-alert">Severely Wasted</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $severely_wasted_count; ?></div>
@@ -805,6 +988,22 @@ else{
             <div class="chart-canvas-wrap">
                 <canvas id="nutriChart"></canvas>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Children List Modal (Total Enrolled + per-status) -->
+<div class="cdw-modal-overlay" id="cdwChildModalOverlay" onclick="if(event.target === this){ closeChildModal(); }">
+    <div class="cdw-modal-box">
+        <div class="cdw-modal-header">
+            <div>
+                <div class="cdw-modal-title" id="cdwChildModalTitle">Children</div>
+                <div class="cdw-modal-subtitle" id="cdwChildModalSubtitle">0 child(ren)</div>
+            </div>
+            <button type="button" class="cdw-modal-close" onclick="closeChildModal()">&times;</button>
+        </div>
+        <div class="cdw-modal-body" id="cdwChildModalBody">
+            <!-- populated by JS -->
         </div>
     </div>
 </div>
@@ -1005,7 +1204,63 @@ new Chart(document.getElementById('nutriChart'), {
     }
 });
 
+/*
+|--------------------------------------------------------------------------
+| PART 10: Clickable status cards -> children list modal
+|--------------------------------------------------------------------------
+*/
+const childrenByStatus = <?php echo json_encode($children_by_status, JSON_UNESCAPED_UNICODE); ?>;
 
+function getInitials(name) {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/);
+    let initials = parts[0].charAt(0);
+    if (parts.length > 1) {
+        initials += parts[parts.length - 1].charAt(0);
+    }
+    return initials.toUpperCase();
+}
+
+function openChildModal(statusKey, displayTitle) {
+    const list = childrenByStatus[statusKey] || [];
+    const overlay = document.getElementById('cdwChildModalOverlay');
+    const titleEl = document.getElementById('cdwChildModalTitle');
+    const subtitleEl = document.getElementById('cdwChildModalSubtitle');
+    const bodyEl = document.getElementById('cdwChildModalBody');
+
+    titleEl.textContent = displayTitle;
+    subtitleEl.textContent = list.length + (list.length === 1 ? ' child' : ' children');
+
+    if (list.length === 0) {
+        bodyEl.innerHTML = '<div class="cdw-modal-empty">No children under this status.</div>';
+    } else {
+        let html = '';
+        list.forEach(function (child) {
+            const name = child.name ? child.name.replace(/\s+/g, ' ').trim() : 'Unnamed';
+            const age = child.age ? child.age : '—';
+            html += '<div class="cdw-modal-child-row">' +
+                        '<div class="cdw-modal-child-avatar">' + getInitials(name) + '</div>' +
+                        '<div>' +
+                            '<div class="cdw-modal-child-name">' + name + '</div>' +
+                            '<div class="cdw-modal-child-age">' + age + ' old</div>' +
+                        '</div>' +
+                    '</div>';
+        });
+        bodyEl.innerHTML = html;
+    }
+
+    overlay.classList.add('active');
+}
+
+function closeChildModal() {
+    document.getElementById('cdwChildModalOverlay').classList.remove('active');
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        closeChildModal();
+    }
+});
 
 </script>
 <script src="../assets/cdw/sidebar.js"></script>

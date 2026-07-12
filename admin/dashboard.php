@@ -126,6 +126,140 @@ function getInterventionCategoryFromFinalStatus($final_status) {
     return null;
 }
 
+/*
+|--------------------------------------------------------------------------
+| PART 11: Visual config for the redesigned dashboard panels
+| Additive only — pure presentation lookups. Does not affect any of the
+| counting / risk logic above or below.
+|--------------------------------------------------------------------------
+*/
+function getStatusVisual($status_key) {
+    $map = array(
+        'Normal' => array(
+            'icon' => '✅',
+            'tone' => 'tone-green',
+            'desc' => 'Children with final overall normal status'
+        ),
+        'Underweight' => array(
+            'icon' => '⚠️',
+            'tone' => 'tone-amber',
+            'desc' => 'Final overall status is underweight'
+        ),
+        'Severely Underweight' => array(
+            'icon' => '⛔',
+            'tone' => 'tone-red',
+            'desc' => 'Final overall status is severely underweight'
+        ),
+        'Overweight' => array(
+            'icon' => '⚖️',
+            'tone' => 'tone-amber',
+            'desc' => 'Final overall status is overweight'
+        ),
+        'Obese' => array(
+            'icon' => '🟠',
+            'tone' => 'tone-orange',
+            'desc' => 'Final overall status is obese'
+        ),
+        'Stunted' => array(
+            'icon' => '📉',
+            'tone' => 'tone-amber',
+            'desc' => 'Final overall status is stunted'
+        ),
+        'Severely Stunted' => array(
+            'icon' => '📉',
+            'tone' => 'tone-red',
+            'desc' => 'Final overall status is severely stunted'
+        ),
+        'Moderately Wasted' => array(
+            'icon' => '🔶',
+            'tone' => 'tone-orange',
+            'desc' => 'Final overall status is moderately wasted'
+        ),
+        'Severely Wasted' => array(
+            'icon' => '🚨',
+            'tone' => 'tone-red',
+            'desc' => 'Final overall status is severely wasted'
+        ),
+    );
+
+    return isset($map[$status_key]) ? $map[$status_key] : array(
+        'icon' => '❔', 'tone' => 'tone-gray', 'desc' => ''
+    );
+}
+
+function getReportVisual($report_type_raw) {
+    $key = strtolower(trim((string)$report_type_raw));
+
+    $map = array(
+        'wmr'                         => array('icon' => '📊', 'label' => 'WMR Report'),
+        'masterlist'                  => array('icon' => '📋', 'label' => 'Masterlist Report'),
+        'feeding_attendance'          => array('icon' => '🍽️', 'label' => 'Feeding Attendance Report'),
+        'nutritional_status_summary'  => array('icon' => '📈', 'label' => 'Nutritional Status Summary'),
+        'individual_child'            => array('icon' => '🧒', 'label' => 'Individual Child Report'),
+        'terminal_report'             => array('icon' => '🏁', 'label' => 'Terminal Report'),
+    );
+
+    if (isset($map[$key])) {
+        return $map[$key];
+    }
+
+    return array(
+        'icon' => '📄',
+        'label' => strtoupper($report_type_raw) . ' Report'
+    );
+}
+
+function getReportStatusPillClass($status_raw) {
+    $key = strtolower(trim((string)$status_raw));
+
+    if ($key === 'submitted') {
+        return 'pill-green';
+    }
+    if ($key === 'pending') {
+        return 'pill-amber';
+    }
+    if ($key === 'rejected' || $key === 'declined') {
+        return 'pill-red';
+    }
+    if ($key === 'saved_to_child_profile') {
+        return 'pill-blue';
+    }
+
+    return 'pill-gray';
+}
+
+function escapeModalList($list) {
+    $escaped = array();
+    foreach ($list as $item) {
+        $escaped[] = array(
+            'primary' => htmlspecialchars((string)($item['primary'] ?? ''), ENT_QUOTES, 'UTF-8'),
+            'secondary' => htmlspecialchars((string)($item['secondary'] ?? ''), ENT_QUOTES, 'UTF-8'),
+            'tag' => isset($item['tag']) && $item['tag'] !== null
+                ? htmlspecialchars((string)$item['tag'], ENT_QUOTES, 'UTF-8')
+                : null,
+            'tagTone' => isset($item['tagTone']) ? (string)$item['tagTone'] : ''
+        );
+    }
+    return $escaped;
+}
+
+function getChildAgeFromBirthdate($birthdate) {
+    if (empty($birthdate)) {
+        return '';
+    }
+    try {
+        $bd = new DateTime($birthdate);
+        $now = new DateTime();
+        $diff = $bd->diff($now);
+        if ($diff->y > 0) {
+            return $diff->y . 'y ' . $diff->m . 'm';
+        }
+        return $diff->m . 'm';
+    } catch (Exception $e) {
+        return '';
+    }
+}
+
 $total_cdcs = 0;
 $total_cdws = 0;
 $total_children = 0;
@@ -174,6 +308,101 @@ $submitted_reports_result = mysqli_query($conn, $submitted_reports_query);
 if ($submitted_reports_result && mysqli_num_rows($submitted_reports_result) > 0) {
     $submitted_reports_row = mysqli_fetch_assoc($submitted_reports_result);
     $submitted_reports = (int)$submitted_reports_row['total'];
+}
+
+/*
+|--------------------------------------------------------------------------
+| PART 12: Modal list data for the clickable summary boxes
+| (Total CDCs / Total CDWs / Total Children / Submitted Reports)
+| Additive only — read-only lists for display, does not affect any counts.
+|--------------------------------------------------------------------------
+*/
+$modal_cdcs = array();
+$cdc_list_query = "SELECT cdc_id, cdc_name, barangay, status FROM cdc ORDER BY cdc_name ASC";
+$cdc_list_result = mysqli_query($conn, $cdc_list_query);
+if ($cdc_list_result) {
+    while ($row = mysqli_fetch_assoc($cdc_list_result)) {
+        $modal_cdcs[] = array(
+            'primary' => $row['cdc_name'],
+            'secondary' => !empty($row['barangay']) ? $row['barangay'] : '—',
+            'tag' => !empty($row['status']) ? $row['status'] : 'Active',
+            'tagTone' => (strtolower($row['status']) === 'inactive') ? 'tone-gray' : 'tone-green'
+        );
+    }
+}
+
+$modal_cdws = array();
+$cdw_list_query = "
+    SELECT 
+        u.user_id, u.first_name, u.last_name,
+        GROUP_CONCAT(DISTINCT c.cdc_name ORDER BY c.cdc_name SEPARATOR ', ') AS assigned_cdcs
+    FROM users u
+    LEFT JOIN cdw_assignments ca ON ca.user_id = u.user_id
+    LEFT JOIN cdc c ON c.cdc_id = ca.cdc_id
+    WHERE u.role_id = 2
+    GROUP BY u.user_id, u.first_name, u.last_name
+    ORDER BY u.first_name ASC, u.last_name ASC
+";
+$cdw_list_result = mysqli_query($conn, $cdw_list_query);
+if ($cdw_list_result) {
+    while ($row = mysqli_fetch_assoc($cdw_list_result)) {
+        $modal_cdws[] = array(
+            'primary' => trim($row['first_name'] . ' ' . $row['last_name']),
+            'secondary' => !empty($row['assigned_cdcs']) ? $row['assigned_cdcs'] : 'No CDC assigned',
+            'tag' => null,
+            'tagTone' => ''
+        );
+    }
+}
+
+$modal_children = array();
+$children_list_query = "
+    SELECT ch.child_id, ch.first_name, ch.middle_name, ch.last_name, ch.birthdate, c.cdc_name
+    FROM children ch
+    LEFT JOIN cdc c ON c.cdc_id = ch.cdc_id
+    WHERE ch.is_deleted = 0
+    ORDER BY ch.last_name ASC, ch.first_name ASC
+";
+$children_list_result = mysqli_query($conn, $children_list_query);
+if ($children_list_result) {
+    while ($row = mysqli_fetch_assoc($children_list_result)) {
+        $full_name = trim($row['first_name'] . ' ' . $row['middle_name'] . ' ' . $row['last_name']);
+        $age = getChildAgeFromBirthdate($row['birthdate']);
+        $modal_children[] = array(
+            'primary' => $full_name,
+            'secondary' => (!empty($row['cdc_name']) ? $row['cdc_name'] : 'Unknown CDC') . ($age !== '' ? ' — ' . $age : ''),
+            'tag' => null,
+            'tagTone' => ''
+        );
+    }
+}
+
+$modal_reports = array();
+$reports_list_query = "
+    SELECT 
+        sr.report_type, sr.submitted_at, sr.status,
+        c.cdc_name,
+        CONCAT(u.first_name, ' ', u.last_name) AS submitted_by_name
+    FROM submitted_reports sr
+    LEFT JOIN cdc c ON sr.cdc_id = c.cdc_id
+    LEFT JOIN users u ON sr.submitted_by = u.user_id
+    ORDER BY sr.submitted_at DESC, sr.submitted_report_id DESC
+    LIMIT 100
+";
+$reports_list_result = mysqli_query($conn, $reports_list_query);
+if ($reports_list_result) {
+    while ($row = mysqli_fetch_assoc($reports_list_result)) {
+        $rv = getReportVisual($row['report_type']);
+        $status_raw = !empty($row['status']) ? $row['status'] : 'submitted';
+        $modal_reports[] = array(
+            'primary' => $rv['label'],
+            'secondary' => (!empty($row['cdc_name']) ? $row['cdc_name'] : 'Unknown CDC') . ' — ' .
+                           (!empty($row['submitted_by_name']) ? trim($row['submitted_by_name']) : 'Unknown User') . ' — ' .
+                           (!empty($row['submitted_at']) ? date("M d, Y g:i A", strtotime($row['submitted_at'])) : '—'),
+            'tag' => ucwords(str_replace('_', ' ', $status_raw)),
+            'tagTone' => str_replace('pill-', 'tone-', getReportStatusPillClass($status_raw))
+        );
+    }
 }
 
 /*
@@ -243,6 +472,8 @@ if ($referral_no_response_result && mysqli_num_rows($referral_no_response_result
 */
 $at_risk_child_keys = array();
 $pending_review_child_keys = array();
+$modal_at_risk = array();
+$modal_pending = array();
 $reviewed_or_sent_child_keys = array();
 
 /*
@@ -323,12 +554,30 @@ foreach ($latest_wmr_reports as $wmr_report) {
                 $current_report_id = (int)$wmr_report['submitted_report_id'];
 
             if (isAtRiskFinalStatus($final_status)) {
+                if (!isset($at_risk_child_keys[$child_key])) {
+                    $modal_at_risk[] = array(
+                        'primary' => $child_name,
+                        'secondary' => $cdc_name,
+                        'tag' => $final_status,
+                        'tagTone' => getStatusVisual($final_status)['tone']
+                    );
+                }
+
                 $at_risk_child_keys[$child_key] = true;
 
                 $intervention_category = getInterventionCategoryFromFinalStatus($final_status);
 
                 if ($intervention_category !== null) {
                     $current_result_key = $child_key . '|report_' . $current_report_id . '|category_' . $intervention_category;
+
+                    if (!isset($sent_intervention_result_keys[$current_result_key]) && !isset($pending_review_child_keys[$current_result_key])) {
+                        $modal_pending[] = array(
+                            'primary' => $child_name,
+                            'secondary' => $cdc_name . ' — ' . $intervention_category,
+                            'tag' => null,
+                            'tagTone' => ''
+                        );
+                    }
 
                     if (!isset($sent_intervention_result_keys[$current_result_key])) {
                         $pending_review_child_keys[$current_result_key] = true;
@@ -378,16 +627,21 @@ $recent_reports_result = mysqli_query($conn, $recent_reports_query);
 
 if ($recent_reports_result) {
     while ($row = mysqli_fetch_assoc($recent_reports_result)) {
-        $report_type = strtoupper($row['report_type']);
+        $report_visual = getReportVisual($row['report_type']);
         $cdc_name = !empty($row['cdc_name']) ? $row['cdc_name'] : 'Unknown CDC';
         $submitted_by_name = !empty($row['submitted_by_name']) ? $row['submitted_by_name'] : 'Unknown User';
         $submitted_at = !empty($row['submitted_at']) ? date("F d, Y g:i A", strtotime($row['submitted_at'])) : '—';
-        $status = !empty($row['status']) ? ucfirst($row['status']) : 'Submitted';
+        $status_raw = !empty($row['status']) ? $row['status'] : 'submitted';
+        $status_label = ucwords(str_replace('_', ' ', $status_raw));
 
         $recent_reports[] = array(
-            'title' => $report_type . ' Report',
+            'icon' => $report_visual['icon'],
+            'title' => $report_visual['label'],
             'description' => $cdc_name,
-            'meta' => 'Submitted by ' . $submitted_by_name . ' • ' . $submitted_at . ' • ' . $status
+            'submitted_by' => $submitted_by_name,
+            'submitted_at' => $submitted_at,
+            'status_label' => $status_label,
+            'status_pill_class' => getReportStatusPillClass($status_raw)
         );
     }
 }
@@ -462,30 +716,6 @@ if ($intervention_alerts_result) {
     <link rel="stylesheet" href="../assets/admin/admin-topbar-notification.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        .status-children-list {
-            margin-top: 10px;
-            padding-left: 18px;
-        }
-
-        .status-children-list li {
-            margin-bottom: 6px;
-            font-size: 13px;
-            color: #334155;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .status-children-list li span {
-            color: #64748b;
-            font-size: 12px;
-        }
-
-        .status-empty-note {
-            margin-top: 8px;
-            font-size: 12px;
-            color: #94a3b8;
-            font-family: 'Inter', sans-serif;
-        }
-
         .alert-actions {
             margin-top: 10px;
         }
@@ -536,6 +766,325 @@ if ($intervention_alerts_result) {
             color: #1f2937;
             font-family: 'Poppins', sans-serif;
         }
+
+        /*
+        |----------------------------------------------------------------
+        | PART 11: "Nutritional Status Summary" — quiet, editorial style
+        | Hairline dividers instead of boxed cards. Color is used only
+        | as a small dot; no icon tiles, no chip backgrounds.
+        |----------------------------------------------------------------
+        */
+        .nss-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nss-row {
+            padding: 18px 2px;
+            border-bottom: 1px solid #eef1f5;
+        }
+
+        .nss-row:last-child {
+            border-bottom: none;
+        }
+
+        .nss-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .nss-title-group {
+            display: flex;
+            align-items: baseline;
+            gap: 9px;
+        }
+
+        .nss-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            position: relative;
+            top: -1px;
+        }
+
+        .tone-green  .nss-dot { background: #34a659; }
+        .tone-amber  .nss-dot { background: #d69a35; }
+        .tone-orange .nss-dot { background: #d97b3f; }
+        .tone-red    .nss-dot { background: #c0483f; }
+        .tone-gray   .nss-dot { background: #b3bac4; }
+
+        .nss-title-group h4 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #263143;
+            letter-spacing: 0.1px;
+        }
+
+        .nss-count {
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            color: #263143;
+            flex-shrink: 0;
+        }
+
+        .nss-desc {
+            font-size: 12px;
+            color: #a3a9b3;
+            font-family: 'Inter', sans-serif;
+            margin: 3px 0 0 16px;
+        }
+
+        .nss-children {
+            margin: 12px 0 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            max-height: 132px;
+            overflow-y: auto;
+        }
+
+        .nss-child-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nss-child-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            position: relative;
+            top: -1px;
+        }
+
+        .tone-green  .nss-child-dot { background: #34a659; }
+        .tone-amber  .nss-child-dot { background: #d69a35; }
+        .tone-orange .nss-child-dot { background: #d97b3f; }
+        .tone-red    .nss-child-dot { background: #c0483f; }
+        .tone-gray   .nss-child-dot { background: #b3bac4; }
+
+        .nss-child-name {
+            font-size: 12.5px;
+            color: #47505f;
+        }
+
+        .nss-child-cdc {
+            font-size: 11.5px;
+            color: #b3bac4;
+        }
+
+        .nss-empty {
+            margin: 10px 0 0 16px;
+            font-size: 12px;
+            color: #b3bac4;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /*
+        |----------------------------------------------------------------
+        | PART 11: "Recent Reports" — quiet, editorial style
+        | Hairline dividers, status shown as a small colored word
+        | (not a filled pill), no icon tiles.
+        |----------------------------------------------------------------
+        */
+        .rr-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rr-row {
+            padding: 16px 2px;
+            border-bottom: 1px solid #eef1f5;
+        }
+
+        .rr-row:last-child {
+            border-bottom: none;
+        }
+
+        .rr-top-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .rr-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #263143;
+        }
+
+        .rr-cdc {
+            font-size: 12px;
+            color: #a3a9b3;
+            font-family: 'Inter', sans-serif;
+            margin-top: 2px;
+        }
+
+        .rr-status {
+            flex-shrink: 0;
+            font-size: 11.5px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .rr-status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-right: 5px;
+            position: relative;
+            top: -1px;
+        }
+
+        .pill-green .rr-status-dot { background: #34a659; }
+        .pill-amber .rr-status-dot { background: #d69a35; }
+        .pill-red   .rr-status-dot { background: #c0483f; }
+        .pill-blue  .rr-status-dot { background: #3b6fd6; }
+        .pill-gray  .rr-status-dot { background: #b3bac4; }
+
+        .pill-green { color: #2f7a49; }
+        .pill-amber { color: #a8701f; }
+        .pill-red   { color: #a83c33; }
+        .pill-blue  { color: #2f57ab; }
+        .pill-gray  { color: #8a92a0; }
+
+        .rr-meta {
+            font-size: 11.5px;
+            color: #a3a9b3;
+            font-family: 'Inter', sans-serif;
+            margin-top: 7px;
+        }
+
+        /*
+        |----------------------------------------------------------------
+        | PART 12: Clickable summary boxes + shared list modal
+        |----------------------------------------------------------------
+        */
+        .summary-box-clickable {
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .summary-box-clickable:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .adm-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .adm-modal-overlay.active {
+            display: flex;
+        }
+        .adm-modal-box {
+            background: #ffffff;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 78vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .adm-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            border-bottom: 1px solid #eef1f5;
+        }
+        .adm-modal-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 15.5px;
+            font-weight: 600;
+            color: #263143;
+        }
+        .adm-modal-subtitle {
+            font-size: 11.5px;
+            color: #a3a9b3;
+            margin-top: 2px;
+            font-family: 'Inter', sans-serif;
+        }
+        .adm-modal-close {
+            background: none;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 16px;
+            color: #a3a9b3;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .adm-modal-close:hover {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .adm-modal-body {
+            padding: 4px 20px;
+            overflow-y: auto;
+        }
+        .adm-modal-row {
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f5f8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .adm-modal-row:last-child {
+            border-bottom: none;
+        }
+        .adm-modal-row-primary {
+            font-size: 13px;
+            font-weight: 600;
+            color: #263143;
+            font-family: 'Inter', sans-serif;
+        }
+        .adm-modal-row-secondary {
+            font-size: 11.5px;
+            color: #a3a9b3;
+            font-family: 'Inter', sans-serif;
+            margin-top: 2px;
+        }
+        .adm-modal-row-tag {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .adm-modal-row-tag.tone-green  { color: #2f7a49; }
+        .adm-modal-row-tag.tone-amber  { color: #a8701f; }
+        .adm-modal-row-tag.tone-orange { color: #b06121; }
+        .adm-modal-row-tag.tone-red    { color: #a83c33; }
+        .adm-modal-row-tag.tone-blue   { color: #2f57ab; }
+        .adm-modal-row-tag.tone-gray   { color: #8a92a0; }
+        .adm-modal-empty {
+            text-align: center;
+            color: #a3a9b3;
+            font-size: 12.5px;
+            font-family: 'Inter', sans-serif;
+            padding: 30px 10px;
+        }
     </style>
 </head>
 <body>
@@ -552,32 +1101,32 @@ if ($intervention_alerts_result) {
             </div>
 
             <div class="summary-grid">
-                <div class="summary-box box-navy">
+                <div class="summary-box box-navy summary-box-clickable" onclick="openSummaryModal('cdcs', 'Total CDCs')">
                     <div class="summary-box-header">Total CDCs</div>
                     <div class="summary-box-value"><?php echo $total_cdcs; ?></div>
                 </div>
 
-                <div class="summary-box box-navy">
+                <div class="summary-box box-navy summary-box-clickable" onclick="openSummaryModal('cdws', 'Total CDWs')">
                     <div class="summary-box-header">Total CDWs</div>
                     <div class="summary-box-value"><?php echo $total_cdws; ?></div>
                 </div>
 
-                <div class="summary-box box-navy">
+                <div class="summary-box box-navy summary-box-clickable" onclick="openSummaryModal('children', 'Total Children')">
                     <div class="summary-box-header">Total Children</div>
                     <div class="summary-box-value"><?php echo $total_children; ?></div>
                 </div>
 
-                <div class="summary-box box-red">
+                <div class="summary-box box-red summary-box-clickable" onclick="openSummaryModal('atrisk', 'At-Risk Children')">
                     <div class="summary-box-header">At-Risk Children</div>
                     <div class="summary-box-value"><?php echo $at_risk_children; ?></div>
                 </div>
 
-                <div class="summary-box box-green">
+                <div class="summary-box box-green summary-box-clickable" onclick="openSummaryModal('reports', 'Submitted Reports')">
                     <div class="summary-box-header">Submitted Reports</div>
                     <div class="summary-box-value"><?php echo $submitted_reports; ?></div>
                 </div>
 
-                <div class="summary-box box-red">
+                <div class="summary-box box-red summary-box-clickable" onclick="openSummaryModal('pending', 'Pending Reviews')">
                     <div class="summary-box-header">Pending Reviews</div>
                     <div class="summary-box-value"><?php echo $pending_reviews; ?></div>
                 </div>
@@ -588,186 +1137,36 @@ if ($intervention_alerts_result) {
             <div class="panel-card">
                 <h2 class="panel-title">Nutritional Status Summary</h2>
 
-                <div class="status-list">
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Normal</h4>
-                            <p>Children with final overall normal status</p>
-                            <?php if (!empty($status_summary['Normal']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Normal']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
-                        </div>
-                        <div class="status-badge"><?php echo $status_summary['Normal']['count']; ?></div>
-                    </div>
+                <div class="nss-list">
+                    <?php foreach ($status_summary as $status_key => $status_data):
+                        $visual = getStatusVisual($status_key);
+                        $children = $status_data['children'];
+                    ?>
+                        <div class="nss-row <?php echo $visual['tone']; ?>">
+                            <div class="nss-head">
+                                <div class="nss-title-group">
+                                    <span class="nss-dot"></span>
+                                    <h4><?php echo htmlspecialchars($status_key); ?></h4>
+                                </div>
+                                <div class="nss-count"><?php echo (int) $status_data['count']; ?></div>
+                            </div>
+                            <p class="nss-desc"><?php echo htmlspecialchars($visual['desc']); ?></p>
 
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Underweight</h4>
-                            <p>Children whose final overall status is underweight</p>
-                            <?php if (!empty($status_summary['Underweight']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Underweight']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
+                            <?php if (!empty($children)): ?>
+                                <div class="nss-children">
+                                    <?php foreach ($children as $child): ?>
+                                        <div class="nss-child-row">
+                                            <span class="nss-child-dot"></span>
+                                            <span class="nss-child-name"><?php echo htmlspecialchars($child['child_name']); ?></span>
+                                            <span class="nss-child-cdc">— <?php echo htmlspecialchars($child['cdc_name']); ?></span>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="nss-empty">No children listed in this category.</div>
+                            <?php endif; ?>
                         </div>
-                        <div class="status-badge"><?php echo $status_summary['Underweight']['count']; ?></div>
-                    </div>
-
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Severely Underweight</h4>
-                            <p>Children whose final overall status is severely underweight</p>
-                            <?php if (!empty($status_summary['Severely Underweight']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Severely Underweight']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
-                        </div>
-                        <div class="status-badge"><?php echo $status_summary['Severely Underweight']['count']; ?></div>
-                    </div>
-
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Overweight</h4>
-                            <p>Children whose final overall status is overweight</p>
-                            <?php if (!empty($status_summary['Overweight']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Overweight']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
-                        </div>
-                        <div class="status-badge"><?php echo $status_summary['Overweight']['count']; ?></div>
-                    </div>
-
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Obese</h4>
-                            <p>Children whose final overall status is obese</p>
-                            <?php if (!empty($status_summary['Obese']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Obese']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
-                        </div>
-                        <div class="status-badge"><?php echo $status_summary['Obese']['count']; ?></div>
-                    </div>
-
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Stunted</h4>
-                            <p>Children whose final overall status is stunted</p>
-                            <?php if (!empty($status_summary['Stunted']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Stunted']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
-                        </div>
-                        <div class="status-badge"><?php echo $status_summary['Stunted']['count']; ?></div>
-                    </div>
-
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Severely Stunted</h4>
-                            <p>Children whose final overall status is severely stunted</p>
-                            <?php if (!empty($status_summary['Severely Stunted']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Severely Stunted']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
-                        </div>
-                        <div class="status-badge"><?php echo $status_summary['Severely Stunted']['count']; ?></div>
-                    </div>
-
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Moderately Wasted</h4>
-                            <p>Children whose final overall status is moderately wasted</p>
-                            <?php if (!empty($status_summary['Moderately Wasted']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Moderately Wasted']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
-                        </div>
-                        <div class="status-badge"><?php echo $status_summary['Moderately Wasted']['count']; ?></div>
-                    </div>
-
-                    <div class="status-item">
-                        <div class="status-item-left">
-                            <h4>Severely Wasted</h4>
-                            <p>Children whose final overall status is severely wasted</p>
-                            <?php if (!empty($status_summary['Severely Wasted']['children'])) { ?>
-                                <ul class="status-children-list">
-                                    <?php foreach ($status_summary['Severely Wasted']['children'] as $child) { ?>
-                                        <li>
-                                            <?php echo htmlspecialchars($child['child_name']); ?>
-                                            <span>• <?php echo htmlspecialchars($child['cdc_name']); ?></span>
-                                        </li>
-                                    <?php } ?>
-                                </ul>
-                            <?php } else { ?>
-                                <div class="status-empty-note">No children listed in this category.</div>
-                            <?php } ?>
-                        </div>
-                        <div class="status-badge"><?php echo $status_summary['Severely Wasted']['count']; ?></div>
-                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
 
@@ -775,12 +1174,21 @@ if ($intervention_alerts_result) {
                 <h2 class="panel-title">Recent Reports</h2>
 
                 <?php if (!empty($recent_reports)) { ?>
-                    <div class="report-list">
+                    <div class="rr-list">
                         <?php foreach ($recent_reports as $report) { ?>
-                            <div class="report-item">
-                                <h4><?php echo htmlspecialchars($report['title']); ?></h4>
-                                <p><?php echo htmlspecialchars($report['description']); ?></p>
-                                <div class="item-meta"><?php echo htmlspecialchars($report['meta']); ?></div>
+                            <div class="rr-row">
+                                <div class="rr-top-row">
+                                    <div>
+                                        <div class="rr-title"><?php echo htmlspecialchars($report['title']); ?></div>
+                                        <div class="rr-cdc"><?php echo htmlspecialchars($report['description']); ?></div>
+                                    </div>
+                                    <div class="rr-status <?php echo $report['status_pill_class']; ?>">
+                                        <span class="rr-status-dot"></span><?php echo htmlspecialchars($report['status_label']); ?>
+                                    </div>
+                                </div>
+                                <div class="rr-meta">
+                                    <?php echo htmlspecialchars($report['submitted_by']); ?> · <?php echo htmlspecialchars($report['submitted_at']); ?>
+                                </div>
                             </div>
                         <?php } ?>
                     </div>
@@ -842,6 +1250,72 @@ if ($intervention_alerts_result) {
 
     </div>
 </div>
+
+<!-- Summary box list modal (Total CDCs / CDWs / Children / At-Risk / Reports / Pending) -->
+<div class="adm-modal-overlay" id="admSummaryModalOverlay" onclick="if(event.target === this){ closeSummaryModal(); }">
+    <div class="adm-modal-box">
+        <div class="adm-modal-header">
+            <div>
+                <div class="adm-modal-title" id="admSummaryModalTitle">List</div>
+                <div class="adm-modal-subtitle" id="admSummaryModalSubtitle">0 item(s)</div>
+            </div>
+            <button type="button" class="adm-modal-close" onclick="closeSummaryModal()">&times;</button>
+        </div>
+        <div class="adm-modal-body" id="admSummaryModalBody">
+            <!-- populated by JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+const summaryModalData = {
+    cdcs: <?php echo json_encode(escapeModalList($modal_cdcs), JSON_UNESCAPED_UNICODE); ?>,
+    cdws: <?php echo json_encode(escapeModalList($modal_cdws), JSON_UNESCAPED_UNICODE); ?>,
+    children: <?php echo json_encode(escapeModalList($modal_children), JSON_UNESCAPED_UNICODE); ?>,
+    atrisk: <?php echo json_encode(escapeModalList($modal_at_risk), JSON_UNESCAPED_UNICODE); ?>,
+    reports: <?php echo json_encode(escapeModalList($modal_reports), JSON_UNESCAPED_UNICODE); ?>,
+    pending: <?php echo json_encode(escapeModalList($modal_pending), JSON_UNESCAPED_UNICODE); ?>
+};
+
+function openSummaryModal(key, displayTitle) {
+    const list = summaryModalData[key] || [];
+    const overlay = document.getElementById('admSummaryModalOverlay');
+    const titleEl = document.getElementById('admSummaryModalTitle');
+    const subtitleEl = document.getElementById('admSummaryModalSubtitle');
+    const bodyEl = document.getElementById('admSummaryModalBody');
+
+    titleEl.textContent = displayTitle;
+    subtitleEl.textContent = list.length + (list.length === 1 ? ' item' : ' items');
+
+    if (list.length === 0) {
+        bodyEl.innerHTML = '<div class="adm-modal-empty">Wala pang laman ang listahang ito.</div>';
+    } else {
+        let html = '';
+        list.forEach(function (item) {
+            html += '<div class="adm-modal-row">' +
+                        '<div>' +
+                            '<div class="adm-modal-row-primary">' + (item.primary || '—') + '</div>' +
+                            (item.secondary ? '<div class="adm-modal-row-secondary">' + item.secondary + '</div>' : '') +
+                        '</div>' +
+                        (item.tag ? '<div class="adm-modal-row-tag ' + (item.tagTone || '') + '">' + item.tag + '</div>' : '') +
+                    '</div>';
+        });
+        bodyEl.innerHTML = html;
+    }
+
+    overlay.classList.add('active');
+}
+
+function closeSummaryModal() {
+    document.getElementById('admSummaryModalOverlay').classList.remove('active');
+}
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        closeSummaryModal();
+    }
+});
+</script>
 
 <script>
 const menuToggle = document.getElementById('menuToggle');
