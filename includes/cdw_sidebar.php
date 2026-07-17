@@ -50,11 +50,11 @@
         <a href="individual_child_report.php" class="sidebar-link <?php echo ($current_page == 'individual_child_report.php') ? 'active' : ''; ?>">
             Individual Child Report
         </a>
-
-        <a href="referral_forms.php"
-   class="sidebar-link <?php echo ($current_page == 'referral_forms.php') ? 'active' : ''; ?>">
-    Referral Forms
-</a>
+        
+        <a href="referral_forms.php" class="sidebar-link <?php echo ($current_page == 'referral_forms.php') ? 'active' : ''; ?>">
+            Referral Forms
+        </a>
+        
     </div>
 
     <div class="sidebar-label">Account</div>

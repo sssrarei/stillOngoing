@@ -145,6 +145,88 @@ if ($search != "") {
         ORDER BY u.user_id DESC
     ");
 }
+
+/*
+|--------------------------------------------------------------------------
+| PART 13: Rich profile-drawer data
+| For Guardians: which child(ren), which CDC each child belongs to, and
+| which CDW(s) are assigned to that CDC.
+| For CDWs: the existing assigned_cdc string is already enough.
+| Additive only — does not change the $users_result query above.
+|--------------------------------------------------------------------------
+*/
+$users_list = array();
+if ($users_result) {
+    while ($row = $users_result->fetch_assoc()) {
+        $users_list[] = $row;
+    }
+}
+
+$cdw_names_by_cdc_cache = array();
+
+function getCdwNamesForCdc($conn, $cdc_id, &$cache) {
+    if ($cdc_id === null || $cdc_id === '') {
+        return array();
+    }
+    if (isset($cache[$cdc_id])) {
+        return $cache[$cdc_id];
+    }
+
+    $names = array();
+    $stmt = $conn->prepare("
+        SELECT CONCAT(u.first_name, ' ', u.last_name) AS cdw_name
+        FROM cdw_assignments ca
+        INNER JOIN users u ON u.user_id = ca.user_id
+        WHERE ca.cdc_id = ?
+        ORDER BY u.first_name ASC, u.last_name ASC
+    ");
+    $stmt->bind_param("i", $cdc_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($r = $result->fetch_assoc()) {
+        $names[] = trim($r['cdw_name']);
+    }
+
+    $cache[$cdc_id] = $names;
+    return $names;
+}
+
+foreach ($users_list as $key => $user) {
+    $users_list[$key]['guardian_children'] = array();
+
+    if ((int)$user['role_id'] !== 3) {
+        continue;
+    }
+
+    $child_stmt = $conn->prepare("
+        SELECT ch.child_id, ch.first_name, ch.last_name, c.cdc_id, c.cdc_name
+        FROM parent_child_links pcl
+        INNER JOIN children ch ON pcl.child_id = ch.child_id
+        LEFT JOIN cdc c ON ch.cdc_id = c.cdc_id
+        WHERE pcl.parent_id = ?
+          AND ch.is_deleted = 0
+        ORDER BY ch.first_name ASC, ch.last_name ASC
+    ");
+    $child_stmt->bind_param("i", $user['user_id']);
+    $child_stmt->execute();
+    $child_result = $child_stmt->get_result();
+
+    $children_info = array();
+    while ($child_row = $child_result->fetch_assoc()) {
+        $cdc_id = $child_row['cdc_id'];
+        $cdc_name = !empty($child_row['cdc_name']) ? $child_row['cdc_name'] : 'No CDC assigned';
+        $cdw_names = ($cdc_id !== null) ? getCdwNamesForCdc($conn, $cdc_id, $cdw_names_by_cdc_cache) : array();
+
+        $children_info[] = array(
+            'child_name' => htmlspecialchars(trim($child_row['first_name'] . ' ' . $child_row['last_name']), ENT_QUOTES, 'UTF-8'),
+            'cdc_name' => htmlspecialchars($cdc_name, ENT_QUOTES, 'UTF-8'),
+            'cdw_names' => htmlspecialchars(!empty($cdw_names) ? implode(', ', $cdw_names) : 'No CDW assigned yet', ENT_QUOTES, 'UTF-8')
+        );
+    }
+
+    $users_list[$key]['guardian_children'] = $children_info;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -155,6 +237,138 @@ if ($search != "") {
     <link rel="stylesheet" href="../assets/admin/admin-style.css">
     <link rel="stylesheet" href="../assets/admin/add_user.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /*
+        |----------------------------------------------------------------
+        | PART 13: Profile drawer functionality + guardian child list
+        | Self-contained so it works even if add_user.css doesn't already
+        | define a working show/hide toggle for these elements.
+        |----------------------------------------------------------------
+        */
+        .drawer-overlay {
+            display: none;
+            position: fixed;
+            top: 88px; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.45);
+            z-index: 1000;
+        }
+        .drawer-overlay.show {
+            display: block;
+        }
+
+        .profile-drawer {
+            position: fixed;
+            top: 88px;
+            right: -420px;
+            width: 100%;
+            max-width: 400px;
+            height: calc(100vh - 88px);
+            background: #ffffff;
+            box-shadow: -12px 0 30px rgba(0,0,0,0.12);
+            z-index: 1001;
+            overflow-y: auto;
+            padding: 26px 24px;
+            transition: right 0.25s ease;
+        }
+        .profile-drawer.show {
+            right: 0;
+        }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+        }
+        .drawer-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .drawer-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #94a3b8;
+            cursor: pointer;
+        }
+        .drawer-close:hover {
+            color: #475569;
+        }
+
+        .drawer-profile-head {
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #eef1f5;
+        }
+        .drawer-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .drawer-role {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #1d4ed8;
+            background: #dbeafe;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .drawer-section {
+            margin-bottom: 16px;
+        }
+        .drawer-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 4px;
+        }
+        .drawer-value {
+            font-size: 13.5px;
+            color: #334155;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .drawer-children-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .drawer-child-row {
+            background: #f8fafc;
+            border: 1px solid #eef1f5;
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+        .drawer-child-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            font-family: 'Inter', sans-serif;
+        }
+        .drawer-child-meta {
+            font-size: 12px;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+            margin-top: 3px;
+        }
+        .drawer-child-empty {
+            font-size: 12.5px;
+            color: #94a3b8;
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body class="<?php echo (isset($_SESSION['theme_mode']) && $_SESSION['theme_mode'] === 'dark') ? 'dark-mode' : ''; ?>">
 
@@ -326,15 +540,18 @@ if ($search != "") {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($users_result && $users_result->num_rows > 0) { ?>
-                        <?php while ($user = $users_result->fetch_assoc()) { ?>
+                    <?php if (!empty($users_list)) { ?>
+                        <?php foreach ($users_list as $user) { ?>
                             <?php
                                 $full_name = trim($user['first_name'] . ' ' . $user['last_name']);
                                 $role_name = ($user['role_id'] == 2) ? 'CDW' : (($user['role_id'] == 3) ? 'Guardian' : 'Unknown');
                                 $assigned_cdc = !empty($user['assigned_cdc']) ? $user['assigned_cdc'] : 'No assigned CDC';
-                                $linked_children = !empty($user['linked_children']) ? $user['linked_children'] : 'No linked child';
-                                $drawer_label = ($user['role_id'] == 2) ? 'Assigned CDC' : 'Linked Child';
-                                $drawer_value = ($user['role_id'] == 2) ? $assigned_cdc : $linked_children;
+                                $drawer_label = ($user['role_id'] == 2) ? 'Assigned CDC' : 'Linked Child & CDC';
+                                $drawer_value = ($user['role_id'] == 2) ? $assigned_cdc : '';
+                                $guardian_children_json = htmlspecialchars(
+                                    json_encode($user['guardian_children'], JSON_UNESCAPED_UNICODE),
+                                    ENT_QUOTES
+                                );
                             ?>
                             <tr>
                                 <td>
@@ -370,6 +587,7 @@ if ($search != "") {
                                         data-address="<?php echo htmlspecialchars(!empty($user['address']) ? $user['address'] : '—', ENT_QUOTES); ?>"
                                         data-link-label="<?php echo htmlspecialchars($drawer_label, ENT_QUOTES); ?>"
                                         data-link-value="<?php echo htmlspecialchars($drawer_value, ENT_QUOTES); ?>"
+                                        data-guardian-children="<?php echo $guardian_children_json; ?>"
                                         onclick="openProfileDrawer(this)"
                                         aria-label="View Profile"
                                     >
@@ -430,6 +648,7 @@ if ($search != "") {
     <div class="drawer-section">
         <div class="drawer-label" id="drawerLinkLabel">Assigned CDC</div>
         <div class="drawer-value" id="drawerLinkValue">—</div>
+        <div class="drawer-children-list" id="drawerChildrenList"></div>
     </div>
 </div>
 
@@ -444,6 +663,81 @@ if ($search != "") {
     function closeAddUserForm() {
         document.getElementById('addUserForm').classList.remove('show');
     }
+
+    /*
+    |----------------------------------------------------------------
+    | PART 13: Profile drawer — was referenced by the View button but
+    | never defined. Added here so clicking "View" actually shows the
+    | user's role, contact info, and (for guardians) each linked
+    | child's CDC + the CDW(s) assigned to that CDC.
+    |----------------------------------------------------------------
+    */
+    function openProfileDrawer(btn) {
+        const name = btn.getAttribute('data-name') || '—';
+        const role = btn.getAttribute('data-role') || '—';
+        const email = btn.getAttribute('data-email') || '—';
+        const contact = btn.getAttribute('data-contact') || '—';
+        const address = btn.getAttribute('data-address') || '—';
+        const linkLabel = btn.getAttribute('data-link-label') || '';
+        const linkValue = btn.getAttribute('data-link-value') || '';
+        let guardianChildren = [];
+
+        try {
+            guardianChildren = JSON.parse(btn.getAttribute('data-guardian-children') || '[]');
+        } catch (e) {
+            guardianChildren = [];
+        }
+
+        document.getElementById('drawerName').textContent = name;
+        document.getElementById('drawerRole').textContent = role;
+        document.getElementById('drawerEmail').textContent = email;
+        document.getElementById('drawerContact').textContent = contact;
+        document.getElementById('drawerAddress').textContent = address;
+        document.getElementById('drawerLinkLabel').textContent = linkLabel;
+
+        const linkValueEl = document.getElementById('drawerLinkValue');
+        const childrenListEl = document.getElementById('drawerChildrenList');
+
+        if (role === 'CDW') {
+            // Simple: which CDC(s) this CDW is linked to.
+            linkValueEl.textContent = linkValue || 'No assigned CDC';
+            linkValueEl.style.display = '';
+            childrenListEl.innerHTML = '';
+        } else {
+            // Guardian: show each linked child, that child's CDC, and the CDW(s) for that CDC.
+            linkValueEl.style.display = 'none';
+
+            if (!guardianChildren || guardianChildren.length === 0) {
+                childrenListEl.innerHTML = '<div class="drawer-child-empty">No linked child.</div>';
+            } else {
+                let html = '';
+                guardianChildren.forEach(function (child) {
+                    html += '<div class="drawer-child-row">' +
+                                '<div class="drawer-child-name">' + child.child_name + '</div>' +
+                                '<div class="drawer-child-meta">CDC: ' + child.cdc_name + '</div>' +
+                                '<div class="drawer-child-meta">CDW: ' + child.cdw_names + '</div>' +
+                            '</div>';
+                });
+                childrenListEl.innerHTML = html;
+            }
+        }
+
+        document.getElementById('drawerOverlay').classList.add('show');
+        document.getElementById('profileDrawer').classList.add('show');
+        document.getElementById('profileDrawer').setAttribute('aria-hidden', 'false');
+    }
+
+    function closeProfileDrawer() {
+        document.getElementById('drawerOverlay').classList.remove('show');
+        document.getElementById('profileDrawer').classList.remove('show');
+        document.getElementById('profileDrawer').setAttribute('aria-hidden', 'true');
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeProfileDrawer();
+        }
+    });
 </script>
 
 <script src="../assets/admin/sidebar.js"></script>
