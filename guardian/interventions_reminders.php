@@ -517,6 +517,17 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
         white-space:pre-line;
     }
 
+    .disclaimer-note{
+        margin-top:16px;
+        padding:16px 18px;
+        border-radius:16px;
+        background:#fef9e7;
+        border:1px solid #f5d76e;
+        color:#7c6212;
+        font-size:14px;
+        line-height:1.7;
+    }
+
     .empty-box{
         padding:24px;
         border:1px dashed #d1d5db;
@@ -696,6 +707,12 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
         border-color:#334155;
     }
 
+    body.dark-mode .disclaimer-note{
+        background:#3f3714;
+        border-color:#8a7326;
+        color:#fef3c7;
+    }
+
     body.dark-mode .notif-date{
         background:#111827;
         border-color:#334155;
@@ -845,6 +862,10 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
                                 <?php echo htmlspecialchars($guidance_note); ?>
                             </div>
                         <?php } ?>
+
+                        <div class="disclaimer-note">
+                            This guidance is intended for basic nutrition support and monitoring. Children with specific health conditions should be referred to a registered nutritionist-dietitian or healthcare provider for proper assessment.
+                        </div>
                     <?php } else { ?>
                         <div class="empty-box">
                             No intervention guidance has been sent yet.

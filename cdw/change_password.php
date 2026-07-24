@@ -38,14 +38,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
             if ($result_check && $result_check->num_rows > 0) {
                 $row_check = $result_check->fetch_assoc();
 
-                if ($current_password !== $row_check['password']) {
+                if (!password_verify($current_password, $row_check['password'])) {
                     $error = "Current password is incorrect.";
                 } else {
+                    $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
                     $sql_update = "UPDATE users SET password = ? WHERE user_id = ? AND role_id = 2";
                     $stmt_update = $conn->prepare($sql_update);
 
                     if ($stmt_update) {
-                        $stmt_update->bind_param("si", $new_password, $user_id);
+                        $stmt_update->bind_param("si", $new_password_hash, $user_id);
 
                         if ($stmt_update->execute()) {
                             $success = "Password changed successfully.";

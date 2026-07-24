@@ -552,6 +552,15 @@ a{
     margin-bottom:18px;
 }
 
+.button-group-split{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:18px;
+}
+
 .btn{
     border:none;
     border-radius:8px;
@@ -946,8 +955,14 @@ th:last-child{
                 </div>
             </div>
 
-            <div class="button-group">
-                <button type="submit" class="btn btn-generate">Generate Report</button>
+            <div class="button-group-split no-print">
+                <div class="button-group" style="margin-bottom:0;">
+                    <button type="submit" class="btn btn-generate">Generate Report</button>
+                </div>
+
+                <button type="button" class="btn btn-print" onclick="window.print()">
+                    Print / Save as PDF
+                </button>
             </div>
         </form>
 
@@ -1049,10 +1064,6 @@ th:last-child{
 
     <div class="footer-actions">
         <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
-
-        <button type="button" class="btn btn-print" onclick="window.print()">
-            Print / Save as PDF
-        </button>
     </div>
 </div>
         </form>

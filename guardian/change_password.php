@@ -45,18 +45,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$user) {
                 $message = 'User account not found.';
                 $message_type = 'error';
-            } elseif ($current_password !== $user['password']) {
+            } elseif (!password_verify($current_password, $user['password'])) {
                 $message = 'Current password is incorrect.';
                 $message_type = 'error';
             } elseif ($current_password === $new_password) {
                 $message = 'New password must be different from current password.';
                 $message_type = 'error';
             } else {
+                $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
                 $update_sql = "UPDATE users SET password = ? WHERE user_id = ?";
                 $update_stmt = $conn->prepare($update_sql);
 
                 if ($update_stmt) {
-                    $update_stmt->bind_param("si", $new_password, $user_id);
+                    $update_stmt->bind_param("si", $new_password_hash, $user_id);
 
                     if ($update_stmt->execute()) {
                         $message = 'Password changed successfully.';

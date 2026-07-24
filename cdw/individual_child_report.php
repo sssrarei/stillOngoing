@@ -741,7 +741,7 @@ mysqli_stmt_close($stmt_deworm);
                 </p>
             </div>
 
-            <form method="POST" class="submit-form no-print">
+            <form method="POST" class="submit-form no-print" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
             <button type="submit" name="submit_report" class="btn-primary">Submit Report to CSWD</button>
 
             <button type="button" class="btn-print" onclick="window.print()">

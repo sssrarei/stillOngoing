@@ -22,7 +22,9 @@ $error = "";
 
 if(isset($_POST['save'])){
     // CHILD INFORMATION
-    $child_name = trim($_POST['child_name']);
+    $first_name = trim($_POST['first_name']);
+    $middle_name = trim($_POST['middle_name']);
+    $last_name = trim($_POST['last_name']);
     $birthdate = $_POST['birthdate'];
     $sex = isset($_POST['sex']) ? trim($_POST['sex']) : '';
     $address = trim($_POST['address']);
@@ -33,27 +35,9 @@ if(isset($_POST['save'])){
     $comorbidities = trim($_POST['comorbidities']);
 
   
-    if(empty($child_name) || empty($birthdate) || empty($sex)){
+    if(empty($first_name) || empty($last_name) || empty($birthdate) || empty($sex)){
         $error = "Please fill in all required child information fields.";
     } else {
-        // Split child full name
-        $child_parts = preg_split('/\s+/', $child_name);
-
-        $first_name = "";
-        $middle_name = "";
-        $last_name = "";
-
-        if(count($child_parts) == 1){
-            $first_name = $child_parts[0];
-        } elseif(count($child_parts) == 2){
-            $first_name = $child_parts[0];
-            $last_name = $child_parts[1];
-        } else {
-            $first_name = array_shift($child_parts);
-            $last_name = array_pop($child_parts);
-            $middle_name = implode(" ", $child_parts);
-        }
-
         // Generate unique access code
         $access_code = "CH-" . rand(1000, 9999);
         $check_code = $conn->query("SELECT child_id FROM children WHERE access_code = '$access_code'");
@@ -471,8 +455,18 @@ if(isset($_POST['save'])){
                 <h3 class="section-title">Child Information</h3>
 
                 <div class="form-row">
-                    <label class="form-label">Child Name</label>
-                    <input type="text" name="child_name" class="form-control" placeholder="First name Middle name Last name" required>
+                    <label class="form-label">First Name</label>
+                    <input type="text" name="first_name" class="form-control" required>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Middle Name <span class="optional">(Optional)</span></label>
+                    <input type="text" name="middle_name" class="form-control">
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" name="last_name" class="form-control" required>
                 </div>
 
                 <div class="form-row">

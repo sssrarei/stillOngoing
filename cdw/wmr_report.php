@@ -410,6 +410,23 @@ if($data['error'] !== ''){
             margin-bottom:18px;
         }
 
+        .button-group-split{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-bottom:18px;
+        }
+
+        .button-group-end{
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+            flex-wrap:wrap;
+            margin-top:18px;
+        }
+
         .btn{
             border:none;
             border-radius:8px;
@@ -801,24 +818,16 @@ if($data['error'] !== ''){
                 </div>
             </div>
 
-            <div class="button-group no-print">
-                <button type="submit" class="btn btn-generate">Generate Report</button>
-                <a href="wmr_report.php" class="btn btn-reset">Reset</a>
+            <div class="button-group-split no-print">
+                <div class="button-group" style="margin-bottom:0;">
+                    <button type="submit" class="btn btn-generate">Generate Report</button>
+                    <a href="wmr_report.php" class="btn btn-reset">Reset</a>
+                </div>
+
+                <button type="button" class="btn btn-print" onclick="window.print()">
+                    Print / Save as PDF
+                </button>
             </div>
-        </form>
-
-        <form method="POST">
-            <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($date_from); ?>">
-            <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($date_to); ?>">
-            <input type="hidden" name="assessment_type" value="<?php echo htmlspecialchars($assessment_type); ?>">
-
-            <div class="button-group no-print" style="margin-top:-6px;">
-    <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
-
-    <button type="button" class="btn btn-print" onclick="window.print()">
-        Print / Save as PDF
-    </button>
-</div>
         </form>
 
         <div class="report-meta">
@@ -901,6 +910,16 @@ if($data['error'] !== ''){
         <?php } else { ?>
             <p class="no-data">No <?php echo htmlspecialchars(ucfirst($assessment_type)); ?> records found for this CDC.</p>
         <?php } ?>
+
+        <form method="POST">
+            <input type="hidden" name="date_from" value="<?php echo htmlspecialchars($date_from); ?>">
+            <input type="hidden" name="date_to" value="<?php echo htmlspecialchars($date_to); ?>">
+            <input type="hidden" name="assessment_type" value="<?php echo htmlspecialchars($assessment_type); ?>">
+
+            <div class="button-group-end no-print">
+                <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
+            </div>
+        </form>
     </div>
 </div>
 

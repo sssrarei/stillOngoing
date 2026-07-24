@@ -25,11 +25,12 @@ if (isset($_POST['change_password'])) {
 
         if (!$user) {
             $error = "User not found.";
-        } elseif ($current_password != $user['password']) {
+        } elseif (!password_verify($current_password, $user['password'])) {
             $error = "Current password is incorrect.";
         } else {
+            $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
             $update = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
-            $update->bind_param("si", $new_password, $user_id);
+            $update->bind_param("si", $new_password_hash, $user_id);
 
             if ($update->execute()) {
                 $success = "Password changed successfully.";

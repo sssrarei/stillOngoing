@@ -623,6 +623,22 @@ if($recent_result && $recent_result->num_rows > 0){
         $recent_records[] = $row;
     }
 }
+
+/*
+|-------------------------------------------------------
+| GROUP RECENT RECORDS BY DATE (for accordion display)
+| Relies on $recent_records already being ordered by
+| feeding_date DESC from the query above.
+|-------------------------------------------------------
+*/
+$grouped_recent_records = [];
+foreach($recent_records as $record){
+    $date_key = $record['feeding_date'];
+    if(!isset($grouped_recent_records[$date_key])){
+        $grouped_recent_records[$date_key] = [];
+    }
+    $grouped_recent_records[$date_key][] = $record;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -635,6 +651,22 @@ if($recent_result && $recent_result->num_rows > 0){
     <link rel="stylesheet" href="../assets/cdw/cdw-style.css?v=6">
     <link rel="stylesheet" href="../assets/cdw/feeding.css?v=6">
     <link rel="stylesheet" href="../assets/cdw/cdw-topbar-notification.css?v=6">
+
+    <style>
+        .date-summary-row{
+            cursor:pointer;
+            background:#f5f7f5;
+        }
+        .date-summary-row:hover{
+            background:#eaf2ea;
+        }
+        .date-toggle-arrow{
+            display:inline-block;
+            margin-right:8px;
+            font-size:11px;
+            transition:transform 0.15s ease;
+        }
+    </style>
 </head>
 <?php include __DIR__ . '/../includes/auth.php'; ?>
 <body class="<?php echo themeClass(); ?>">
@@ -948,60 +980,76 @@ if($recent_result && $recent_result->num_rows > 0){
                     </thead>
 
                     <tbody>
-                        <?php foreach($recent_records as $record){ ?>
-                            <?php
-                                $recent_full_name = format_child_name(
-                                    $record['first_name'],
-                                    $record['middle_name'],
-                                    $record['last_name']
-                                );
+                        <?php if(!empty($grouped_recent_records)){ ?>
+                            <?php $group_index = 0; ?>
+                            <?php foreach($grouped_recent_records as $date_key => $date_records){ $group_index++; ?>
+                                <tr class="date-summary-row" onclick="toggleFeedingDateGroup(<?php echo $group_index; ?>)">
+                                    <td colspan="6">
+                                        <span class="date-toggle-arrow" id="feedingArrow<?php echo $group_index; ?>">▶</span>
+                                        <strong><?php echo date("M d, Y", strtotime($date_key)); ?></strong>
+                                        — <?php echo count($date_records); ?> record<?php echo count($date_records) > 1 ? 's' : ''; ?>
+                                    </td>
+                                </tr>
+                                <?php foreach($date_records as $record){ ?>
+                                    <?php
+                                        $recent_full_name = format_child_name(
+                                            $record['first_name'],
+                                            $record['middle_name'],
+                                            $record['last_name']
+                                        );
 
-                                $summary_lines = build_feeding_summary($conn, $record['feeding_record_id']);
+                                        $summary_lines = build_feeding_summary($conn, $record['feeding_record_id']);
 
-                                $recorded_by_name = trim(
-                                    ($record['recorded_first_name'] ?? '') . ' ' .
-                                    ($record['recorded_last_name'] ?? '')
-                                );
+                                        $recorded_by_name = trim(
+                                            ($record['recorded_first_name'] ?? '') . ' ' .
+                                            ($record['recorded_last_name'] ?? '')
+                                        );
 
-                                if($recorded_by_name == ''){
-                                    $recorded_by_name = 'N/A';
-                                }
-                            ?>
+                                        if($recorded_by_name == ''){
+                                            $recorded_by_name = 'N/A';
+                                        }
+                                    ?>
 
-                            <tr>
-                                <td>
-                                    <?php echo date("M d, Y", strtotime($record['feeding_date'])); ?>
-                                </td>
+                                    <tr class="feeding-detail-row feeding-group-<?php echo $group_index; ?>" style="display:none;">
+                                        <td>
+                                            <?php echo date("M d, Y", strtotime($record['feeding_date'])); ?>
+                                        </td>
 
-                                <td>
-                                    <?php echo htmlspecialchars($recent_full_name); ?>
-                                </td>
+                                        <td>
+                                            <?php echo htmlspecialchars($recent_full_name); ?>
+                                        </td>
 
-                                <td>
-                                    <span class="status-badge <?php echo strtolower($record['attendance']); ?>">
-                                        <?php echo htmlspecialchars($record['attendance']); ?>
-                                    </span>
-                                </td>
+                                        <td>
+                                            <span class="status-badge <?php echo strtolower($record['attendance']); ?>">
+                                                <?php echo htmlspecialchars($record['attendance']); ?>
+                                            </span>
+                                        </td>
 
-                                <td>
-                                    <?php if(!empty($summary_lines)){ ?>
-                                        <ul class="table-summary-list">
-                                            <?php foreach($summary_lines as $line){ ?>
-                                                <li><?php echo htmlspecialchars($line); ?></li>
+                                        <td>
+                                            <?php if(!empty($summary_lines)){ ?>
+                                                <ul class="table-summary-list">
+                                                    <?php foreach($summary_lines as $line){ ?>
+                                                        <li><?php echo htmlspecialchars($line); ?></li>
+                                                    <?php } ?>
+                                                </ul>
+                                            <?php } else { ?>
+                                                -
                                             <?php } ?>
-                                        </ul>
-                                    <?php } else { ?>
-                                        -
-                                    <?php } ?>
-                                </td>
+                                        </td>
 
-                                <td>
-                                    <?php echo !empty($record['remarks']) ? htmlspecialchars($record['remarks']) : '-'; ?>
-                                </td>
+                                        <td>
+                                            <?php echo !empty($record['remarks']) ? htmlspecialchars($record['remarks']) : '-'; ?>
+                                        </td>
 
-                                <td>
-                                    <?php echo htmlspecialchars($recorded_by_name); ?>
-                                </td>
+                                        <td>
+                                            <?php echo htmlspecialchars($recorded_by_name); ?>
+                                        </td>
+                                    </tr>
+                                <?php } ?>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <tr>
+                                <td colspan="6" class="empty-row">No feeding records found yet.</td>
                             </tr>
                         <?php } ?>
                     </tbody>
@@ -1460,6 +1508,23 @@ if (applyRemarksToTableBtn && remarksForAllInput) {
 }
 
 renderMealInputsForAllChildren();
+
+function toggleFeedingDateGroup(groupIndex) {
+    const rows = document.querySelectorAll(".feeding-group-" + groupIndex);
+    const arrow = document.getElementById("feedingArrow" + groupIndex);
+
+    if (!rows.length) return;
+
+    const isHidden = rows[0].style.display === "none" || rows[0].style.display === "";
+
+    rows.forEach(function (row) {
+        row.style.display = isHidden ? "table-row" : "none";
+    });
+
+    if (arrow) {
+        arrow.textContent = isHidden ? "▼" : "▶";
+    }
+}
 
 function toggleSidebar() {
     var sidebar = document.getElementById('sidebar');

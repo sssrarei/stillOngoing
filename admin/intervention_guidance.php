@@ -1666,7 +1666,6 @@ if ($selected_report_id > 0) {
     <?php endif; ?>
 </div>
         </div>
-    </div>
 
     <!-- =====================================================
          SELECTED REPORT AT-RISK CHILDREN
@@ -1723,7 +1722,7 @@ if ($selected_report_id > 0) {
 
     </div>
 
-    <div class="table-wrapper">
+    
 
                 <div class="table-wrapper">
                     <table>
@@ -1743,6 +1742,9 @@ if ($selected_report_id > 0) {
                         </thead>
 
                         <tbody>
+
+
+                        
                             <?php if (!empty($report_children)) : ?>
                                 <?php foreach ($report_children as $child) : ?>
                                     <?php

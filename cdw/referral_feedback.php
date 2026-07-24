@@ -462,7 +462,7 @@ if (!$view_referral_id) {
                             <?php } ?>
                         </div>
                     <?php } else { ?>
-                        <div class="comment-empty">Wala pang mensahe sa referral na ito.</div>
+                        <div class="comment-empty">There are no messages on this referral yet.</div>
                     <?php } ?>
 
                     <form method="POST" class="comment-form" enctype="multipart/form-data">

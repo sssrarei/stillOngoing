@@ -24,6 +24,7 @@ if(isset($_POST['register'])){
     } elseif($password != $confirm_password){
         $error = "Password and Confirm Password do not match.";
     } else {
+        $password = password_hash($password, PASSWORD_DEFAULT);
 
         // Check if email already exists in users table
         $check_email = $conn->query("SELECT * FROM users WHERE email = '$email'");

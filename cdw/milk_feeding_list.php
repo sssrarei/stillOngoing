@@ -197,6 +197,22 @@ if($selected_cdc_id > 0){
         $recent_records[] = $row;
     }
 }
+
+/*
+|-------------------------------------------------------
+| GROUP RECENT RECORDS BY DATE (for accordion display)
+| Relies on $recent_records already being ordered by
+| feeding_date DESC from the query above.
+|-------------------------------------------------------
+*/
+$grouped_recent_records = [];
+foreach($recent_records as $record){
+    $date_key = $record['feeding_date'];
+    if(!isset($grouped_recent_records[$date_key])){
+        $grouped_recent_records[$date_key] = [];
+    }
+    $grouped_recent_records[$date_key][] = $record;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -208,6 +224,22 @@ if($selected_cdc_id > 0){
     <link rel="stylesheet" href="../assets/cdw/cdw-style.css">
     <link rel="stylesheet" href="../assets/cdw/milk_feeding.css">
     <link rel="stylesheet" href="../assets/cdw/cdw-topbar-notification.css">
+
+    <style>
+        .date-summary-row{
+            cursor:pointer;
+            background:#f5f7f5;
+        }
+        .date-summary-row:hover{
+            background:#eaf2ea;
+        }
+        .date-toggle-arrow{
+            display:inline-block;
+            margin-right:8px;
+            font-size:11px;
+            transition:transform 0.15s ease;
+        }
+    </style>
 </head>
 <?php include __DIR__ . '/../includes/auth.php'; ?>
 <body class="<?php echo themeClass(); ?>">
@@ -417,29 +449,39 @@ if($selected_cdc_id > 0){
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(!empty($recent_records)){ ?>
-                                <?php foreach($recent_records as $record){ ?>
-                                    <tr>
-                                        <td><?php echo date("M d, Y", strtotime($record['feeding_date'])); ?></td>
-                                        <td><?php echo htmlspecialchars($record['first_name'] . ' ' . $record['last_name']); ?></td>
-                                        <td>
-                                            <span class="mini-status <?php echo strtolower($record['attendance']); ?>">
-                                                <?php echo htmlspecialchars($record['attendance']); ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <?php echo $record['milk_type'] != NULL ? htmlspecialchars($record['milk_type']) : "-"; ?>
-                                        </td>
-                                        <td>
-                                            <?php echo $record['amount'] != NULL ? htmlspecialchars($record['amount']) : "-"; ?>
-                                        </td>
-                                        <td>
-                                            <?php echo $record['remarks'] != NULL && $record['remarks'] != "" ? htmlspecialchars($record['remarks']) : "-"; ?>
-                                        </td>
-                                        <td>
-                                            <?php echo htmlspecialchars($record['recorded_first_name'] . ' ' . $record['recorded_last_name']); ?>
+                            <?php if(!empty($grouped_recent_records)){ ?>
+                                <?php $group_index = 0; ?>
+                                <?php foreach($grouped_recent_records as $date_key => $date_records){ $group_index++; ?>
+                                    <tr class="date-summary-row" onclick="toggleMilkDateGroup(<?php echo $group_index; ?>)">
+                                        <td colspan="7">
+                                            <span class="date-toggle-arrow" id="milkArrow<?php echo $group_index; ?>">▶</span>
+                                            <strong><?php echo date("M d, Y", strtotime($date_key)); ?></strong>
+                                            — <?php echo count($date_records); ?> record<?php echo count($date_records) > 1 ? 's' : ''; ?>
                                         </td>
                                     </tr>
+                                    <?php foreach($date_records as $record){ ?>
+                                        <tr class="milk-detail-row milk-group-<?php echo $group_index; ?>" style="display:none;">
+                                            <td><?php echo date("M d, Y", strtotime($record['feeding_date'])); ?></td>
+                                            <td><?php echo htmlspecialchars($record['first_name'] . ' ' . $record['last_name']); ?></td>
+                                            <td>
+                                                <span class="mini-status <?php echo strtolower($record['attendance']); ?>">
+                                                    <?php echo htmlspecialchars($record['attendance']); ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <?php echo $record['milk_type'] != NULL ? htmlspecialchars($record['milk_type']) : "-"; ?>
+                                            </td>
+                                            <td>
+                                                <?php echo $record['amount'] != NULL ? htmlspecialchars($record['amount']) : "-"; ?>
+                                            </td>
+                                            <td>
+                                                <?php echo $record['remarks'] != NULL && $record['remarks'] != "" ? htmlspecialchars($record['remarks']) : "-"; ?>
+                                            </td>
+                                            <td>
+                                                <?php echo htmlspecialchars($record['recorded_first_name'] . ' ' . $record['recorded_last_name']); ?>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
                                 <?php } ?>
                             <?php } else { ?>
                                 <tr>
@@ -458,8 +500,7 @@ if($selected_cdc_id > 0){
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
-    const feedingDate = document.getElementById("feeding_date");
-    const milkType = document.getElementById("milk_type");
+    const feedingDate = document.getElementById("feeding_date");    const milkType = document.getElementById("milk_type");
     const amount = document.getElementById("amount");
     const applyBtn = document.getElementById("applyToTableBtn");
 
@@ -619,6 +660,23 @@ document.addEventListener("DOMContentLoaded", function () {
         if (overlay) overlay.classList.remove("show");
     }
 });
+
+function toggleMilkDateGroup(groupIndex) {
+    const rows = document.querySelectorAll(".milk-group-" + groupIndex);
+    const arrow = document.getElementById("milkArrow" + groupIndex);
+
+    if (!rows.length) return;
+
+    const isHidden = rows[0].style.display === "none" || rows[0].style.display === "";
+
+    rows.forEach(function (row) {
+        row.style.display = isHidden ? "table-row" : "none";
+    });
+
+    if (arrow) {
+        arrow.textContent = isHidden ? "▼" : "▶";
+    }
+}
 
 function toggleSidebar() {
     const sidebar = document.getElementById("sidebar");

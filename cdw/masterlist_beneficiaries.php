@@ -278,6 +278,14 @@ a{
     margin-bottom:18px;
 }
 
+.button-group-end{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+}
+
 .btn{
     border:none;
     border-radius:8px;
@@ -555,15 +563,11 @@ a{
             <div class="success-message"><?php echo htmlspecialchars($success); ?></div>
         <?php } ?>
 
-        <form method="POST">
-        <div class="button-group no-print">
-            <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
-
+        <div class="button-group-end no-print">
             <button type="button" class="btn btn-print" onclick="window.print()">
                 Print / Save as PDF
             </button>
         </div>
-    </form>
 
         <div class="prepared-by">
             <div class="prepared-by-label">Prepared by</div>
@@ -600,6 +604,12 @@ a{
         <?php } else { ?>
             <div class="empty-state">No beneficiary records found for this CDC.</div>
         <?php } ?>
+
+        <form method="POST">
+            <div class="button-group-end no-print" style="margin-top:18px; margin-bottom:0;">
+                <button type="submit" name="submit_report" class="btn btn-submit">Submit Report</button>
+            </div>
+        </form>
 
     </div>
 </div>

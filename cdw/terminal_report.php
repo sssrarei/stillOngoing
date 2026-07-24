@@ -339,20 +339,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_report'])) {
     </div>
 
     <div class="content-card">
-        <form method="POST" class="top-actions no-print">
-    <button
-        type="submit"
-        name="submit_report"
-        class="btn btn-submit <?php echo !$can_submit ? 'btn-disabled' : ''; ?>"
-        <?php echo !$can_submit ? 'disabled' : ''; ?>
-    >
-        Submit Report
-    </button>
-
+        <div class="top-actions no-print" style="display:flex; justify-content:flex-end;">
     <button type="button" class="btn btn-print" onclick="window.print()">
         Print / Save as PDF
     </button>
-</form>
+</div>
 
         <?php if (!empty($error)) { ?>
             <div class="error-message"><?php echo h($error); ?></div>
@@ -459,6 +450,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_report'])) {
         <?php } else { ?>
             <p class="no-data">No terminal report data found.</p>
         <?php } ?>
+
+        <form method="POST" style="margin-top:18px;">
+            <div class="no-print" style="display:flex; justify-content:flex-end;">
+                <button
+                    type="submit"
+                    name="submit_report"
+                    class="btn btn-submit <?php echo !$can_submit ? 'btn-disabled' : ''; ?>"
+                    <?php echo !$can_submit ? 'disabled' : ''; ?>
+                >
+                    Submit Report
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 

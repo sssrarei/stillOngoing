@@ -112,12 +112,13 @@ a {
 }
 
 .success-message {
-    background: rgba(67,160,71,0.15);
-    color: #7dff9a;
-    border: 1px solid rgba(67,160,71,0.4);
+    background: rgba(76,175,80,0.12);
+    color: #4CAF50;
+    border: 1px solid rgba(76,175,80,0.4);
     border-radius: 10px;
     padding: 14px 16px;
     margin-bottom: 16px;
+    font-weight: 600;
 }
 
 .warning-message {

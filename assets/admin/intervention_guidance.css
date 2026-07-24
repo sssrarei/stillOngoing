@@ -8,10 +8,50 @@ body{
     background:#f4f6f9;
     font-family:'Inter', sans-serif;
     color:#1f2937;
+    overflow-x:hidden;
 }
 
 .main-content{
     padding:100px 24px 24px;
+    margin-left:260px !important;
+    overflow-x:hidden;
+    max-width:100%;
+}
+
+@media (max-width: 991px){
+    .main-content{
+        margin-left:0 !important;
+    }
+}
+
+/* Defensive fix: tie main-content margin directly to the sidebar's own
+   class instead of relying on mainContent/body classes staying in sync
+   with it. Prevents overlap if those toggles ever get out of sync. */
+@media (min-width: 992px){
+    #sidebar.hidden ~ #mainContent{
+        margin-left:0 !important;
+    }
+
+    #sidebar:not(.hidden) ~ #mainContent{
+        margin-left:260px !important;
+    }
+}
+
+/* === TEMPORARY TEST MARKER (FIX-V2) ===
+   Layunin: i-verify na ang FILE NA ITO (bagong-save) ang talagang
+   na-load ng browser. Kapag nakita mo itong pulang banner sa TAAS
+   ng page, ibig sabihin TAMA ang folder/file kung saan mo ito na-save.
+   TANGGALIN na lang itong buong block kapag tapos na ang verification. */
+body::before{
+    content:"FIX-V2 APPLIED \2014 intervention_guidance.css";
+    display:block;
+    background:#e11d48;
+    color:#ffffff;
+    text-align:center;
+    font-size:13px;
+    font-weight:700;
+    padding:8px;
+    letter-spacing:0.5px;
 }
 
 .page-header{
@@ -57,6 +97,7 @@ body{
     border-radius:16px;
     box-shadow:0 6px 20px rgba(0,0,0,.06);
     margin-bottom:24px;
+    overflow:hidden;
 }
 
 .filter-card{
@@ -785,4 +826,3 @@ body.dark-mode .note-group textarea{
 .pagination-btn:hover {
     background: #dbeafe;
 }
-

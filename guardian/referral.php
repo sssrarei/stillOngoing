@@ -716,7 +716,7 @@ if ($child_id) {
                                     <?php } ?>
                                 </div>
                             <?php } else { ?>
-                                <div class="comment-empty">Wala pang mensahe. Puwede kang magtanong dito sa CDW tungkol sa referral na ito.</div>
+                                <div class="comment-empty">There are no messages yet. You can ask CDW about this referral here.</div>
                             <?php } ?>
 
                             <form method="POST" class="comment-form" enctype="multipart/form-data">

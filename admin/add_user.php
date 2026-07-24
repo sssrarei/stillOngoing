@@ -36,6 +36,7 @@ if (isset($_POST['add_user'])) {
             $error = "Email already exists.";
         } else {
             $role_id = 2;
+            $password = password_hash($password, PASSWORD_DEFAULT);
 
             $insert_user = $conn->prepare("
                 INSERT INTO users (role_id, first_name, last_name, email, contact_number, address, password)

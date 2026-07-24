@@ -85,7 +85,7 @@ if(isset($_POST['update'])){
             last_name = '$last_name',
             birthdate = '$birthdate',
             sex = '$sex',
-            address = '$address'
+            address = '$address',
             religion = '$religion'
             WHERE child_id = '$child_id'
             AND cdc_id = '$active_cdc_id'";

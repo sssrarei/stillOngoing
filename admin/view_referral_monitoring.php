@@ -434,7 +434,7 @@ if (!$view_referral_id) {
                         <?php } ?>
                     </div>
                 <?php } else { ?>
-                    <div class="rm-no-comments">Wala pang mensahe sa referral na ito.</div>
+                    <div class="rm-no-comments">There are no messages on this referral yet.</div>
                 <?php } ?>
 
                 <div class="rm-readonly-note">This is a read-only monitoring view. Status updates and replies are handled by the CDW and Guardian.</div>
