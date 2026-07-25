@@ -86,6 +86,20 @@ $total_guardian = $total_guardian_result ? (int)$total_guardian_result->fetch_as
 
 $cdc_list = $conn->query("SELECT cdc_id, cdc_name, barangay FROM cdc ORDER BY cdc_name ASC");
 
+/*
+|----------------------------------------------------------------
+| Unassigned CDW indicator (display-only, does not affect any
+| existing add-user logic or the CDC assignment checkboxes).
+|----------------------------------------------------------------
+*/
+$cdc_ids_with_cdw = [];
+$cdw_assigned_result = $conn->query("SELECT DISTINCT cdc_id FROM cdw_assignments");
+if ($cdw_assigned_result) {
+    while ($row = $cdw_assigned_result->fetch_assoc()) {
+        $cdc_ids_with_cdw[] = (int)$row['cdc_id'];
+    }
+}
+
 if ($search != "") {
     $like = "%" . $search . "%";
     $users_stmt = $conn->prepare("
@@ -239,6 +253,27 @@ foreach ($users_list as $key => $user) {
     <link rel="stylesheet" href="../assets/admin/add_user.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        /*
+        |----------------------------------------------------------------
+        | Unassigned CDW badge (Select CDC Assignment list)
+        | Self-contained so it works even if add_user.css doesn't already
+        | define a style for it.
+        |----------------------------------------------------------------
+        */
+        .unassigned-cdw-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 9px;
+            border-radius: 999px;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            font-size: 11px;
+            font-weight: 700;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
         /*
         |----------------------------------------------------------------
         | PART 13: Profile drawer functionality + guardian child list
@@ -505,9 +540,15 @@ foreach ($users_list as $key => $user) {
                                     $checked = "checked";
                                 }
 
+                                $is_unassigned_cdc = !in_array((int)$cdc['cdc_id'], $cdc_ids_with_cdw);
+                                $unassigned_badge = $is_unassigned_cdc
+                                    ? " <span class='unassigned-cdw-badge'>No CDW Assigned</span>"
+                                    : "";
+
                                 echo "<div class='checkbox-item'>" .
                                     "<input type='checkbox' name='cdc_ids[]' id='cdc_" . $cdc['cdc_id'] . "' value='" . $cdc['cdc_id'] . "' $checked>" .
                                     "<label for='cdc_" . $cdc['cdc_id'] . "'>" . htmlspecialchars($cdc['cdc_name'] . " - " . $cdc['barangay']) . "</label>" .
+                                    $unassigned_badge .
                                     "</div>";
                             }
                         }

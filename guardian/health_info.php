@@ -178,6 +178,41 @@ if($submission_table_exists && !$pending_submission){
     }
 }
 
+/*
+|----------------------------------------------------------------
+| Hide the "Submit Updated Health Information to CDW" card once
+| the latest submission has already been Approved (no pending,
+| no need to resubmit). Display-only check, does not touch the
+| pending/rejected logic above.
+|----------------------------------------------------------------
+*/
+$latest_submission_approved = false;
+
+if($submission_table_exists && !$pending_submission){
+    $latest_sql = "
+        SELECT status
+        FROM child_health_information_requests
+        WHERE child_id = ?
+          AND guardian_id = ?
+        ORDER BY submitted_at DESC, request_id DESC
+        LIMIT 1
+    ";
+
+    $latest_stmt = $conn->prepare($latest_sql);
+
+    if($latest_stmt){
+        $latest_stmt->bind_param("ii", $child_id, $guardian_user_id);
+        $latest_stmt->execute();
+        $latest_result = $latest_stmt->get_result();
+        $latest_row = $latest_result->fetch_assoc();
+        $latest_stmt->close();
+
+        if($latest_row && $latest_row['status'] === 'Approved'){
+            $latest_submission_approved = true;
+        }
+    }
+}
+
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info'])){
     if(!$submission_table_exists){
         $message = "Submission table not found. Please create child_health_information_requests first.";
@@ -772,6 +807,7 @@ if ($comorbidity_status === 'No') {
             </div>
         </div>
 
+        <?php if(!$latest_submission_approved) { ?>
         <div class="health-card">
             <div class="health-card-header">
                 <h2 class="health-card-title">Submit Updated Health Information to CDW</h2>
@@ -891,6 +927,7 @@ if ($comorbidity_status === 'No') {
 
             </div>
         </div>
+        <?php } ?>
 
     </div>
 </div>

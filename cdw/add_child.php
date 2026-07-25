@@ -30,9 +30,7 @@ if(isset($_POST['save'])){
     $address = trim($_POST['address']);
     $religion = trim($_POST['religion']);
 
-    // HEALTH INFORMATION
-    $allergies = trim($_POST['allergies']);
-    $comorbidities = trim($_POST['comorbidities']);
+    
 
   
     if(empty($first_name) || empty($last_name) || empty($birthdate) || empty($sex)){
@@ -47,28 +45,6 @@ if(isset($_POST['save'])){
             $check_code = $conn->query("SELECT child_id FROM children WHERE access_code = '$access_code'");
         }
 
-        // FILE UPLOADS
-        $vaccination_card_path = "";
-        $medical_history_path = "";
-
-        if(isset($_FILES['vaccination_card']) && $_FILES['vaccination_card']['error'] == 0){
-            $vacc_name = time() . "_vacc_" . basename($_FILES['vaccination_card']['name']);
-            $vacc_target = "../uploads/vaccination_cards/" . $vacc_name;
-
-            if(move_uploaded_file($_FILES['vaccination_card']['tmp_name'], $vacc_target)){
-                $vaccination_card_path = "uploads/vaccination_cards/" . $vacc_name;
-            }
-        }
-
-        if(isset($_FILES['medical_history_file']) && $_FILES['medical_history_file']['error'] == 0){
-            $med_name = time() . "_med_" . basename($_FILES['medical_history_file']['name']);
-            $med_target = "../uploads/medical_history/" . $med_name;
-
-            if(move_uploaded_file($_FILES['medical_history_file']['tmp_name'], $med_target)){
-                $medical_history_path = "uploads/medical_history/" . $med_name;
-            }
-        }
-
         // SAVE CHILD
     $child_sql = "INSERT INTO children
     (first_name, middle_name, last_name, birthdate, sex, address, religion, cdc_id, access_code)
@@ -78,32 +54,7 @@ if(isset($_POST['save'])){
         if($conn->query($child_sql)){
             $child_id = $conn->insert_id;
 
-            
-
-            // SAVE HEALTH INFORMATION ONLY IF MAY INPUT
-                if(empty($error)){
-                    $has_health_info = !empty($vaccination_card_path) || 
-                                    !empty($allergies) || 
-                                    !empty($comorbidities) || 
-                                    !empty($medical_history_path);
-
-                    if($has_health_info){
-                        $health_sql = "INSERT INTO child_health_information
-                            (child_id, vaccination_card_file_path, allergies, comorbidities, medical_history_file_path)
-                            VALUES
-                            ('$child_id', '$vaccination_card_path', '$allergies', '$comorbidities', '$medical_history_path')";
-
-                        $health_saved = $conn->query($health_sql);
-
-                        if(!$health_saved){
-                            $error = "Child saved, but health information failed: " . $conn->error;
-                        } else {
-                            $success = "Child Profile Registration successful! Child Access Code: " . $access_code;
-                        }
-                    } else {
-                        $success = "Child Profile Registration successful! Child Access Code: " . $access_code;
-                    }
-                }
+            $success = "Child Profile Registration successful! Child Access Code: " . $access_code;
         } else {
             $error = "Error: " . $conn->error;
         }
@@ -504,35 +455,6 @@ if(isset($_POST['save'])){
                 </div>
                 
 
-            <div class="form-card full">
-                <h3 class="section-title">Child Health Information <span class="optional">(Optional)</span></h3>
-
-                <div class="health-grid">
-                    <div>
-                        <div class="form-row">
-                            <label class="form-label">Vaccination Card</label>
-                            <input type="file" name="vaccination_card" class="form-file">
-                        </div>
-
-                        <div class="form-row">
-                            <label class="form-label">Allergies</label>
-                            <input type="text" name="allergies" class="form-control">
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="form-row">
-                            <label class="form-label">Medical History</label>
-                            <input type="file" name="medical_history_file" class="form-file">
-                        </div>
-
-                        <div class="form-row">
-                            <label class="form-label">Comorbidities</label>
-                            <input type="text" name="comorbidities" class="form-control">
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="form-actions">

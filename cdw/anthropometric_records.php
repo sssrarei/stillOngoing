@@ -16,6 +16,13 @@ $active_cdc_id = (int) $_SESSION['active_cdc_id'];
 $user_id = (int) $_SESSION['user_id'];
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $child_id = isset($_GET['child_id']) ? (int) $_GET['child_id'] : 0;
+
+$per_page = 10;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+if($page < 1){
+    $page = 1;
+}
+$offset = ($page - 1) * $per_page;
 $edit_id = isset($_GET['edit_id']) ? (int) $_GET['edit_id'] : 0;
 $view_only = (isset($_GET['view']) && $_GET['view'] == '1') ? true : false;
 
@@ -383,8 +390,41 @@ if(!$view_only && isset($_POST['save_record'])){
    SEARCH MODE
 ========================================================= */
 $search_results = null;
+$total_pupils = 0;
+$total_pupil_pages = 1;
 
 if($child_id <= 0){
+    $count_sql = "SELECT COUNT(*) AS total
+            FROM children
+            WHERE cdc_id = ?";
+
+    if($search !== ""){
+        $count_sql .= " AND (
+            first_name LIKE ? OR
+            middle_name LIKE ? OR
+            last_name LIKE ?
+        )";
+    }
+
+    $count_stmt = $conn->prepare($count_sql);
+
+    if($search !== ""){
+        $search_param = "%" . $search . "%";
+        $count_stmt->bind_param("isss", $active_cdc_id, $search_param, $search_param, $search_param);
+    } else {
+        $count_stmt->bind_param("i", $active_cdc_id);
+    }
+
+    $count_stmt->execute();
+    $total_pupils = $count_stmt->get_result()->fetch_assoc()['total'];
+    $count_stmt->close();
+
+    $total_pupil_pages = ($total_pupils > 0) ? ceil($total_pupils / $per_page) : 1;
+    if($page > $total_pupil_pages){
+        $page = $total_pupil_pages;
+    }
+    $offset = ($page - 1) * $per_page;
+
     $sql = "SELECT child_id, first_name, middle_name, last_name
             FROM children
             WHERE cdc_id = ?";
@@ -397,15 +437,14 @@ if($child_id <= 0){
         )";
     }
 
-    $sql .= " ORDER BY first_name ASC, last_name ASC";
+    $sql .= " ORDER BY first_name ASC, last_name ASC LIMIT ? OFFSET ?";
 
     $stmt = $conn->prepare($sql);
 
     if($search !== ""){
-        $search_param = "%" . $search . "%";
-        $stmt->bind_param("isss", $active_cdc_id, $search_param, $search_param, $search_param);
+        $stmt->bind_param("isssii", $active_cdc_id, $search_param, $search_param, $search_param, $per_page, $offset);
     } else {
-        $stmt->bind_param("i", $active_cdc_id);
+        $stmt->bind_param("iii", $active_cdc_id, $per_page, $offset);
     }
 
     $stmt->execute();
@@ -490,6 +529,35 @@ if($child_id > 0){
     
 
     <style>
+        .field-tooltip-wrap {
+            position: relative;
+        }
+
+        .field-tooltip-wrap .field-description {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 3px;
+            white-space: nowrap;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            padding: 3px 6px;
+            border-radius: 3px;
+            z-index: 10;
+        }
+
+        .field-tooltip-wrap:hover .field-description {
+            display: block;
+        }
+
+        .field-description {
+            font-size: 8px;
+            font-weight: 400;
+            color: #999999;
+            line-height: 1.3;
+        }
+
         .measurements-table {
             width: 100%;
             border-collapse: collapse;
@@ -633,6 +701,47 @@ if($child_id > 0){
                 min-width: 1260px;
             }
         }
+
+        .pupil-pagination{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:6px;
+            flex-wrap:wrap;
+            margin-top:16px;
+        }
+
+        .pupil-page-link{
+            min-width:36px;
+            height:36px;
+            padding:0 10px;
+            border-radius:8px;
+            border:1px solid #d6d6d6;
+            background:#ffffff;
+            color:#333;
+            font-size:13px;
+            font-weight:600;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            text-decoration:none;
+        }
+
+        .pupil-page-link:hover{
+            border-color:#2E7D32;
+            color:#2E7D32;
+        }
+
+        .pupil-page-link.active{
+            background:#2E7D32;
+            border-color:#2E7D32;
+            color:#fff;
+        }
+
+        .pupil-page-link.disabled{
+            opacity:0.45;
+            pointer-events:none;
+        }
     </style>
 </head>
 <?php include __DIR__ . '/../includes/auth.php'; ?>
@@ -698,6 +807,29 @@ if($child_id > 0){
                         <div class="empty-state">No pupils found under the selected CDC.</div>
                     <?php } ?>
                 </div>
+
+                <?php if($total_pupil_pages > 1){ ?>
+                    <div class="pupil-pagination">
+                        <?php
+                            $pupil_query_params = $search !== "" ? "&search=" . urlencode($search) : "";
+
+                            $prev_pupil_page = max(1, $page - 1);
+                            $next_pupil_page = min($total_pupil_pages, $page + 1);
+
+                            $prev_pupil_disabled = ($page <= 1) ? "disabled" : "";
+                            $next_pupil_disabled = ($page >= $total_pupil_pages) ? "disabled" : "";
+                        ?>
+                        <a href="?page=<?php echo $prev_pupil_page . $pupil_query_params; ?>" class="pupil-page-link <?php echo $prev_pupil_disabled; ?>">‹</a>
+
+                        <?php for($i = 1; $i <= $total_pupil_pages; $i++){
+                            $pupil_active_class = ($i == $page) ? "active" : "";
+                        ?>
+                            <a href="?page=<?php echo $i . $pupil_query_params; ?>" class="pupil-page-link <?php echo $pupil_active_class; ?>"><?php echo $i; ?></a>
+                        <?php } ?>
+
+                        <a href="?page=<?php echo $next_pupil_page . $pupil_query_params; ?>" class="pupil-page-link <?php echo $next_pupil_disabled; ?>">›</a>
+                    </div>
+                <?php } ?>
             </div>
 
         <?php } else { ?>
@@ -757,14 +889,20 @@ if($child_id > 0){
                             <input type="number" step="0.01" name="weight" class="form-control" value="<?php echo htmlspecialchars($form_weight); ?>" required>
 
                             <label class="form-label">MUAC (cm):</label>
-                            <input type="number" step="0.01" name="muac" class="form-control" value="<?php echo htmlspecialchars($form_muac); ?>" required>
+                            <div class="field-tooltip-wrap">
+                                <input type="number" step="0.01" name="muac" class="form-control" value="<?php echo htmlspecialchars($form_muac); ?>" required>
+                                <small class="field-description">Measurement of the child's upper arm circumference.</small>
+                            </div>
 
                             <label class="form-label">Presence of Edema:</label>
+                        <div class="field-tooltip-wrap">
                         <select name="edema_status" id="edema_status" class="form-control" required>
                             <option value="">Select</option>
                             <option value="Absent" <?php echo ($form_edema_status === 'Absent') ? 'selected' : ''; ?>>Absent</option>
                             <option value="Present" <?php echo ($form_edema_status === 'Present') ? 'selected' : ''; ?>>Present</option>
                         </select>
+                        <small class="field-description">Swelling of the body, a sign of malnutrition.</small>
+                        </div>
 
                         <label class="form-label" id="edema_grade_label" style="display:none;">
                             Edema Grade:

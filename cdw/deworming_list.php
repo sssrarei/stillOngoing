@@ -87,8 +87,22 @@ if($selected_cdc_id > 0){
 */
 if(isset($_POST['save_deworming_records'])){
     $deworming_date = trim($_POST['deworming_date']);
-    $medicine = trim($_POST['medicine']);
-    $dosage = trim($_POST['dosage']);
+    $medicine_choice = trim($_POST['medicine'] ?? '');
+    $medicine_other = trim($_POST['medicine_other'] ?? '');
+    $dosage_choice = trim($_POST['dosage'] ?? '');
+    $dosage_other = trim($_POST['dosage_other'] ?? '');
+
+    if($medicine_choice === "Others"){
+        $medicine = $medicine_other !== "" ? "Others: " . $medicine_other : "Others";
+    } else {
+        $medicine = $medicine_choice;
+    }
+
+    if($dosage_choice === "Others"){
+        $dosage = $dosage_other !== "" ? "Others: " . $dosage_other : "Others";
+    } else {
+        $dosage = $dosage_choice;
+    }
 
     if($selected_cdc_id <= 0){
         $error = "No CDC selected.";
@@ -281,12 +295,33 @@ foreach($recent_records as $record){
 
                         <div class="form-group">
                             <label for="medicine">Medicine</label>
-                            <input type="text" name="medicine" id="medicine" placeholder="Enter medicine" required>
+                            <select name="medicine" id="medicine" required>
+                                <option value="">-- Select Medicine --</option>
+                                <option value="Albendazole">Albendazole</option>
+                                <option value="Mebendazole">Mebendazole</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="medicineOtherGroup" style="display:none;">
+                            <label for="medicine_other">Specify Medicine</label>
+                            <input type="text" name="medicine_other" id="medicine_other" placeholder="Enter medicine name">
                         </div>
 
                         <div class="form-group">
                             <label for="dosage">Dosage</label>
-                            <input type="text" name="dosage" id="dosage" placeholder="Ex. 400 mg" required>
+                            <select name="dosage" id="dosage" required>
+                                <option value="">-- Select Dosage --</option>
+                                <option value="200mg">200mg</option>
+                                <option value="400mg">400mg</option>
+                                <option value="500mg">500mg</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="dosageOtherGroup" style="display:none;">
+                            <label for="dosage_other">Specify Dosage</label>
+                            <input type="text" name="dosage_other" id="dosage_other" placeholder="Ex. 250mg">
                         </div>
 
                     </div>
@@ -488,7 +523,58 @@ document.addEventListener("DOMContentLoaded", function () {
     const dewormingDate = document.getElementById("deworming_date");
     const medicine = document.getElementById("medicine");
     const dosage = document.getElementById("dosage");
+    const medicineOther = document.getElementById("medicine_other");
+    const dosageOther = document.getElementById("dosage_other");
+    const medicineOtherGroup = document.getElementById("medicineOtherGroup");
+    const dosageOtherGroup = document.getElementById("dosageOtherGroup");
     const applyBtn = document.getElementById("applyToTableBtn");
+
+    function toggleMedicineOther() {
+        if (!medicine || !medicineOtherGroup) return;
+        if (medicine.value === "Others") {
+            medicineOtherGroup.style.display = "block";
+        } else {
+            medicineOtherGroup.style.display = "none";
+            if (medicineOther) medicineOther.value = "";
+        }
+    }
+
+    function toggleDosageOther() {
+        if (!dosage || !dosageOtherGroup) return;
+        if (dosage.value === "Others") {
+            dosageOtherGroup.style.display = "block";
+        } else {
+            dosageOtherGroup.style.display = "none";
+            if (dosageOther) dosageOther.value = "";
+        }
+    }
+
+    function getMedicineValue() {
+        if (!medicine) return "";
+        if (medicine.value === "Others") {
+            const other = medicineOther ? medicineOther.value.trim() : "";
+            return other !== "" ? "Others: " + other : "Others";
+        }
+        return medicine.value;
+    }
+
+    function getDosageValue() {
+        if (!dosage) return "";
+        if (dosage.value === "Others") {
+            const other = dosageOther ? dosageOther.value.trim() : "";
+            return other !== "" ? "Others: " + other : "Others";
+        }
+        return dosage.value;
+    }
+
+    if (medicine) {
+        medicine.addEventListener("change", toggleMedicineOther);
+        toggleMedicineOther();
+    }
+    if (dosage) {
+        dosage.addEventListener("change", toggleDosageOther);
+        toggleDosageOther();
+    }
 
     const remarksForAllSelect = document.getElementById("remarksForAllSelect");
     const applyRemarksToTableBtn = document.getElementById("applyRemarksToTableBtn");
@@ -551,10 +637,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function applySetupToTakenRows() {
-        if (dewormingDate.value === "" || medicine.value === "" || dosage.value === "") {
-            alert("Please select date, enter medicine, and dosage first.");
+        if (dewormingDate.value === "" || getMedicineValue() === "" || getDosageValue() === "") {
+            alert("Please select date, medicine, and dosage first.");
             return;
         }
+
+        const finalMedicine = getMedicineValue();
+        const finalDosage = getDosageValue();
 
         document.querySelectorAll(".deworm-row").forEach(function (row) {
             const attendance = row.querySelector(".attendance-select");
@@ -564,8 +653,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!attendance || !medicineInput || !dosageInput) return;
 
             if (attendance.value === "Taken") {
-                medicineInput.value = medicine.value;
-                dosageInput.value = dosage.value;
+                medicineInput.value = finalMedicine;
+                dosageInput.value = finalDosage;
             } else {
                 medicineInput.value = "";
                 dosageInput.value = "";
@@ -620,12 +709,15 @@ document.addEventListener("DOMContentLoaded", function () {
         if (attendance) {
             attendance.addEventListener("change", function () {
                 if (this.value === "Taken") {
-                    if (medicine.value !== "") {
-                        row.querySelector(".medicine-input").value = medicine.value;
+                    const finalMedicine = getMedicineValue();
+                    const finalDosage = getDosageValue();
+
+                    if (finalMedicine !== "") {
+                        row.querySelector(".medicine-input").value = finalMedicine;
                     }
 
-                    if (dosage.value !== "") {
-                        row.querySelector(".dosage-input").value = dosage.value;
+                    if (finalDosage !== "") {
+                        row.querySelector(".dosage-input").value = finalDosage;
                     }
                 }
 

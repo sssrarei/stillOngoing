@@ -490,7 +490,7 @@ foreach ($nutritional_graph_data as $item) {
 $today = date('Y-m-d');
 
 $event_sql = "
-    SELECT title, event_type, event_date, start_time, end_time, location, status
+    SELECT title, description, event_type, event_date, start_time, end_time, location, status
     FROM events
     WHERE is_deleted = 0
     AND status = 'Upcoming'
@@ -906,6 +906,15 @@ $is_dark_mode = ($theme_mode === 'dark');
                 <?php echo htmlspecialchars($event['title']); ?>
             </div>
         </div>
+
+        <?php if(!empty($event['description'])){ ?>
+        <div class="cdw-event-field full">
+            <span class="cdw-label">Description</span>
+            <div class="cdw-value">
+                <?php echo nl2br(htmlspecialchars($event['description'])); ?>
+            </div>
+        </div>
+        <?php } ?>
 
         <div class="cdw-event-field">
             <span class="cdw-label">Type</span>

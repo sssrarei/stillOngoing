@@ -19,6 +19,13 @@ $cdc_id = $_SESSION['active_cdc_id'];
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $theme_mode = $_SESSION['theme_mode'];
 
+$per_page = 10;
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+if($page < 1){
+    $page = 1;
+}
+$offset = ($page - 1) * $per_page;
+
 function compute_age_months_from_birthdate($birthdate){
     if(empty($birthdate) || $birthdate == '0000-00-00'){
         return 'N/A';
@@ -36,6 +43,22 @@ function compute_age_months_from_birthdate($birthdate){
 }
 
 if ($search !== "") {
+    $count_sql = "SELECT COUNT(*) AS total
+              FROM children
+              WHERE cdc_id = ?
+                AND is_deleted = 0
+                AND (
+                    first_name LIKE ?
+                    OR middle_name LIKE ?
+                    OR last_name LIKE ?
+                )";
+    $count_stmt = $conn->prepare($count_sql);
+    $search_param = "%" . $search . "%";
+    $count_stmt->bind_param("isss", $cdc_id, $search_param, $search_param, $search_param);
+    $count_stmt->execute();
+    $total_rows = $count_stmt->get_result()->fetch_assoc()['total'];
+    $count_stmt->close();
+
     $child_sql = "SELECT child_id, first_name, middle_name, last_name, sex, birthdate
               FROM children
               WHERE cdc_id = ?
@@ -45,24 +68,40 @@ if ($search !== "") {
                     OR middle_name LIKE ?
                     OR last_name LIKE ?
                 )
-              ORDER BY first_name ASC, last_name ASC";
+              ORDER BY first_name ASC, last_name ASC
+              LIMIT ? OFFSET ?";
 
     $child_stmt = $conn->prepare($child_sql);
-    $search_param = "%" . $search . "%";
-    $child_stmt->bind_param("isss", $cdc_id, $search_param, $search_param, $search_param);
+    $child_stmt->bind_param("isssii", $cdc_id, $search_param, $search_param, $search_param, $per_page, $offset);
 } else {
+    $count_sql = "SELECT COUNT(*) AS total
+              FROM children
+              WHERE cdc_id = ?
+                AND is_deleted = 0";
+    $count_stmt = $conn->prepare($count_sql);
+    $count_stmt->bind_param("i", $cdc_id);
+    $count_stmt->execute();
+    $total_rows = $count_stmt->get_result()->fetch_assoc()['total'];
+    $count_stmt->close();
+
     $child_sql = "SELECT child_id, first_name, middle_name, last_name, sex, birthdate
               FROM children
               WHERE cdc_id = ?
                 AND is_deleted = 0
-              ORDER BY first_name ASC, last_name ASC";
+              ORDER BY first_name ASC, last_name ASC
+              LIMIT ? OFFSET ?";
 
     $child_stmt = $conn->prepare($child_sql);
-    $child_stmt->bind_param("i", $cdc_id);
+    $child_stmt->bind_param("iii", $cdc_id, $per_page, $offset);
 }
 
 $child_stmt->execute();
 $child_result = $child_stmt->get_result();
+
+$total_pages = ($total_rows > 0) ? ceil($total_rows / $per_page) : 1;
+if($page > $total_pages){
+    $page = $total_pages;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -264,6 +303,58 @@ $child_result = $child_stmt->get_result();
             color:#777;
         }
 
+        .pagination{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:6px;
+            flex-wrap:wrap;
+            margin-top:18px;
+        }
+
+        .page-link{
+            min-width:36px;
+            height:36px;
+            padding:0 10px;
+            border-radius:8px;
+            border:1px solid #d6d6d6;
+            background:#ffffff;
+            color:#333;
+            font-size:13px;
+            font-weight:600;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .page-link:hover{
+            border-color:#2E7D32;
+            color:#2E7D32;
+        }
+
+        .page-link.active{
+            background:#2E7D32;
+            border-color:#2E7D32;
+            color:#fff;
+        }
+
+        .page-link.disabled{
+            opacity:0.45;
+            pointer-events:none;
+        }
+
+        body.dark-mode .page-link{
+            background:#111827;
+            border-color:#334155;
+            color:#e5e7eb;
+        }
+
+        body.dark-mode .page-link.active{
+            background:#2E7D32;
+            border-color:#2E7D32;
+            color:#fff;
+        }
+
         body.dark-mode{
             background:#0f172a;
             color:#e5e7eb;
@@ -433,6 +524,29 @@ $child_result = $child_stmt->get_result();
                     </tbody>
                 </table>
             </div>
+
+            <?php if($total_pages > 1){ ?>
+                <div class="pagination">
+                    <?php
+                        $query_params = $search !== "" ? "&search=" . urlencode($search) : "";
+
+                        $prev_page = max(1, $page - 1);
+                        $next_page = min($total_pages, $page + 1);
+
+                        $prev_disabled = ($page <= 1) ? "disabled" : "";
+                        $next_disabled = ($page >= $total_pages) ? "disabled" : "";
+                    ?>
+                    <a href="?page=<?php echo $prev_page . $query_params; ?>" class="page-link <?php echo $prev_disabled; ?>">‹</a>
+
+                    <?php for($i = 1; $i <= $total_pages; $i++){
+                        $active_class = ($i == $page) ? "active" : "";
+                    ?>
+                        <a href="?page=<?php echo $i . $query_params; ?>" class="page-link <?php echo $active_class; ?>"><?php echo $i; ?></a>
+                    <?php } ?>
+
+                    <a href="?page=<?php echo $next_page . $query_params; ?>" class="page-link <?php echo $next_disabled; ?>">›</a>
+                </div>
+            <?php } ?>
         <?php } else { ?>
             <p class="no-data">No pupils found.</p>
         <?php } ?>

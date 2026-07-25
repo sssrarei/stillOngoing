@@ -340,7 +340,7 @@ $status_note = getStatusNote($current_status);
 $today = date('Y-m-d');
 
 $event_sql = "
-    SELECT title, event_type, event_date, start_time, end_time, location, status
+    SELECT title, description, event_type, event_date, start_time, end_time, location, status
     FROM events
     WHERE is_deleted = 0
     AND status = 'Upcoming'
@@ -564,6 +564,15 @@ $upcoming_events = $event_stmt->get_result();
                                     <?php echo htmlspecialchars($event['title']); ?>
                                 </span>
                             </div>
+
+                            <?php if(!empty($event['description'])){ ?>
+                            <div class="guardian-event-row">
+                                <span class="event-label">Description</span>
+                                <span class="event-value">
+                                    <?php echo nl2br(htmlspecialchars($event['description'])); ?>
+                                </span>
+                            </div>
+                            <?php } ?>
 
                             <div class="guardian-event-row">
                                 <span class="event-label">Type</span>
