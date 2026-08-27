@@ -29,6 +29,36 @@ function status_class($status) {
     return 'status-chip status-' . str_replace(' ', '-', $status);
 }
 
+function nutri_slug($category) {
+    return strtolower(str_replace(' ', '-', trim((string)$category)));
+}
+
+function nutri_class($category) {
+    $known = [
+        'normal', 'underweight', 'severely-underweight', 'overweight', 'obese',
+        'stunted', 'severely-stunted', 'moderately-wasted', 'severely-wasted'
+    ];
+    $slug = nutri_slug($category);
+    $suffix = in_array($slug, $known, true) ? $slug : 'other';
+    return 'nutri-chip nutri-' . $suffix;
+}
+
+function nutri_bar_color($category) {
+    $map = [
+        'normal' => '#16a34a',
+        'underweight' => '#d97706',
+        'severely-underweight' => '#dc2626',
+        'overweight' => '#d97706',
+        'obese' => '#dc2626',
+        'stunted' => '#d97706',
+        'severely-stunted' => '#dc2626',
+        'moderately-wasted' => '#ea580c',
+        'severely-wasted' => '#dc2626',
+    ];
+    $slug = nutri_slug($category);
+    return $map[$slug] ?? '#64748b';
+}
+
 /*
 |--------------------------------------------------------------------------
 | THIS PAGE IS READ-ONLY.
@@ -111,6 +141,7 @@ if ($view_referral_id) {
 */
 $referrals_list = [];
 $summary = ['Pending' => 0, 'Sent' => 0, 'Viewed' => 0, 'In Progress' => 0, 'Completed' => 0];
+$nutrition_summary = [];
 $cdc_options = [];
 
 if (!$view_referral_id) {
@@ -139,6 +170,7 @@ if (!$view_referral_id) {
         SELECT
             r.referral_id,
             r.status,
+            r.final_category,
             r.sent_at,
             r.created_at,
             c.first_name,
@@ -185,6 +217,32 @@ if (!$view_referral_id) {
         $summary[$srow['status']] = (int) $srow['total'];
     }
     $summary_stmt->close();
+
+    // Nutritional status breakdown respects the CDC filter but not the status
+    // filter, mirroring the status summary above.
+    $nutri_sql = "
+        SELECT r.final_category, COUNT(*) AS total
+        FROM referrals r
+        INNER JOIN children c ON c.child_id = r.child_id
+        $summary_where
+        GROUP BY r.final_category
+        ORDER BY total DESC
+    ";
+    $nutri_stmt = $conn->prepare($nutri_sql);
+    if ($filter_cdc_id) {
+        $nutri_stmt->bind_param("i", $filter_cdc_id);
+    }
+    $nutri_stmt->execute();
+    $nutri_result = $nutri_stmt->get_result();
+    while ($nrow = $nutri_result->fetch_assoc()) {
+        $nutrition_summary[] = ['label' => $nrow['final_category'], 'total' => (int) $nrow['total']];
+    }
+    $nutri_stmt->close();
+}
+
+$nutrition_max = 0;
+foreach ($nutrition_summary as $nrow) {
+    $nutrition_max = max($nutrition_max, $nrow['total']);
 }
 ?>
 <!DOCTYPE html>
@@ -210,7 +268,7 @@ if (!$view_referral_id) {
     .rm-page-header{ margin-bottom:20px; }
     .rm-page-title{ font-family:'Poppins',sans-serif; font-size:26px; font-weight:700; color:#1f2937; margin:6px 0 6px; }
     .rm-page-subtitle{ color:#6b7280; font-size:14px; }
-    .rm-back-link{ color:#c2410c; font-weight:600; font-size:14px; text-decoration:none; }
+    .rm-back-link{ color:#2C5EAD; font-weight:600; font-size:14px; text-decoration:none; }
     .rm-back-link:hover{ text-decoration:underline; }
 
     .rm-summary-grid{
@@ -278,6 +336,47 @@ if (!$view_referral_id) {
     .status-viewed{ background:#ede9fe; color:#6d28d9; }
     .status-in-progress{ background:#ffedd5; color:#c2410c; }
     .status-completed{ background:#dcfce7; color:#166534; }
+
+    .nutri-chip{
+        display:inline-block;
+        padding:5px 12px;
+        border-radius:999px;
+        font-size:12px;
+        font-weight:700;
+        white-space:nowrap;
+    }
+    .nutri-normal{ background:#dcfce7; color:#166534; }
+    .nutri-underweight{ background:#fef3c7; color:#92400e; }
+    .nutri-severely-underweight{ background:#fee2e2; color:#991b1b; }
+    .nutri-overweight{ background:#fef3c7; color:#92400e; }
+    .nutri-obese{ background:#fee2e2; color:#991b1b; }
+    .nutri-stunted{ background:#fef3c7; color:#92400e; }
+    .nutri-severely-stunted{ background:#fee2e2; color:#991b1b; }
+    .nutri-moderately-wasted{ background:#ffedd5; color:#c2410c; }
+    .nutri-severely-wasted{ background:#fee2e2; color:#991b1b; }
+    .nutri-other{ background:#f1f5f9; color:#64748b; }
+
+    .rm-section-label{
+        font-size:12px; color:#94a3b8; text-transform:uppercase;
+        letter-spacing:0.4px; margin:0 0 16px;
+    }
+
+    .rm-bar-chart{ display:flex; flex-direction:column; gap:16px; }
+    .rm-bar-row{
+        display:grid;
+        grid-template-columns:150px 1fr 36px;
+        align-items:center;
+        gap:14px;
+    }
+    .rm-bar-label{ font-size:13px; font-weight:600; color:#334155; }
+    .rm-bar-track{ background:#f1f5f9; border-radius:999px; height:14px; overflow:hidden; }
+    .rm-bar-fill{ height:100%; border-radius:999px; }
+    .rm-bar-value{ font-size:14px; font-weight:700; color:#1f2937; text-align:right; font-family:'Poppins',sans-serif; }
+
+    @media (max-width: 640px) {
+        .rm-bar-row{ grid-template-columns:1fr; gap:6px; }
+        .rm-bar-value{ text-align:left; }
+    }
 
     .rm-no-data{ color:#94a3b8; font-style:italic; padding:20px 0; }
 
@@ -458,6 +557,25 @@ if (!$view_referral_id) {
             <div class="rm-summary-card"><div class="rm-summary-label">Completed</div><div class="rm-summary-value"><?php echo (int) $summary['Completed']; ?></div></div>
         </div>
 
+        <?php if (!empty($nutrition_summary)) { ?>
+            <div class="rm-content-card">
+                <p class="rm-section-label">Nutritional Status Summary</p>
+                <div class="rm-bar-chart">
+                    <?php foreach ($nutrition_summary as $nrow) {
+                        $pct = $nutrition_max > 0 ? round(($nrow['total'] / $nutrition_max) * 100) : 0;
+                    ?>
+                        <div class="rm-bar-row">
+                            <div class="rm-bar-label"><?php echo h($nrow['label']); ?></div>
+                            <div class="rm-bar-track">
+                                <div class="rm-bar-fill" style="width:<?php echo (int) $pct; ?>%; background:<?php echo h(nutri_bar_color($nrow['label'])); ?>;"></div>
+                            </div>
+                            <div class="rm-bar-value"><?php echo (int) $nrow['total']; ?></div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+        <?php } ?>
+
         <div class="rm-content-card">
 
             <form method="GET" class="rm-filters">
@@ -491,7 +609,7 @@ if (!$view_referral_id) {
                                 <th>Sent Date</th>
                                 <th>Comments</th>
                                 <th>Last Update</th>
-                                <th>Action</th>
+                                <th>Nutritional Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -506,11 +624,7 @@ if (!$view_referral_id) {
                                     <td><?php echo h(format_datetime_display($row['sent_at'])); ?></td>
                                     <td><?php echo (int) $row['comment_count']; ?></td>
                                     <td><?php echo h(format_datetime_display($last_update)); ?></td>
-                                    <td>
-                                        <a href="view_referral_monitoring.php?referral_id=<?php echo (int) $row['referral_id']; ?>" class="rm-back-link">
-                                            View
-                                        </a>
-                                    </td>
+                                    <td><span class="<?php echo nutri_class($row['final_category']); ?>"><?php echo h($row['final_category']); ?></span></td>
                                 </tr>
                             <?php } ?>
                         </tbody>

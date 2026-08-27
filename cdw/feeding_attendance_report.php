@@ -82,7 +82,9 @@ function fetch_feeding_attendance_rows($conn, $cdc_id, $date_from, $date_to){
             LEFT JOIN feeding_record_items fri ON fr.feeding_record_id = fri.feeding_record_id
             LEFT JOIN food_groups fg ON fri.food_group_id = fg.food_group_id
             LEFT JOIN food_items fi ON fri.food_item_id = fi.food_item_id
-            WHERE c.cdc_id = ?";
+            WHERE c.cdc_id = ?
+              AND c.is_deleted = 0
+              AND fr.is_deleted = 0";
 
     $types = "i";
     $params = [$cdc_id];

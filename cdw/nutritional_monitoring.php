@@ -44,6 +44,7 @@ $child_sql = "
     FROM children c
     LEFT JOIN cdc d ON c.cdc_id = d.cdc_id
     WHERE c.child_id = ?
+      AND c.is_deleted = 0
     LIMIT 1
 ";
 $stmt_child = mysqli_prepare($conn, $child_sql);

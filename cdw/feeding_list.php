@@ -204,6 +204,7 @@ $children_sql = "
     SELECT child_id, first_name, middle_name, last_name, sex
     FROM children
     WHERE cdc_id = ?
+      AND is_deleted = 0
 ";
 
 if($search !== ""){
@@ -249,7 +250,7 @@ $record_stmt = $conn->prepare("
     SELECT fr.feeding_record_id, fr.child_id, fr.attendance, fr.remarks
     FROM feeding_records fr
     INNER JOIN children c ON fr.child_id = c.child_id
-    WHERE fr.feeding_date = ? AND c.cdc_id = ?
+    WHERE fr.feeding_date = ? AND c.cdc_id = ? AND c.is_deleted = 0
 ");
 $record_stmt->bind_param("si", $feeding_date, $active_cdc_id);
 $record_stmt->execute();
@@ -272,7 +273,7 @@ $meal_stmt = $conn->prepare("
     INNER JOIN children c ON fr.child_id = c.child_id
     INNER JOIN food_groups fg ON fri.food_group_id = fg.food_group_id
     INNER JOIN food_items fi ON fri.food_item_id = fi.food_item_id
-    WHERE fr.feeding_date = ? AND c.cdc_id = ?
+    WHERE fr.feeding_date = ? AND c.cdc_id = ? AND c.is_deleted = 0
     ORDER BY fg.food_group_name ASC, fi.food_item_name ASC
 ");
 $meal_stmt->bind_param("si", $feeding_date, $active_cdc_id);
@@ -299,7 +300,7 @@ $measurement_stmt = $conn->prepare("
     FROM feeding_record_items fri
     INNER JOIN feeding_records fr ON fri.feeding_record_id = fr.feeding_record_id
     INNER JOIN children c ON fr.child_id = c.child_id
-    WHERE fr.feeding_date = ? AND c.cdc_id = ?
+    WHERE fr.feeding_date = ? AND c.cdc_id = ? AND c.is_deleted = 0
     ORDER BY fr.child_id ASC, fri.feeding_item_id ASC
 ");
 $measurement_stmt->bind_param("si", $feeding_date, $active_cdc_id);
@@ -610,7 +611,7 @@ $recent_stmt = $conn->prepare("
     FROM feeding_records fr
     INNER JOIN children c ON fr.child_id = c.child_id
     LEFT JOIN users u ON fr.recorded_by = u.user_id
-    WHERE c.cdc_id = ?
+    WHERE c.cdc_id = ? AND c.is_deleted = 0
     ORDER BY fr.feeding_date DESC, fr.feeding_record_id DESC
     LIMIT 20
 ");

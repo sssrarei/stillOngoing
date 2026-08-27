@@ -449,7 +449,6 @@ if ($guardian_submission_feature_enabled) {
             color:#f8fafc;
             border:1px solid #334155;
         }
-/*
         .btn-delete {
         background: #E74C3C;
         color: #fff;
@@ -461,13 +460,14 @@ if ($guardian_submission_feature_enabled) {
         font-family: 'Inter', sans-serif; 
         font-size: 13px;
         font-weight: 600;
+        border: none;
+        cursor: pointer;
         }
 
 .btn-delete:hover {
     background: #c0392b;
 }
 
-*/
 
     </style>
 </head>
@@ -672,13 +672,22 @@ if ($guardian_submission_feature_enabled) {
 
             <div class="card-actions">
                 <a href="edit_child.php?child_id=<?php echo $child['child_id']; ?>" class="btn-edit">Edit Child Information</a>
-                  
-              <!-- <a href="delete_child.php?child_id=<?php echo $child['child_id']; ?>" 
-            class="btn-delete"
-                onclick="return confirm('Are you sure you want to delete this child?');">
-                Delete Child</a>
-                -->
+            </div>
 
+            <div class="reject-modal-overlay" id="deleteModalOverlay">
+                <div class="reject-modal-box">
+                    <h4 class="reject-modal-title">Delete Child Record</h4>
+                    <p class="reject-modal-text">
+                        Are you sure you want to delete <strong><?php echo htmlspecialchars($child_full_name); ?></strong>?
+                        This will also hide all related anthropometric, feeding, milk feeding, and deworming records.
+                        You can restore this record within 30 days from the Deleted Children page.
+                    </p>
+
+                    <div class="reject-modal-actions">
+                        <button type="button" class="btn-reject-cancel" onclick="closeDeleteModal()">Cancel</button>
+                        <button type="button" class="btn-reject-confirm" onclick="confirmDeleteChild()">Yes, Delete</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -745,6 +754,12 @@ if ($guardian_submission_feature_enabled) {
                 Open Nutritional Monitoring
             </a>
         </div>
+    </div>
+
+    <div style="margin-top:18px; text-align:right;">
+        <button type="button" class="btn-delete" onclick="openDeleteModal()">
+            Delete Child
+        </button>
     </div>
 </div>
 
@@ -841,7 +856,30 @@ function confirmRejectSubmission() {
     reasonInput.value = finalReason;
     form.submit();
 }
+
+function openDeleteModal() {
+    var overlay = document.getElementById('deleteModalOverlay');
+
+    if (overlay) {
+        overlay.classList.add('show');
+    }
+}
+
+function closeDeleteModal() {
+    var overlay = document.getElementById('deleteModalOverlay');
+
+    if (overlay) {
+        overlay.classList.remove('show');
+    }
+}
+
+function confirmDeleteChild() {
+    window.location.href = 'delete_child.php?child_id=<?php echo (int) $child['child_id']; ?>';
+}
+
 </script>
+
+<script src="../assets/cdw/sidebar.js"></script>
 
 </body>
 </html>

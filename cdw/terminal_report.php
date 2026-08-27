@@ -93,6 +93,7 @@ function find_first_record_of_type_after_baseline($records, $type, $baseline_dat
 $children_sql = "SELECT child_id, first_name, middle_name, last_name, sex
                  FROM children
                  WHERE cdc_id = ?
+                   AND is_deleted = 0
                  ORDER BY last_name ASC, first_name ASC";
 
 $children_stmt = mysqli_prepare($conn, $children_sql);

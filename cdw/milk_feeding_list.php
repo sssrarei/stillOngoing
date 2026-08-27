@@ -69,6 +69,7 @@ if($selected_cdc_id > 0){
                      INNER JOIN cdw_assignments ca ON c.cdc_id = ca.cdc_id
                      WHERE ca.user_id = ?
                      AND c.cdc_id = ?
+                     AND c.is_deleted = 0
                      ORDER BY c.last_name ASC, c.first_name ASC";
 
     $stmt_children = $conn->prepare($sql_children);

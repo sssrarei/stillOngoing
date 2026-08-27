@@ -396,7 +396,8 @@ $total_pupil_pages = 1;
 if($child_id <= 0){
     $count_sql = "SELECT COUNT(*) AS total
             FROM children
-            WHERE cdc_id = ?";
+            WHERE cdc_id = ?
+            AND is_deleted = 0";
 
     if($search !== ""){
         $count_sql .= " AND (
@@ -427,7 +428,8 @@ if($child_id <= 0){
 
     $sql = "SELECT child_id, first_name, middle_name, last_name
             FROM children
-            WHERE cdc_id = ?";
+            WHERE cdc_id = ?
+            AND is_deleted = 0";
 
     if($search !== ""){
         $sql .= " AND (

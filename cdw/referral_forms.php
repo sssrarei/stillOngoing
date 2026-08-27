@@ -102,6 +102,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_referral'])) {
 | so this condition already guarantees assessment_type = Endline.
 |--------------------------------------------------------------------------
 */
+/*
+|--------------------------------------------------------------------------
+| SUMMARY COUNTS (unpaginated)
+| These must reflect ALL eligible records regardless of which page
+| the table below is currently showing.
+|
+| DEDUPE NOTE: a child can end up with more than one eligible
+| intervention_guidance row when the same Terminal Report gets
+| submitted more than once (resend/duplicate submission). We only
+| want the MOST RECENT one (by sent_at) per child to count/show.
+|--------------------------------------------------------------------------
+*/
+$summary_sql = "
+    SELECT r.referral_id
+    FROM intervention_guidance ig
+    INNER JOIN (
+        SELECT child_id, MAX(sent_at) AS latest_sent_at
+        FROM intervention_guidance
+        WHERE needs_referral = 1
+          AND sent_to_guardian = 1
+        GROUP BY child_id
+    ) latest ON latest.child_id = ig.child_id AND latest.latest_sent_at = ig.sent_at
+    INNER JOIN children c ON c.child_id = ig.child_id
+    LEFT JOIN referrals r ON r.guidance_id = ig.guidance_id
+    WHERE ig.needs_referral = 1
+      AND ig.sent_to_guardian = 1
+      AND c.cdc_id = ?
+      AND c.is_deleted = 0
+";
+
+$summary_stmt = $conn->prepare($summary_sql);
+$summary_stmt->bind_param("i", $cdc_id);
+$summary_stmt->execute();
+$summary_result = $summary_stmt->get_result();
+
+$total_records = 0;
+$not_generated_count = 0;
+$generated_count = 0;
+
+while ($srow = $summary_result->fetch_assoc()) {
+    $total_records++;
+    if (empty($srow['referral_id'])) {
+        $not_generated_count++;
+    } else {
+        $generated_count++;
+    }
+}
+
+$summary_stmt->close();
+
+/*
+|--------------------------------------------------------------------------
+| PAGINATION
+|--------------------------------------------------------------------------
+*/
+$per_page = 10;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+if ($page < 1) {
+    $page = 1;
+}
+
+$total_pages = ($total_records > 0) ? (int) ceil($total_records / $per_page) : 1;
+if ($page > $total_pages) {
+    $page = $total_pages;
+}
+
+$offset = ($page - 1) * $per_page;
+
+/*
+|--------------------------------------------------------------------------
+| DISPLAY QUERY (paginated)
+|--------------------------------------------------------------------------
+*/
 $sql = "
     SELECT
         ig.guidance_id,
@@ -117,33 +190,31 @@ $sql = "
         r.status AS referral_status,
         r.sent_at AS referral_sent_at
     FROM intervention_guidance ig
+    INNER JOIN (
+        SELECT child_id, MAX(sent_at) AS latest_sent_at
+        FROM intervention_guidance
+        WHERE needs_referral = 1
+          AND sent_to_guardian = 1
+        GROUP BY child_id
+    ) latest ON latest.child_id = ig.child_id AND latest.latest_sent_at = ig.sent_at
     INNER JOIN children c ON c.child_id = ig.child_id
     LEFT JOIN referrals r ON r.guidance_id = ig.guidance_id
     WHERE ig.needs_referral = 1
       AND ig.sent_to_guardian = 1
       AND c.cdc_id = ?
+      AND c.is_deleted = 0
     ORDER BY ig.sent_at DESC
+    LIMIT ? OFFSET ?
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $cdc_id);
+$stmt->bind_param("iii", $cdc_id, $per_page, $offset);
 $stmt->execute();
 $result = $stmt->get_result();
 
 $referrals_list = [];
-$total_records = 0;
-$not_generated_count = 0;
-$generated_count = 0;
 
 while ($row = $result->fetch_assoc()) {
-    $total_records++;
-
-    if (empty($row['referral_id'])) {
-        $not_generated_count++;
-    } else {
-        $generated_count++;
-    }
-
     $referrals_list[] = $row;
 }
 
@@ -178,6 +249,48 @@ if (isset($_GET['error']) && $_GET['error'] === 'send_failed') {
     <link rel="stylesheet" href="../assets/cdw/cdw-style.css">
     <link rel="stylesheet" href="../assets/cdw/referral_forms.css">
     <link rel="stylesheet" href="../assets/cdw/cdw-topbar-notification.css">
+    <style>
+        .pupil-pagination{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:6px;
+            flex-wrap:wrap;
+            margin-top:16px;
+        }
+
+        .pupil-page-link{
+            min-width:36px;
+            height:36px;
+            padding:0 10px;
+            border-radius:8px;
+            border:1px solid #d6d6d6;
+            background:#ffffff;
+            color:#333;
+            font-size:13px;
+            font-weight:600;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            text-decoration:none;
+        }
+
+        .pupil-page-link:hover{
+            border-color:#2E7D32;
+            color:#2E7D32;
+        }
+
+        .pupil-page-link.active{
+            background:#2E7D32;
+            border-color:#2E7D32;
+            color:#fff;
+        }
+
+        .pupil-page-link.disabled{
+            opacity:0.45;
+            pointer-events:none;
+        }
+    </style>
 </head>
 <body class="<?php echo themeClass(); ?>">
 
@@ -267,6 +380,27 @@ if (isset($_GET['error']) && $_GET['error'] === 'send_failed') {
                     </tbody>
                 </table>
             </div>
+
+            <?php if ($total_pages > 1) { ?>
+                <div class="pupil-pagination">
+                    <?php
+                        $prev_ref_page = max(1, $page - 1);
+                        $next_ref_page = min($total_pages, $page + 1);
+
+                        $prev_ref_disabled = ($page <= 1) ? "disabled" : "";
+                        $next_ref_disabled = ($page >= $total_pages) ? "disabled" : "";
+                    ?>
+                    <a href="?page=<?php echo $prev_ref_page; ?>" class="pupil-page-link <?php echo $prev_ref_disabled; ?>">‹</a>
+
+                    <?php for ($i = 1; $i <= $total_pages; $i++) {
+                        $ref_active_class = ($i == $page) ? "active" : "";
+                    ?>
+                        <a href="?page=<?php echo $i; ?>" class="pupil-page-link <?php echo $ref_active_class; ?>"><?php echo $i; ?></a>
+                    <?php } ?>
+
+                    <a href="?page=<?php echo $next_ref_page; ?>" class="pupil-page-link <?php echo $next_ref_disabled; ?>">›</a>
+                </div>
+            <?php } ?>
         <?php } else { ?>
             <p class="no-data">No official referral-eligible records found for this CDC yet.</p>
         <?php } ?>

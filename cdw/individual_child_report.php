@@ -161,6 +161,7 @@ if (!$show_details) {
             sex
         FROM children
         WHERE cdc_id = ?
+          AND is_deleted = 0
     ";
 
     $types = "i";
@@ -363,7 +364,7 @@ $child_sql = "
     INNER JOIN cdc d ON c.cdc_id = d.cdc_id
     LEFT JOIN guardians g ON c.child_id = g.child_id
     LEFT JOIN child_health_information chi ON c.child_id = chi.child_id
-    WHERE c.child_id = ? AND c.cdc_id = ?
+    WHERE c.child_id = ? AND c.cdc_id = ? AND c.is_deleted = 0
     LIMIT 1
 ";
 

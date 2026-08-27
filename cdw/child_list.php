@@ -19,6 +19,22 @@ $cdc_id = $_SESSION['active_cdc_id'];
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $theme_mode = $_SESSION['theme_mode'];
 
+// Count for the "View Deleted Children" button badge (30-day restorable window)
+$deleted_count = 0;
+$deleted_count_stmt = $conn->prepare("
+    SELECT COUNT(*) AS total
+    FROM children
+    WHERE cdc_id = ?
+      AND is_deleted = 1
+      AND deleted_at IS NOT NULL
+      AND deleted_at >= (NOW() - INTERVAL 30 DAY)
+");
+$deleted_count_stmt->bind_param("i", $cdc_id);
+$deleted_count_stmt->execute();
+$deleted_count_row = $deleted_count_stmt->get_result()->fetch_assoc();
+$deleted_count = (int) ($deleted_count_row['total'] ?? 0);
+$deleted_count_stmt->close();
+
 $per_page = 10;
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 if($page < 1){
@@ -491,6 +507,7 @@ if($page > $total_pages){
             </form>
 
             <a href="add_child.php" class="btn btn-add">+ Add Child</a>
+            <a href="deleted_children.php" class="btn btn-reset">🗑 View Deleted Children<?php echo $deleted_count > 0 ? " ({$deleted_count})" : ""; ?></a>
         </div>
 
         <?php if($child_result && $child_result->num_rows > 0){ ?>
