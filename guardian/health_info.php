@@ -30,10 +30,31 @@ $sql = "
         children.*,
         cdc.cdc_name,
         cdc.address AS cdc_address,
-        child_health_information.vaccination_card_file_path,
-        child_health_information.allergies,
-        child_health_information.comorbidities,
-        child_health_information.medical_history_file_path
+        child_health_information.born_at,
+        child_health_information.learns_at_home_with,
+        child_health_information.plays_with_older_siblings,
+        child_health_information.plays_with_younger_siblings,
+        child_health_information.plays_with_neighbors,
+        child_health_information.has_meal_before_school,
+        child_health_information.food_normally_eaten,
+        child_health_information.has_baon,
+        child_health_information.travel_time_to_dcc_minutes,
+        child_health_information.travel_mode_to_dcc,
+        child_health_information.travel_time_to_ncdc_minutes,
+        child_health_information.travel_mode_to_ncdc,
+        child_health_information.public_transport_type,
+        child_health_information.goes_to_school_with,
+        child_health_information.has_eccd_card,
+        child_health_information.has_mother_child_book,
+        child_health_information.has_other_health_record,
+        child_health_information.vaccine_bcg,
+        child_health_information.vaccine_dpt,
+        child_health_information.vaccine_opv,
+        child_health_information.vaccine_hepab,
+        child_health_information.vaccine_measles,
+        child_health_information.vaccine_others_name,
+        child_health_information.vaccine_others_status,
+        child_health_information.is_left_handed
     FROM parent_child_links
     INNER JOIN children ON parent_child_links.child_id = children.child_id
     INNER JOIN cdc ON children.cdc_id = cdc.cdc_id
@@ -90,41 +111,35 @@ $religion = !empty($child['religion']) ? $child['religion']: 'N/A';
 $cdc_name = !empty($child['cdc_name']) ? $child['cdc_name'] : 'N/A';
 $cdc_address = !empty($child['cdc_address']) ? $child['cdc_address'] : 'N/A';
 
-$official_vaccination = !empty($child['vaccination_card_file_path']) ? $child['vaccination_card_file_path'] : 'N/A';
-$official_allergies = !empty($child['allergies']) ? $child['allergies'] : 'N/A';
-$official_comorbidities = !empty($child['comorbidities']) ? $child['comorbidities'] : 'N/A';
-$official_medical_history = !empty($child['medical_history_file_path']) ? $child['medical_history_file_path'] : 'N/A';
+$official_birth_order = (isset($child['birth_order']) && $child['birth_order'] !== null && $child['birth_order'] !== '') ? $child['birth_order'] : 'N/A';
+$official_siblings_info = !empty($child['siblings_info']) ? $child['siblings_info'] : 'N/A';
+$official_eccd_experience_info = !empty($child['eccd_experience_info']) ? $child['eccd_experience_info'] : 'N/A';
 
-function renderFileOrText($value){
-    if (empty($value) || $value === 'N/A') {
-        return 'N/A';
-    }
-
-    $value = trim($value);
-    $safe_value = htmlspecialchars($value);
-
-    if (preg_match('/(\.\.\/uploads\/[^\s]+|uploads\/[^\s]+)/i', $value, $matches)) {
-        $file_path = trim($matches[1]);
-        $safe_file_path = htmlspecialchars($file_path);
-
-        $text_only = trim(str_replace($file_path, '', $value));
-        $text_only = trim(str_replace('Medical Attached File:', '', $text_only));
-        $text_only = trim(str_replace('Vaccination Attached File:', '', $text_only));
-        $text_only = trim(str_replace('Attached File:', '', $text_only));
-
-        $html = '';
-
-        if (!empty($text_only)) {
-            $html .= '<div class="attached-text">' . nl2br(htmlspecialchars($text_only)) . '</div>';
-        }
-
-        $html .= '<a href="' . $safe_file_path . '" target="_blank" class="file-link">View Attached File</a>';
-
-        return $html;
-    }
-
-    return nl2br($safe_value);
-}
+$official_born_at = !empty($child['born_at']) ? $child['born_at'] : 'N/A';
+$official_learns_at_home_with = !empty($child['learns_at_home_with']) ? $child['learns_at_home_with'] : 'N/A';
+$official_plays_with_older_siblings = !empty($child['plays_with_older_siblings']) ? $child['plays_with_older_siblings'] : 'N/A';
+$official_plays_with_younger_siblings = !empty($child['plays_with_younger_siblings']) ? $child['plays_with_younger_siblings'] : 'N/A';
+$official_plays_with_neighbors = !empty($child['plays_with_neighbors']) ? $child['plays_with_neighbors'] : 'N/A';
+$official_has_meal_before_school = !empty($child['has_meal_before_school']) ? $child['has_meal_before_school'] : 'N/A';
+$official_food_normally_eaten = !empty($child['food_normally_eaten']) ? $child['food_normally_eaten'] : 'N/A';
+$official_has_baon = !empty($child['has_baon']) ? $child['has_baon'] : 'N/A';
+$official_travel_time_to_dcc_minutes = (isset($child['travel_time_to_dcc_minutes']) && $child['travel_time_to_dcc_minutes'] !== null && $child['travel_time_to_dcc_minutes'] !== '') ? $child['travel_time_to_dcc_minutes'] . ' minute(s)' : 'N/A';
+$official_travel_mode_to_dcc = !empty($child['travel_mode_to_dcc']) ? $child['travel_mode_to_dcc'] : 'N/A';
+$official_travel_time_to_ncdc_minutes = (isset($child['travel_time_to_ncdc_minutes']) && $child['travel_time_to_ncdc_minutes'] !== null && $child['travel_time_to_ncdc_minutes'] !== '') ? $child['travel_time_to_ncdc_minutes'] . ' minute(s)' : 'N/A';
+$official_travel_mode_to_ncdc = !empty($child['travel_mode_to_ncdc']) ? $child['travel_mode_to_ncdc'] : 'N/A';
+$official_public_transport_type = !empty($child['public_transport_type']) ? $child['public_transport_type'] : 'N/A';
+$official_goes_to_school_with = !empty($child['goes_to_school_with']) ? $child['goes_to_school_with'] : 'N/A';
+$official_has_eccd_card = isset($child['has_eccd_card']) ? ((int)$child['has_eccd_card'] === 1 ? 'Yes' : 'No') : 'N/A';
+$official_has_mother_child_book = isset($child['has_mother_child_book']) ? ((int)$child['has_mother_child_book'] === 1 ? 'Yes' : 'No') : 'N/A';
+$official_has_other_health_record = !empty($child['has_other_health_record']) ? $child['has_other_health_record'] : 'N/A';
+$official_vaccine_bcg = !empty($child['vaccine_bcg']) ? $child['vaccine_bcg'] : 'N/A';
+$official_vaccine_dpt = !empty($child['vaccine_dpt']) ? $child['vaccine_dpt'] : 'N/A';
+$official_vaccine_opv = !empty($child['vaccine_opv']) ? $child['vaccine_opv'] : 'N/A';
+$official_vaccine_hepab = !empty($child['vaccine_hepab']) ? $child['vaccine_hepab'] : 'N/A';
+$official_vaccine_measles = !empty($child['vaccine_measles']) ? $child['vaccine_measles'] : 'N/A';
+$official_vaccine_others_name = !empty($child['vaccine_others_name']) ? $child['vaccine_others_name'] : 'N/A';
+$official_vaccine_others_status = !empty($child['vaccine_others_status']) ? $child['vaccine_others_status'] : 'N/A';
+$official_is_left_handed = !empty($child['is_left_handed']) ? $child['is_left_handed'] : 'N/A';
 
 $submission_table_exists = false;
 $table_check = $conn->query("SHOW TABLES LIKE 'child_health_information_requests'");
@@ -221,70 +236,58 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info']))
         $message = "You already have a pending health information submission waiting for CDW review.";
         $message_type = 'error';
     } else {
-        $allergy_status = trim($_POST['allergy_status'] ?? '');
-$allergen_type = trim($_POST['allergen_type'] ?? '');
-$allergen_other = trim($_POST['allergen_other'] ?? '');
+        $birth_order_input = trim($_POST['birth_order'] ?? '');
+$siblings_info_input = trim($_POST['siblings_info'] ?? '');
+$eccd_experience_info_input = trim($_POST['eccd_experience_info'] ?? '');
 
-$comorbidity_status = trim($_POST['comorbidity_status'] ?? '');
-$comorbidity_type = trim($_POST['comorbidity_type'] ?? '');
-$comorbidity_other = trim($_POST['comorbidity_other'] ?? '');
+$born_at_input = trim($_POST['born_at'] ?? '');
+$learns_at_home_with_input = trim($_POST['learns_at_home_with'] ?? '');
+$plays_with_older_siblings_input = trim($_POST['plays_with_older_siblings'] ?? '');
+$plays_with_younger_siblings_input = trim($_POST['plays_with_younger_siblings'] ?? '');
+$plays_with_neighbors_input = trim($_POST['plays_with_neighbors'] ?? '');
+$has_meal_before_school_input = trim($_POST['has_meal_before_school'] ?? '');
+$food_normally_eaten_input = trim($_POST['food_normally_eaten'] ?? '');
+$has_baon_input = trim($_POST['has_baon'] ?? '');
+$travel_time_to_dcc_minutes_input = trim($_POST['travel_time_to_dcc_minutes'] ?? '');
+$travel_mode_to_dcc_input = trim($_POST['travel_mode_to_dcc'] ?? '');
+$travel_time_to_ncdc_minutes_input = trim($_POST['travel_time_to_ncdc_minutes'] ?? '');
+$travel_mode_to_ncdc_input = trim($_POST['travel_mode_to_ncdc'] ?? '');
+$public_transport_type_input = trim($_POST['public_transport_type'] ?? '');
+$goes_to_school_with_input = trim($_POST['goes_to_school_with'] ?? '');
+$has_eccd_card_input = isset($_POST['has_eccd_card']) ? 1 : 0;
+$has_mother_child_book_input = isset($_POST['has_mother_child_book']) ? 1 : 0;
+$has_other_health_record_input = trim($_POST['has_other_health_record'] ?? '');
+$vaccine_bcg_input = trim($_POST['vaccine_bcg'] ?? '');
+$vaccine_dpt_input = trim($_POST['vaccine_dpt'] ?? '');
+$vaccine_opv_input = trim($_POST['vaccine_opv'] ?? '');
+$vaccine_hepab_input = trim($_POST['vaccine_hepab'] ?? '');
+$vaccine_measles_input = trim($_POST['vaccine_measles'] ?? '');
+$vaccine_others_name_input = trim($_POST['vaccine_others_name'] ?? '');
+$vaccine_others_status_input = trim($_POST['vaccine_others_status'] ?? '');
+$is_left_handed_input = trim($_POST['is_left_handed'] ?? '');
 
-$medical_history_text = '';
-
-$allergies = '';
-$comorbidities = '';
-
-if ($allergy_status === 'No') {
-    $allergies = 'No';
-} elseif ($allergy_status === 'Yes') {
-    if ($allergen_type === 'Others' && $allergen_other !== '') {
-        $allergies = 'Yes - Others: ' . $allergen_other;
-    } elseif ($allergen_type !== '') {
-        $allergies = 'Yes - ' . $allergen_type;
-    } else {
-        $allergies = 'Yes';
-    }
+if ($travel_mode_to_dcc_input !== 'Public Transportation' && $travel_mode_to_ncdc_input !== 'Public Transportation') {
+    $public_transport_type_input = '';
 }
 
-if ($comorbidity_status === 'No') {
-    $comorbidities = 'No';
-} elseif ($comorbidity_status === 'Yes') {
-    if ($comorbidity_type === 'Others' && $comorbidity_other !== '') {
-        $comorbidities = 'Yes - Others: ' . $comorbidity_other;
-    } elseif ($comorbidity_type !== '') {
-        $comorbidities = 'Yes - ' . $comorbidity_type;
-    } else {
-        $comorbidities = 'Yes';
-    }
-}
+$birth_order_value = ($birth_order_input !== '') ? (int)$birth_order_input : null;
+$travel_time_to_dcc_value = ($travel_time_to_dcc_minutes_input !== '') ? (int)$travel_time_to_dcc_minutes_input : null;
+$travel_time_to_ncdc_value = ($travel_time_to_ncdc_minutes_input !== '') ? (int)$travel_time_to_ncdc_minutes_input : null;
 
-        $upload_dir = "../uploads/";
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
-        }
-
-        $vaccination_path = '';
-        $medical_file_path = '';
-
-        if(isset($_FILES['vaccination_file']) && $_FILES['vaccination_file']['error'] === 0){
-            $vaccination_name = time() . "_vacc_" . preg_replace('/[^A-Za-z0-9_\.-]/', '_', basename($_FILES['vaccination_file']['name']));
-            $vaccination_target = $upload_dir . $vaccination_name;
-
-            if(move_uploaded_file($_FILES['vaccination_file']['tmp_name'], $vaccination_target)){
-                $vaccination_path = $vaccination_target;
-            }
-        }
-
-        if(isset($_FILES['medical_file']) && $_FILES['medical_file']['error'] === 0){
-            $medical_name = time() . "_med_" . preg_replace('/[^A-Za-z0-9_\.-]/', '_', basename($_FILES['medical_file']['name']));
-            $medical_target = $upload_dir . $medical_name;
-
-            if(move_uploaded_file($_FILES['medical_file']['tmp_name'], $medical_target)){
-                $medical_file_path = $medical_target;
-            }
-        }
-
-      if(empty($vaccination_path) && empty($allergies) && empty($comorbidities) && empty($medical_file_path)){
+      if(
+            $birth_order_input === '' && $siblings_info_input === '' && $eccd_experience_info_input === ''
+            && $born_at_input === '' && $learns_at_home_with_input === ''
+            && $plays_with_older_siblings_input === '' && $plays_with_younger_siblings_input === '' && $plays_with_neighbors_input === ''
+            && $has_meal_before_school_input === '' && $food_normally_eaten_input === '' && $has_baon_input === ''
+            && $travel_time_to_dcc_minutes_input === '' && $travel_mode_to_dcc_input === ''
+            && $travel_time_to_ncdc_minutes_input === '' && $travel_mode_to_ncdc_input === ''
+            && $goes_to_school_with_input === '' && !$has_eccd_card_input && !$has_mother_child_book_input
+            && $has_other_health_record_input === ''
+            && $vaccine_bcg_input === '' && $vaccine_dpt_input === '' && $vaccine_opv_input === ''
+            && $vaccine_hepab_input === '' && $vaccine_measles_input === ''
+            && $vaccine_others_name_input === '' && $vaccine_others_status_input === ''
+            && $is_left_handed_input === ''
+      ){
             $message = "Please provide at least one health information entry before submitting.";
             $message_type = 'error';
         
@@ -296,14 +299,37 @@ if ($comorbidity_status === 'No') {
                 INSERT INTO child_health_information_requests (
                 child_id,
                 guardian_id,
-                vaccination_card_file_path,
-                allergies,
-                comorbidities,
-                medical_history,
-                medical_history_file_path,
+                birth_order,
+                born_at,
+                siblings_info,
+                eccd_experience_info,
+                learns_at_home_with,
+                plays_with_older_siblings,
+                plays_with_younger_siblings,
+                plays_with_neighbors,
+                has_meal_before_school,
+                food_normally_eaten,
+                has_baon,
+                travel_time_to_dcc_minutes,
+                travel_mode_to_dcc,
+                travel_time_to_ncdc_minutes,
+                travel_mode_to_ncdc,
+                public_transport_type,
+                goes_to_school_with,
+                has_eccd_card,
+                has_mother_child_book,
+                has_other_health_record,
+                vaccine_bcg,
+                vaccine_dpt,
+                vaccine_opv,
+                vaccine_hepab,
+                vaccine_measles,
+                vaccine_others_name,
+                vaccine_others_status,
+                is_left_handed,
                 status,
                 submitted_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', NOW())
             ";
 
             $insert_stmt = $conn->prepare($insert_sql);
@@ -313,14 +339,37 @@ if ($comorbidity_status === 'No') {
                 $message_type = 'error';
             } else {
                $insert_stmt->bind_param(
-                "iisssss",
+                "iiissssssssssisisssiisssssssss",
                 $child_id,
                 $guardian_user_id,
-                $vaccination_path,
-                $allergies,
-                $comorbidities,
-                $medical_history_text,
-                $medical_file_path
+                $birth_order_value,
+                $born_at_input,
+                $siblings_info_input,
+                $eccd_experience_info_input,
+                $learns_at_home_with_input,
+                $plays_with_older_siblings_input,
+                $plays_with_younger_siblings_input,
+                $plays_with_neighbors_input,
+                $has_meal_before_school_input,
+                $food_normally_eaten_input,
+                $has_baon_input,
+                $travel_time_to_dcc_value,
+                $travel_mode_to_dcc_input,
+                $travel_time_to_ncdc_value,
+                $travel_mode_to_ncdc_input,
+                $public_transport_type_input,
+                $goes_to_school_with_input,
+                $has_eccd_card_input,
+                $has_mother_child_book_input,
+                $has_other_health_record_input,
+                $vaccine_bcg_input,
+                $vaccine_dpt_input,
+                $vaccine_opv_input,
+                $vaccine_hepab_input,
+                $vaccine_measles_input,
+                $vaccine_others_name_input,
+                $vaccine_others_status_input,
+                $is_left_handed_input
             );
 
                 if($insert_stmt->execute()){
@@ -501,6 +550,21 @@ if ($comorbidity_status === 'No') {
         font-size:14px;
         color:#7c5a10;
         line-height:1.6;
+    }
+
+    .update-info-prompt{
+        padding:18px;
+        border:1px solid #c8e6c9;
+        background:linear-gradient(135deg, #eafaf1 0%, #f5fffa 100%);
+        border-radius:18px;
+        margin-bottom:18px;
+    }
+
+    .update-info-text{
+        font-size:14px;
+        color:#1e5631;
+        line-height:1.6;
+        margin-bottom:12px;
     }
 
     .rejected-box{
@@ -779,35 +843,139 @@ if ($comorbidity_status === 'No') {
                         </div>
                     </div>
 
+                    <div class="info-row">
+                        <span class="info-label">Birth Order</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_birth_order); ?></div>
+                    </div>
+
+                    <div class="info-row full">
+                        <span class="info-label">Siblings Info</span>
+                        <div class="info-value"><?php echo nl2br(htmlspecialchars($official_siblings_info)); ?></div>
+                    </div>
+
+                    <div class="info-row full">
+                        <span class="info-label">Past ECCD Experience</span>
+                        <div class="info-value"><?php echo nl2br(htmlspecialchars($official_eccd_experience_info)); ?></div>
+                    </div>
+
                 </div>
 
                 <h3 class="sub-section-title">Current Health Information</h3>
 
                 <div class="info-list">
                     <div class="info-row">
-                        <span class="info-label">Vaccination Records</span>
-                        <div class="info-value"><?php echo renderFileOrText($official_vaccination); ?></div>
+                        <span class="info-label">Born At</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_born_at); ?></div>
                     </div>
 
                     <div class="info-row">
-                        <span class="info-label">Allergen</span>
-                        <div class="info-value"><?php echo htmlspecialchars($official_allergies); ?></div>
+                        <span class="info-label">Learns at Home With</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_learns_at_home_with); ?></div>
                     </div>
 
                     <div class="info-row">
-                        <span class="info-label">Comorbidities</span>
-                        <div class="info-value"><?php echo htmlspecialchars($official_comorbidities); ?></div>
+                        <span class="info-label">Plays with Older Siblings</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_plays_with_older_siblings); ?></div>
                     </div>
 
                     <div class="info-row">
-                        <span class="info-label">Medical History</span>
-                        <div class="info-value"><?php echo renderFileOrText($official_medical_history); ?></div>
+                        <span class="info-label">Plays with Younger Siblings</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_plays_with_younger_siblings); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Plays with Neighbors</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_plays_with_neighbors); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Has Meal Before School</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_has_meal_before_school); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Food Normally Eaten</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_food_normally_eaten); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Has Baon</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_has_baon); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Travel to DCC</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_travel_time_to_dcc_minutes); ?> — <?php echo htmlspecialchars($official_travel_mode_to_dcc); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Travel to NCDC</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_travel_time_to_ncdc_minutes); ?> — <?php echo htmlspecialchars($official_travel_mode_to_ncdc); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Public Transport Type</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_public_transport_type); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Goes to School With</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_goes_to_school_with); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Has ECCD Card</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_has_eccd_card); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Has Mother-Child Book</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_has_mother_child_book); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Other Health Record</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_has_other_health_record); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Vaccine — BCG</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_vaccine_bcg); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Vaccine — DPT</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_vaccine_dpt); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Vaccine — OPV</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_vaccine_opv); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Vaccine — Hepatitis B</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_vaccine_hepab); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Vaccine — Measles</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_vaccine_measles); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Vaccine — Others</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_vaccine_others_name); ?> — <?php echo htmlspecialchars($official_vaccine_others_status); ?></div>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Left-Handed</span>
+                        <div class="info-value"><?php echo htmlspecialchars($official_is_left_handed); ?></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <?php if(!$latest_submission_approved) { ?>
         <div class="health-card">
             <div class="health-card-header">
                 <h2 class="health-card-title">Submit Updated Health Information to CDW</h2>
@@ -841,79 +1009,242 @@ if ($comorbidity_status === 'No') {
                             </div>
                         </div>
                     <?php } ?>
-                    <form method="POST" enctype="multipart/form-data" class="health-form">
+
+                    <?php if($latest_submission_approved) { ?>
+                        <div class="update-info-prompt" id="updateInfoPrompt">
+                            <p class="update-info-text">
+                                Your latest submission has been approved and applied to the child's official record.
+                                You may submit updated information anytime.
+                            </p>
+                            <button type="button" class="btn-submit-health" onclick="toggleHealthUpdateForm()">
+                                Update Information
+                            </button>
+                        </div>
+                    <?php } ?>
+
+                    <form method="POST" enctype="multipart/form-data" class="health-form" id="healthUpdateForm"<?php echo $latest_submission_approved ? ' style="display:none;"' : ''; ?>>
 
                         <div class="form-group">
-                            <label class="form-label">Vaccination Records (Upload Image)</label>
-                            <input type="file" name="vaccination_file" class="form-input-file" accept=".jpg,.jpeg,.png,.webp">
-                            <div class="form-help">Upload the vaccination card image if available.</div>
+                            <label class="form-label">Birth Order</label>
+                            <input type="number" min="1" name="birth_order" class="form-text-input">
+                        </div>
+
+                        <div class="form-group full">
+                            <label class="form-label">Siblings Info</label>
+                            <textarea name="siblings_info" class="form-control" placeholder="Names/ages of siblings"></textarea>
+                        </div>
+
+                        <div class="form-group full">
+                            <label class="form-label">Past ECCD Experience</label>
+                            <textarea name="eccd_experience_info" class="form-control" placeholder="e.g. Service type, service, dates"></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Allergies</label>
-                            <select name="allergy_status" id="allergyStatus" class="form-control form-select">
+                            <label class="form-label">Born At</label>
+                            <select name="born_at" class="form-control form-select">
                                 <option value="">Select answer</option>
-                                <option value="No">No</option>
-                                <option value="Yes">Yes</option>
+                                <option value="Hospital">Hospital</option>
+                                <option value="Health Center">Health Center</option>
+                                <option value="Home">Home</option>
                             </select>
-                            <div class="form-help">Select Yes if the child has any known allergy.</div>
-                        </div>
-
-                        <div class="form-group" id="allergenGroup" style="display:none;">
-                            <label class="form-label">Allergen</label>
-                            <select name="allergen_type" id="allergenType" class="form-control form-select">
-                                <option value="">Select allergen</option>
-                                <option value="Peanut">Peanut</option>
-                                <option value="Egg">Egg</option>
-                                <option value="Milk">Milk</option>
-                                <option value="Seafood">Seafood</option>
-                                <option value="Medicine">Medicine</option>
-                                <option value="Dust">Dust</option>
-                                <option value="Insect Bite">Insect Bite</option>
-                                <option value="Others">Others</option>
-                            </select>
-                            <div class="form-help">Choose the specific allergen if allergies is Yes.</div>
-                        </div>
-
-                        <div class="form-group" id="allergenOtherGroup" style="display:none;">
-                            <label class="form-label">Specify Other Allergen</label>
-                            <input type="text" name="allergen_other" id="allergenOther" class="form-text-input" placeholder="Type other allergen">
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Comorbidities</label>
-                            <select name="comorbidity_status" id="comorbidityStatus" class="form-control form-select">
+                            <label class="form-label">Learns at Home With</label>
+                            <input type="text" name="learns_at_home_with" class="form-text-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Plays with Older Siblings</label>
+                            <select name="plays_with_older_siblings" class="form-control form-select">
                                 <option value="">Select answer</option>
-                                <option value="No">No</option>
-                                <option value="Yes">Yes</option>
+                                <option value="Always">Always</option>
+                                <option value="Sometimes">Sometimes</option>
+                                <option value="Rarely">Rarely</option>
+                                <option value="Never">Never</option>
                             </select>
-                            <div class="form-help">Select Yes if the child has an existing health condition.</div>
                         </div>
-
-                        <div class="form-group" id="comorbidityGroup" style="display:none;">
-                            <label class="form-label">Comorbidity Type</label>
-                            <select name="comorbidity_type" id="comorbidityType" class="form-control form-select">
-                                <option value="">Select comorbidity</option>
-                                <option value="Asthma">Asthma</option>
-                                <option value="Heart Condition">Heart Condition</option>
-                                <option value="Diabetes">Diabetes</option>
-                                <option value="Anemia">Anemia</option>
-                                <option value="Seizure Disorder">Seizure Disorder</option>
-                                <option value="Others">Others</option>
-                            </select>
-                            <div class="form-help">Choose the condition if comorbidities is Yes.</div>
-                        </div>
-
-                        <div class="form-group" id="comorbidityOtherGroup" style="display:none;">
-                            <label class="form-label">Specify Other Comorbidity</label>
-                            <input type="text" name="comorbidity_other" id="comorbidityOther" class="form-text-input" placeholder="Type other comorbidity">
-                        </div>
-                        
 
                         <div class="form-group">
-                            <label class="form-label">Medical History / Medical Document (Upload Image)</label>
-                            <input type="file" name="medical_file" class="form-input-file" accept=".jpg,.jpeg,.png,.webp">
-                            <div class="form-help">You may upload a medical document image if needed.</div>
+                            <label class="form-label">Plays with Younger Siblings</label>
+                            <select name="plays_with_younger_siblings" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Always">Always</option>
+                                <option value="Sometimes">Sometimes</option>
+                                <option value="Rarely">Rarely</option>
+                                <option value="Never">Never</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Plays with Neighbors</label>
+                            <select name="plays_with_neighbors" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Always">Always</option>
+                                <option value="Sometimes">Sometimes</option>
+                                <option value="Rarely">Rarely</option>
+                                <option value="Never">Never</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Has Meal Before School</label>
+                            <select name="has_meal_before_school" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Always">Always</option>
+                                <option value="Most of the time">Most of the time</option>
+                                <option value="Sometimes">Sometimes</option>
+                                <option value="Rarely">Rarely</option>
+                                <option value="Never">Never</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Food Normally Eaten</label>
+                            <input type="text" name="food_normally_eaten" class="form-text-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Has Baon</label>
+                            <select name="has_baon" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Money">Money</option>
+                                <option value="Food">Food</option>
+                                <option value="Both">Both</option>
+                                <option value="None">None</option>
+                                <option value="Don't Know">Don't Know</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Travel Time to DCC (minutes)</label>
+                            <input type="number" min="0" name="travel_time_to_dcc_minutes" class="form-text-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Travel Mode to DCC</label>
+                            <select name="travel_mode_to_dcc" id="travelModeToDcc" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Walking">Walking</option>
+                                <option value="Private Vehicle">Private Vehicle</option>
+                                <option value="Public Transportation">Public Transportation</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Travel Time to NCDC (minutes)</label>
+                            <input type="number" min="0" name="travel_time_to_ncdc_minutes" class="form-text-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Travel Mode to NCDC</label>
+                            <select name="travel_mode_to_ncdc" id="travelModeToNcdc" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Walking">Walking</option>
+                                <option value="Private Vehicle">Private Vehicle</option>
+                                <option value="Public Transportation">Public Transportation</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="publicTransportTypeGroup" style="display:none;">
+                            <label class="form-label">Public Transport Type</label>
+                            <input type="text" name="public_transport_type" id="publicTransportType" class="form-text-input" placeholder="e.g. Tricycle, Jeepney">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Goes to School With</label>
+                            <input type="text" name="goes_to_school_with" class="form-text-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" name="has_eccd_card" value="1"> Has ECCD Card
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" name="has_mother_child_book" value="1"> Has Mother-Child Book
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Other Health Record</label>
+                            <input type="text" name="has_other_health_record" class="form-text-input">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vaccine — BCG</label>
+                            <select name="vaccine_bcg" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Don't Know">Don't Know</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vaccine — DPT</label>
+                            <select name="vaccine_dpt" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Don't Know">Don't Know</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vaccine — OPV</label>
+                            <select name="vaccine_opv" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Don't Know">Don't Know</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vaccine — Hepatitis B</label>
+                            <select name="vaccine_hepab" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Don't Know">Don't Know</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vaccine — Measles</label>
+                            <select name="vaccine_measles" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Don't Know">Don't Know</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vaccine — Others (Name)</label>
+                            <input type="text" name="vaccine_others_name" class="form-text-input" placeholder="e.g. Rotavirus">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vaccine — Others (Status)</label>
+                            <select name="vaccine_others_status" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                                <option value="Don't Know">Don't Know</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Left-Handed</label>
+                            <select name="is_left_handed" class="form-control form-select">
+                                <option value="">Select answer</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
                         </div>
 
                         <div class="form-actions">
@@ -927,83 +1258,52 @@ if ($comorbidity_status === 'No') {
 
             </div>
         </div>
-        <?php } ?>
 
     </div>
 </div>
 
 <script>
 
-function setupConditionalDropdowns() {
-    const allergyStatus = document.getElementById('allergyStatus');
-    const allergenGroup = document.getElementById('allergenGroup');
-    const allergenType = document.getElementById('allergenType');
-    const allergenOtherGroup = document.getElementById('allergenOtherGroup');
+function toggleHealthUpdateForm() {
+    var form = document.getElementById('healthUpdateForm');
+    var prompt = document.getElementById('updateInfoPrompt');
 
-    const comorbidityStatus = document.getElementById('comorbidityStatus');
-    const comorbidityGroup = document.getElementById('comorbidityGroup');
-    const comorbidityType = document.getElementById('comorbidityType');
-    const comorbidityOtherGroup = document.getElementById('comorbidityOtherGroup');
-
-    function updateAllergyFields() {
-        if (!allergyStatus || !allergenGroup || !allergenType || !allergenOtherGroup) return;
-
-        if (allergyStatus.value === 'Yes') {
-            allergenGroup.style.display = 'flex';
-        } else {
-            allergenGroup.style.display = 'none';
-            allergenOtherGroup.style.display = 'none';
-            allergenType.value = '';
-        }
+    if (form) {
+        form.style.display = 'block';
     }
 
-    function updateAllergenOtherField() {
-        if (!allergenType || !allergenOtherGroup) return;
-
-        allergenOtherGroup.style.display = allergenType.value === 'Others' ? 'flex' : 'none';
+    if (prompt) {
+        prompt.style.display = 'none';
     }
-
-    function updateComorbidityFields() {
-        if (!comorbidityStatus || !comorbidityGroup || !comorbidityType || !comorbidityOtherGroup) return;
-
-        if (comorbidityStatus.value === 'Yes') {
-            comorbidityGroup.style.display = 'flex';
-        } else {
-            comorbidityGroup.style.display = 'none';
-            comorbidityOtherGroup.style.display = 'none';
-            comorbidityType.value = '';
-        }
-    }
-
-    function updateComorbidityOtherField() {
-        if (!comorbidityType || !comorbidityOtherGroup) return;
-
-        comorbidityOtherGroup.style.display = comorbidityType.value === 'Others' ? 'flex' : 'none';
-    }
-
-    if (allergyStatus) {
-        allergyStatus.addEventListener('change', updateAllergyFields);
-    }
-
-    if (allergenType) {
-        allergenType.addEventListener('change', updateAllergenOtherField);
-    }
-
-    if (comorbidityStatus) {
-        comorbidityStatus.addEventListener('change', updateComorbidityFields);
-    }
-
-    if (comorbidityType) {
-        comorbidityType.addEventListener('change', updateComorbidityOtherField);
-    }
-
-    updateAllergyFields();
-    updateAllergenOtherField();
-    updateComorbidityFields();
-    updateComorbidityOtherField();
 }
 
-setupConditionalDropdowns();
+function setupTravelConditionalFields() {
+    const travelModeToDcc = document.getElementById('travelModeToDcc');
+    const travelModeToNcdc = document.getElementById('travelModeToNcdc');
+    const publicTransportTypeGroup = document.getElementById('publicTransportTypeGroup');
+
+    function updatePublicTransportType() {
+        if (!publicTransportTypeGroup) return;
+
+        const dccValue = travelModeToDcc ? travelModeToDcc.value : '';
+        const ncdcValue = travelModeToNcdc ? travelModeToNcdc.value : '';
+
+        const show = (dccValue === 'Public Transportation') || (ncdcValue === 'Public Transportation');
+        publicTransportTypeGroup.style.display = show ? 'flex' : 'none';
+    }
+
+    if (travelModeToDcc) {
+        travelModeToDcc.addEventListener('change', updatePublicTransportType);
+    }
+
+    if (travelModeToNcdc) {
+        travelModeToNcdc.addEventListener('change', updatePublicTransportType);
+    }
+
+    updatePublicTransportType();
+}
+
+setupTravelConditionalFields();
 
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');

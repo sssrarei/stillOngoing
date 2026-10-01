@@ -622,6 +622,7 @@ foreach ($users_list as $key => $user) {
                                     <button
                                         type="button"
                                         class="view-profile-btn"
+                                        data-user-id="<?php echo (int) $user['user_id']; ?>"
                                         data-name="<?php echo htmlspecialchars($full_name, ENT_QUOTES); ?>"
                                         data-role="<?php echo htmlspecialchars($role_name, ENT_QUOTES); ?>"
                                         data-email="<?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?>"
@@ -692,6 +693,12 @@ foreach ($users_list as $key => $user) {
         <div class="drawer-value" id="drawerLinkValue">—</div>
         <div class="drawer-children-list" id="drawerChildrenList"></div>
     </div>
+
+    <div class="drawer-section" id="drawerFullProfileSection" style="display:none;">
+        <a href="#" id="drawerFullProfileLink" class="btn btn-primary" style="display:inline-flex; width:100%; text-decoration:none; text-align:center; justify-content:center;">
+            View Full CDW Profile
+        </a>
+    </div>
 </div>
 
 
@@ -715,6 +722,7 @@ foreach ($users_list as $key => $user) {
     |----------------------------------------------------------------
     */
     function openProfileDrawer(btn) {
+        const userId = btn.getAttribute('data-user-id') || '';
         const name = btn.getAttribute('data-name') || '—';
         const role = btn.getAttribute('data-role') || '—';
         const email = btn.getAttribute('data-email') || '—';
@@ -739,15 +747,22 @@ foreach ($users_list as $key => $user) {
 
         const linkValueEl = document.getElementById('drawerLinkValue');
         const childrenListEl = document.getElementById('drawerChildrenList');
+        const fullProfileSection = document.getElementById('drawerFullProfileSection');
+        const fullProfileLink = document.getElementById('drawerFullProfileLink');
 
         if (role === 'CDW') {
             // Simple: which CDC(s) this CDW is linked to.
             linkValueEl.textContent = linkValue || 'No assigned CDC';
             linkValueEl.style.display = '';
             childrenListEl.innerHTML = '';
+
+            // CDW only: link to the full read-only Form 6 profile page.
+            fullProfileLink.href = 'view_cdw_profile.php?user_id=' + encodeURIComponent(userId);
+            fullProfileSection.style.display = '';
         } else {
             // Guardian: show each linked child, that child's CDC, and the CDW(s) for that CDC.
             linkValueEl.style.display = 'none';
+            fullProfileSection.style.display = 'none';
 
             if (!guardianChildren || guardianChildren.length === 0) {
                 childrenListEl.innerHTML = '<div class="drawer-child-empty">No linked child.</div>';

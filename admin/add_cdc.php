@@ -83,12 +83,51 @@ $barangay_list = [
 ];
 
 
+function checkboxListToString($postArray) {
+    if (!is_array($postArray) || empty($postArray)) {
+        return null;
+    }
+    $clean = array_map('trim', $postArray);
+    $clean = array_filter($clean, function ($v) { return $v !== ''; });
+    if (empty($clean)) {
+        return null;
+    }
+    return implode(', ', $clean);
+}
+
+function blankToNull($value) {
+    $value = trim((string) $value);
+    return ($value === '') ? null : $value;
+}
+
 // Add CDC
 // Add CDC
 if (isset($_POST['add_cdc'])) {
     $cdc_name = isset($_POST['cdc_name']) ? trim($_POST['cdc_name']) : "";
     $barangay = isset($_POST['barangay']) ? trim($_POST['barangay']) : "";
     $address = isset($_POST['address']) ? trim($_POST['address']) : "";
+
+    $year_established = ($_POST['year_established'] ?? '') !== '' ? (int) $_POST['year_established'] : null;
+    $telephone   = blankToNull($_POST['telephone'] ?? '');
+    $fax_number  = blankToNull($_POST['fax_number'] ?? '');
+    $cdc_email   = blankToNull($_POST['cdc_email'] ?? '');
+
+    $accreditation_status = blankToNull($_POST['accreditation_status'] ?? '');
+    $date_accredited       = blankToNull($_POST['date_accredited'] ?? '');
+    $accreditation_no       = blankToNull($_POST['accreditation_no'] ?? '');
+    $accreditation_level    = blankToNull($_POST['accreditation_level'] ?? '');
+
+    $services_offered = checkboxListToString($_POST['services_offered'] ?? []);
+    $services_offered_other = blankToNull($_POST['services_offered_other'] ?? '');
+
+    $facilities_available = checkboxListToString($_POST['facilities_available'] ?? []);
+    $facilities_other = blankToNull($_POST['facilities_other'] ?? '');
+
+    $utilities_available = checkboxListToString($_POST['utilities_available'] ?? []);
+    $utilities_other = blankToNull($_POST['utilities_other'] ?? '');
+
+    $equipment_materials = checkboxListToString($_POST['equipment_materials'] ?? []);
+    $equipment_other = blankToNull($_POST['equipment_other'] ?? '');
 
     if ($cdc_name == "") {
         $error = "Please enter CDC name.";
@@ -101,8 +140,27 @@ if (isset($_POST['add_cdc'])) {
         if ($check_result && $check_result->num_rows > 0) {
             $error = "CDC name already exists.";
         } else {
-            $stmt = $conn->prepare("INSERT INTO cdc (cdc_name, barangay, address) VALUES (?, ?, ?)");
-            $stmt->bind_param("sss", $cdc_name, $barangay, $address);
+            $stmt = $conn->prepare("
+                INSERT INTO cdc (
+                    cdc_name, barangay, address,
+                    year_established, telephone, fax_number, email,
+                    accreditation_status, date_accredited, accreditation_no, accreditation_level,
+                    services_offered, services_offered_other,
+                    facilities_available, facilities_other,
+                    utilities_available, utilities_other,
+                    equipment_materials, equipment_other
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmt->bind_param(
+                "sssisssssssssssssss",
+                $cdc_name, $barangay, $address,
+                $year_established, $telephone, $fax_number, $cdc_email,
+                $accreditation_status, $date_accredited, $accreditation_no, $accreditation_level,
+                $services_offered, $services_offered_other,
+                $facilities_available, $facilities_other,
+                $utilities_available, $utilities_other,
+                $equipment_materials, $equipment_other
+            );
 
             if ($stmt->execute()) {
                 $success = "CDC added successfully.";
@@ -162,11 +220,13 @@ if ($search != "") {
             c.cdc_name,
             c.barangay,
             c.address,
-            COUNT(ch.child_id) AS total_children
+            c.accreditation_status,
+            COUNT(DISTINCT ch.child_id) AS total_children,
+            (SELECT COUNT(*) FROM cdw_assignments ca WHERE ca.cdc_id = c.cdc_id) AS total_cdw
         FROM cdc c
         LEFT JOIN children ch ON c.cdc_id = ch.cdc_id
         WHERE c.cdc_name LIKE ? OR c.barangay LIKE ? OR c.address LIKE ?
-        GROUP BY c.cdc_id, c.cdc_name, c.barangay, c.address
+        GROUP BY c.cdc_id, c.cdc_name, c.barangay, c.address, c.accreditation_status
         ORDER BY c.cdc_id DESC
     ");
     $cdc_stmt->bind_param("sss", $like, $like, $like);
@@ -179,10 +239,12 @@ if ($search != "") {
             c.cdc_name,
             c.barangay,
             c.address,
-            COUNT(ch.child_id) AS total_children
+            c.accreditation_status,
+            COUNT(DISTINCT ch.child_id) AS total_children,
+            (SELECT COUNT(*) FROM cdw_assignments ca WHERE ca.cdc_id = c.cdc_id) AS total_cdw
         FROM cdc c
         LEFT JOIN children ch ON c.cdc_id = ch.cdc_id
-        GROUP BY c.cdc_id, c.cdc_name, c.barangay, c.address
+        GROUP BY c.cdc_id, c.cdc_name, c.barangay, c.address, c.accreditation_status
         ORDER BY c.cdc_id DESC
     ");
 }
@@ -347,6 +409,130 @@ if ($summary_result && $summary_result->num_rows > 0) {
                         value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>"
                     >
                 </div>
+
+                <div class="form-group">
+                    <label for="year_established">Year Established</label>
+                    <input type="number" id="year_established" name="year_established" min="1900" max="<?php echo date('Y'); ?>"
+                           value="<?php echo isset($_POST['year_established']) ? htmlspecialchars($_POST['year_established']) : ''; ?>">
+                </div>
+            </div>
+
+            <h3 style="margin-top:20px; font-size:15px; color:#2C5EAD;">Contact Details</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="telephone">Telephone No.</label>
+                    <input type="text" id="telephone" name="telephone" value="<?php echo htmlspecialchars($_POST['telephone'] ?? ''); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="fax_number">Fax No.</label>
+                    <input type="text" id="fax_number" name="fax_number" value="<?php echo htmlspecialchars($_POST['fax_number'] ?? ''); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="cdc_email">Email Address</label>
+                    <input type="email" id="cdc_email" name="cdc_email" value="<?php echo htmlspecialchars($_POST['cdc_email'] ?? ''); ?>">
+                </div>
+            </div>
+
+            <h3 style="margin-top:20px; font-size:15px; color:#2C5EAD;">Status of the Center</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="accreditation_status">Accreditation Status</label>
+                    <select id="accreditation_status" name="accreditation_status">
+                        <option value="">-- Select --</option>
+                        <option value="Accredited" <?php echo (($_POST['accreditation_status'] ?? '') === 'Accredited') ? 'selected' : ''; ?>>Accredited</option>
+                        <option value="Not Accredited" <?php echo (($_POST['accreditation_status'] ?? '') === 'Not Accredited') ? 'selected' : ''; ?>>Not Accredited</option>
+                        <option value="Accredited but Expired" <?php echo (($_POST['accreditation_status'] ?? '') === 'Accredited but Expired') ? 'selected' : ''; ?>>Accredited but Expired</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date_accredited">Date Accredited</label>
+                    <input type="date" id="date_accredited" name="date_accredited" value="<?php echo htmlspecialchars($_POST['date_accredited'] ?? ''); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="accreditation_no">Accreditation No.</label>
+                    <input type="text" id="accreditation_no" name="accreditation_no" value="<?php echo htmlspecialchars($_POST['accreditation_no'] ?? ''); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="accreditation_level">Level</label>
+                    <select id="accreditation_level" name="accreditation_level">
+                        <option value="">-- Select --</option>
+                        <option value="1" <?php echo (($_POST['accreditation_level'] ?? '') === '1') ? 'selected' : ''; ?>>Level 1</option>
+                        <option value="2" <?php echo (($_POST['accreditation_level'] ?? '') === '2') ? 'selected' : ''; ?>>Level 2</option>
+                        <option value="3" <?php echo (($_POST['accreditation_level'] ?? '') === '3') ? 'selected' : ''; ?>>Level 3</option>
+                    </select>
+                </div>
+            </div>
+
+            <h3 style="margin-top:20px; font-size:15px; color:#2C5EAD;">Services Offered</h3>
+            <div class="checkbox-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <?php
+                $services_options = ['Supplemental Parental Care','Nutritional Care','Early Learning','Guiding Children\'s Behavior','Supplemental Feeding','Play & Socialization','Health Related Activities','Inculcating Character & Values','Child Safety & Protection'];
+                foreach ($services_options as $opt) {
+                    $cb_id = 'svc_' . preg_replace('/[^a-z0-9]/i', '', $opt);
+                ?>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="<?php echo $cb_id; ?>" name="services_offered[]" value="<?php echo htmlspecialchars($opt); ?>">
+                        <label for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($opt); ?></label>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="form-group full" style="margin-top:10px;">
+                <label for="services_offered_other">Others, please specify</label>
+                <input type="text" id="services_offered_other" name="services_offered_other" value="<?php echo htmlspecialchars($_POST['services_offered_other'] ?? ''); ?>">
+            </div>
+
+            <h3 style="margin-top:20px; font-size:15px; color:#2C5EAD;">Available Facilities</h3>
+            <div class="checkbox-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <?php
+                $facilities_options = ['CDW Table','Toilet','Play Area','Nap Area','Classroom'];
+                foreach ($facilities_options as $opt) {
+                    $cb_id = 'fac_' . preg_replace('/[^a-z0-9]/i', '', $opt);
+                ?>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="<?php echo $cb_id; ?>" name="facilities_available[]" value="<?php echo htmlspecialchars($opt); ?>">
+                        <label for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($opt); ?></label>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="form-group full" style="margin-top:10px;">
+                <label for="facilities_other">Others, please specify</label>
+                <input type="text" id="facilities_other" name="facilities_other" value="<?php echo htmlspecialchars($_POST['facilities_other'] ?? ''); ?>">
+            </div>
+
+            <h3 style="margin-top:20px; font-size:15px; color:#2C5EAD;">Utilities/Services Offered</h3>
+            <div class="checkbox-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <?php
+                $utilities_options = ['Electricity','Feeding Facilities & Utensils','First Aid Kit','Running Water','Playground with Equipment','Structure with Accessibility - PWD','Potable Water','Secured Doors & Windows','Computer','Facilities & Eqpt. To Measure Child\'s Growth'];
+                foreach ($utilities_options as $opt) {
+                    $cb_id = 'util_' . preg_replace('/[^a-z0-9]/i', '', $opt);
+                ?>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="<?php echo $cb_id; ?>" name="utilities_available[]" value="<?php echo htmlspecialchars($opt); ?>">
+                        <label for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($opt); ?></label>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="form-group full" style="margin-top:10px;">
+                <label for="utilities_other">Others, please specify</label>
+                <input type="text" id="utilities_other" name="utilities_other" value="<?php echo htmlspecialchars($_POST['utilities_other'] ?? ''); ?>">
+            </div>
+
+            <h3 style="margin-top:20px; font-size:15px; color:#2C5EAD;">Available Equipment & Learning Materials</h3>
+            <div class="checkbox-group" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <?php
+                $equipment_options = ['Audio/Video Materials','Manipulative Toys','Reading Materials','Musical Instrument','Children\'s Books','Coloring Books'];
+                foreach ($equipment_options as $opt) {
+                    $cb_id = 'eqp_' . preg_replace('/[^a-z0-9]/i', '', $opt);
+                ?>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="<?php echo $cb_id; ?>" name="equipment_materials[]" value="<?php echo htmlspecialchars($opt); ?>">
+                        <label for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($opt); ?></label>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="form-group full" style="margin-top:10px;">
+                <label for="equipment_other">Others, please specify</label>
+                <input type="text" id="equipment_other" name="equipment_other" value="<?php echo htmlspecialchars($_POST['equipment_other'] ?? ''); ?>">
             </div>
 
             <div class="form-actions">
@@ -359,18 +545,20 @@ if ($summary_result && $summary_result->num_rows > 0) {
     <div class="table-card">
         <div class="card-header">
             <h2>CDC List</h2>
-            <p>View all registered child development centers. Click a CDC name to manage its assigned CDW.</p>
+            <p>View all registered child development centers. Use "Edit CDC Details" to update Form 7 info, or "Manage CDW" to assign a worker.</p>
         </div>
 
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 24%;">CDC Name</th>
-                        <th style="width: 15%;">Barangay</th>
-                        <th style="width: 26%;">Address</th>
-                        <th style="width: 15%; text-align:center;">No. of Child</th>
-                        <th style="width: 20%;">Assigned CDW</th>
+                        <th style="width: 20%;">CDC Name</th>
+                        <th style="width: 12%;">Barangay</th>
+                        <th style="width: 18%;">Address</th>
+                        <th style="width: 10%; text-align:center;">No. of Child</th>
+                        <th style="width: 10%; text-align:center;">No. of CDW</th>
+                        <th style="width: 12%;">Accreditation</th>
+                        <th style="width: 18%;">Assigned CDW</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -384,13 +572,23 @@ if ($summary_result && $summary_result->num_rows > 0) {
                             ?>
                             <tr>
                                 <td class="cdc-name">
-                                    <a href="#" class="cdc-link" onclick="openManageCdw(<?php echo $cdc_id_val; ?>, '<?php echo htmlspecialchars(addslashes($row['cdc_name']), ENT_QUOTES); ?>', <?php echo $current_cdw_id; ?>); return false;">
+                                    <div style="font-weight:700; margin-bottom:6px;">
                                         <?php echo htmlspecialchars($row['cdc_name']); ?>
-                                    </a>
+                                    </div>
+                                    <div style="display:flex; flex-direction:column; gap:4px;">
+                                        <a href="edit_cdc.php?cdc_id=<?php echo $cdc_id_val; ?>" style="font-size:12px; color:#2C5EAD; font-weight:700; text-decoration:none;">
+                                            Edit CDC Details
+                                        </a>
+                                        <a href="#" onclick="openManageCdw(<?php echo $cdc_id_val; ?>, '<?php echo htmlspecialchars(addslashes($row['cdc_name']), ENT_QUOTES); ?>', <?php echo $current_cdw_id; ?>); return false;" style="font-size:12px; color:#6b7280; text-decoration:none;">
+                                            Manage CDW
+                                        </a>
+                                    </div>
                                 </td>
                                 <td><?php echo !empty($row['barangay']) ? htmlspecialchars($row['barangay']) : 'N/A'; ?></td>
                                 <td><?php echo !empty($row['address']) ? htmlspecialchars($row['address']) : 'N/A'; ?></td>
                                 <td class="child-count"><?php echo (int)$row['total_children']; ?></td>
+                                <td class="child-count"><?php echo (int)$row['total_cdw']; ?></td>
+                                <td><?php echo !empty($row['accreditation_status']) ? htmlspecialchars($row['accreditation_status']) : 'N/A'; ?></td>
                                 <td class="assigned-cdw<?php echo $current_cdw ? '' : ' unassigned'; ?>">
                                     <?php echo htmlspecialchars($current_cdw_name); ?>
                                 </td>
@@ -398,7 +596,7 @@ if ($summary_result && $summary_result->num_rows > 0) {
                         <?php } ?>
                     <?php } else { ?>
                         <tr>
-                            <td colspan="5" class="empty-state">No CDC found.</td>
+                            <td colspan="7" class="empty-state">No CDC found.</td>
                         </tr>
                     <?php } ?>
                 </tbody>

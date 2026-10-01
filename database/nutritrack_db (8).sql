@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 27, 2026 at 05:33 AM
+-- Generation Time: Sep 30, 2026 at 04:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -54,24 +54,24 @@ CREATE TABLE `anthropometric_records` (
 --
 
 INSERT INTO `anthropometric_records` (`record_id`, `child_id`, `height`, `weight`, `muac`, `edema_status`, `edema_grade`, `muac_status`, `date_recorded`, `age_months`, `place_of_measurement`, `assessment_type`, `is_submitted`, `submitted_at`, `wfa_status`, `hfa_status`, `wflh_status`, `recorded_by`, `is_deleted`) VALUES
-(93, 69, 99.00, 11.40, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 46, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Underweight', 'Normal', 'Severely Wasted', 52, 0),
-(94, 77, 99.00, 11.40, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 40, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Severely Wasted', 52, 0),
+(93, 69, 99.00, 11.40, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 46, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Underweight', 'Normal', 'Severely Wasted', 52, 1),
+(94, 77, 99.00, 11.40, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 40, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Severely Wasted', 52, 1),
 (95, 71, 99.00, 13.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 42, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Normal', 52, 0),
-(96, 75, 99.00, 14.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 43, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Normal', 52, 0),
+(96, 75, 99.00, 14.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 43, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Normal', 52, 1),
 (97, 78, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 51, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Severely Underweight', 'Normal', 'Severely Wasted', 52, 0),
-(98, 70, 99.00, 12.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 47, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Underweight', 'Normal', 'Wasted', 52, 0),
+(98, 70, 98.00, 13.40, 13.00, 'Absent', NULL, 'Normal', '2026-09-27', 52, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Normal', 52, 0),
 (99, 74, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 29, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Tall', 'Severely Wasted', 52, 0),
 (100, 72, 95.00, 13.50, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 32, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Normal', 52, 0),
 (101, 76, 89.00, 11.50, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 32, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Normal', 52, 0),
 (102, 73, 89.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-11', 30, NULL, 'baseline', 1, '2026-07-17 23:45:57', 'Normal', 'Normal', 'Normal', 52, 0),
-(103, 69, 99.00, 15.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 47, NULL, 'midline', 1, '2026-07-17 23:56:15', 'Normal', 'Normal', 'Normal', 52, 0),
-(104, 69, 99.00, 19.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-11', 48, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Overweight', 52, 0),
-(105, 77, 99.00, 18.50, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 41, NULL, 'midline', 1, '2026-07-17 23:56:15', 'Normal', 'Normal', 'Overweight', 52, 0),
+(103, 69, 99.00, 15.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 47, NULL, 'midline', 1, '2026-07-17 23:56:15', 'Normal', 'Normal', 'Normal', 52, 1),
+(104, 69, 99.00, 19.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-11', 48, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Overweight', 52, 1),
+(105, 77, 99.00, 18.50, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 41, NULL, 'midline', 1, '2026-07-17 23:56:15', 'Normal', 'Normal', 'Overweight', 52, 1),
 (106, 71, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 43, NULL, 'midline', 1, '2026-07-17 23:56:15', 'Underweight', 'Normal', 'Severely Wasted', 52, 0),
-(107, 75, 99.00, 19.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 44, NULL, 'midline', 1, '2026-07-17 23:56:15', 'Normal', 'Normal', 'Overweight', 52, 0),
+(107, 75, 99.00, 19.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 44, NULL, 'midline', 1, '2026-07-17 23:56:15', 'Normal', 'Normal', 'Overweight', 52, 1),
 (108, 78, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 52, NULL, 'midline', 1, '2026-07-17 23:56:15', 'Severely Underweight', 'Normal', 'Severely Wasted', 52, 0),
-(109, 77, 99.00, 20.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-11', 42, NULL, 'endline', 0, NULL, 'Overweight', 'Normal', 'Obese', 52, 0),
-(110, 75, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-11', 45, NULL, 'endline', 0, NULL, 'Underweight', 'Normal', 'Severely Wasted', 52, 0),
+(109, 77, 99.00, 20.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-11', 42, NULL, 'endline', 0, NULL, 'Overweight', 'Normal', 'Obese', 52, 1),
+(110, 75, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-11', 45, NULL, 'endline', 0, NULL, 'Underweight', 'Normal', 'Severely Wasted', 52, 1),
 (111, 71, 99.00, 14.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-11', 44, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Normal', 52, 0),
 (112, 78, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-11', 53, NULL, 'endline', 0, NULL, 'Severely Underweight', 'Normal', 'Severely Wasted', 52, 0),
 (113, 70, 99.00, 13.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-11', 48, NULL, 'midline', 0, NULL, 'Normal', 'Normal', 'Normal', 52, 0),
@@ -124,7 +124,11 @@ INSERT INTO `anthropometric_records` (`record_id`, `child_id`, `height`, `weight
 (160, 111, 99.00, 12.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-05', 37, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Wasted', 68, 0),
 (161, 109, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-05-05', 34, NULL, 'baseline', 0, NULL, 'Normal', 'Normal', 'Severely Wasted', 68, 0),
 (162, 109, 99.00, 12.00, 13.00, 'Absent', NULL, 'Normal', '2026-06-05', 35, NULL, 'midline', 0, NULL, 'Normal', 'Normal', 'Wasted', 68, 0),
-(163, 109, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-05', 36, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Severely Wasted', 68, 0);
+(163, 109, 99.00, 11.00, 13.00, 'Absent', NULL, 'Normal', '2026-07-05', 36, NULL, 'endline', 0, NULL, 'Normal', 'Normal', 'Severely Wasted', 68, 0),
+(164, 113, 99.00, 11.50, 0.00, NULL, NULL, NULL, '2026-09-18', NULL, NULL, 'baseline', 0, NULL, NULL, NULL, NULL, 52, 0),
+(165, 116, 98.00, 13.40, 0.00, NULL, NULL, NULL, '2026-09-27', 63, NULL, 'baseline', 0, NULL, 'Underweight', 'Stunted', 'Normal', 52, 0),
+(166, 116, 98.00, 13.40, 0.00, NULL, NULL, NULL, '2026-09-26', NULL, NULL, 'monthly_followup', 0, NULL, NULL, NULL, NULL, 52, 0),
+(167, 117, 98.00, 12.50, 0.00, NULL, NULL, NULL, '2026-09-28', 27, NULL, 'baseline', 0, NULL, 'Normal', 'Tall', 'Normal', 76, 0);
 
 -- --------------------------------------------------------
 
@@ -138,27 +142,45 @@ CREATE TABLE `cdc` (
   `barangay` varchar(100) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `status` varchar(20) DEFAULT 'Active',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `year_established` year(4) DEFAULT NULL,
+  `telephone` varchar(30) DEFAULT NULL,
+  `fax_number` varchar(30) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `accreditation_status` enum('Accredited','Not Accredited','Accredited but Expired') DEFAULT NULL,
+  `date_accredited` date DEFAULT NULL,
+  `accreditation_no` varchar(50) DEFAULT NULL,
+  `accreditation_level` enum('1','2','3') DEFAULT NULL,
+  `services_offered` varchar(500) DEFAULT NULL,
+  `services_offered_other` varchar(150) DEFAULT NULL,
+  `facilities_available` varchar(255) DEFAULT NULL,
+  `facilities_other` varchar(150) DEFAULT NULL,
+  `utilities_available` varchar(500) DEFAULT NULL,
+  `utilities_other` varchar(150) DEFAULT NULL,
+  `equipment_materials` varchar(255) DEFAULT NULL,
+  `equipment_other` varchar(150) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `cdc`
 --
 
-INSERT INTO `cdc` (`cdc_id`, `cdc_name`, `barangay`, `address`, `status`, `created_at`) VALUES
-(25, 'Aniban I', 'Aniban I', 'Lot 1, Block 2', 'Active', '2026-07-17 14:18:12'),
-(26, 'BAYANAN', 'Bayanan', 'Bayan Luma IV, Bacoor Lot 3, Block 4', 'Active', '2026-07-17 14:18:53'),
-(27, 'Maliksi 3', 'Maliksi III', 'Maliksi 3, Bacoor', 'Active', '2026-07-18 06:17:31'),
-(28, 'Zapote2', 'Zapote II', 'Zapote II, Bacoor', 'Active', '2026-07-18 07:28:13'),
-(29, 'Talaba 4', 'Talaba IV', 'Talaba 4, Bacoor', 'Active', '2026-07-18 08:31:32'),
-(30, 'Panapaan 1', 'P. F. Espiritu I', 'Panapaan 1', 'Active', '2026-07-18 08:44:56'),
-(31, 'Panapaan 3', 'P. F. Espiritu III', 'Panapaan 3', 'Active', '2026-07-18 08:46:03'),
-(32, 'Alima 1', 'Alima', 'Alima 1', 'Active', '2026-07-18 08:52:33'),
-(33, 'Zapote 3', 'Zapote III', 'Zapote III, Bacoor', 'Active', '2026-07-18 09:23:47'),
-(34, 'Ligas 1', 'Ligas I', 'Ligas 1, blk5 lt 19', 'Active', '2026-07-24 14:10:12'),
-(35, 'Molino III MAIN', 'Molino III', 'Purok 3, Molino III, Bacoor City, Cavite', 'Active', '2026-07-25 05:19:46'),
-(36, 'Talaba I CDC', 'Talaba I', 'Blk 5 Lot 12, Talaba I, Bacoor City, Cavite', 'Active', '2026-07-25 05:20:29'),
-(37, 'Zapote I Main', 'Zapote I', 'Zapote I Main St., Bacoor City, Cavite', 'Active', '2026-07-25 05:20:49');
+INSERT INTO `cdc` (`cdc_id`, `cdc_name`, `barangay`, `address`, `status`, `created_at`, `year_established`, `telephone`, `fax_number`, `email`, `accreditation_status`, `date_accredited`, `accreditation_no`, `accreditation_level`, `services_offered`, `services_offered_other`, `facilities_available`, `facilities_other`, `utilities_available`, `utilities_other`, `equipment_materials`, `equipment_other`) VALUES
+(25, 'Aniban I', 'Aniban I', 'Lot 1, Block 2', 'Active', '2026-07-17 14:18:12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(26, 'BAYANAN', 'Bayanan', 'Bayan Luma IV, Bacoor Lot 3, Block 4', 'Active', '2026-07-17 14:18:53', NULL, NULL, NULL, NULL, 'Accredited', '2014-06-19', '123', '1', 'Supplemental Parental Care, Nutritional Care, Early Learning, Guiding Children\'s Behavior, Play & Socialization', NULL, 'Classroom', NULL, 'Potable Water, Computer', NULL, 'Manipulative Toys, Reading Materials, Musical Instrument, Children\'s Books', NULL),
+(27, 'Maliksi 3', 'Maliksi III', 'Maliksi 3, Bacoor', 'Active', '2026-07-18 06:17:31', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(28, 'Zapote2', 'Zapote II', 'Zapote II, Bacoor', 'Active', '2026-07-18 07:28:13', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(29, 'Talaba 4', 'Talaba IV', 'Talaba 4, Bacoor', 'Active', '2026-07-18 08:31:32', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(30, 'Panapaan 1', 'P. F. Espiritu I', 'Panapaan 1', 'Active', '2026-07-18 08:44:56', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(31, 'Panapaan 3', 'P. F. Espiritu III', 'Panapaan 3', 'Active', '2026-07-18 08:46:03', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(32, 'Alima 1', 'Alima', 'Alima 1', 'Active', '2026-07-18 08:52:33', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(33, 'Zapote 3', 'Zapote III', 'Zapote III, Bacoor', 'Active', '2026-07-18 09:23:47', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(34, 'Ligas 1', 'Ligas I', 'Ligas 1, blk5 lt 19', 'Active', '2026-07-24 14:10:12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(35, 'Molino III MAIN', 'Molino III', 'Purok 3, Molino III, Bacoor City, Cavite', 'Active', '2026-07-25 05:19:46', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(36, 'Talaba I CDC', 'Talaba I', 'Blk 5 Lot 12, Talaba I, Bacoor City, Cavite', 'Active', '2026-07-25 05:20:29', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(37, 'Zapote I Main', 'Zapote I', 'Zapote I Main St., Bacoor City, Cavite', 'Active', '2026-07-25 05:20:49', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(38, 'ZAPOTE II', 'Zapote II', 'Barangay Zapote II, Bacoor, Cavite', 'Active', '2026-09-24 12:00:50', '2015', 'N/A', 'N/A', 'zapoteII@gmail.com', 'Accredited', '2015-06-23', '101', '1', 'Supplemental Parental Care, Nutritional Care, Early Learning, Guiding Children\'s Behavior, Supplemental Feeding, Play & Socialization, Health Related Activities, Inculcating Character & Values, Child Safety & Protection', NULL, 'CDW Table, Toilet, Play Area, Nap Area, Classroom', NULL, 'Electricity, Feeding Facilities & Utensils, First Aid Kit, Running Water, Playground with Equipment, Structure with Accessibility - PWD, Potable Water, Secured Doors & Windows, Computer, Facilities & Eqpt. To Measure Child\'s Growth', NULL, 'Reading Materials, Children\'s Books, Coloring Books', NULL),
+(39, 'Daang bukid CDC', 'Daang Bukid', 'Daang Bukid, Bacoor', 'Active', '2026-09-28 03:12:37', '2021', 'N/A', 'N/A', 'daangbukid@gmail.com', 'Accredited', '2010-06-14', '123', '1', 'Supplemental Parental Care, Nutritional Care, Early Learning, Guiding Children\'s Behavior, Supplemental Feeding, Play & Socialization, Health Related Activities, Inculcating Character & Values, Child Safety & Protection', NULL, 'CDW Table, Toilet, Classroom', NULL, 'Electricity, Feeding Facilities & Utensils, Running Water, Playground with Equipment, Structure with Accessibility - PWD, Potable Water, Secured Doors & Windows, Facilities & Eqpt. To Measure Child\'s Growth', NULL, 'Reading Materials, Children\'s Books', NULL);
 
 -- --------------------------------------------------------
 
@@ -192,7 +214,8 @@ INSERT INTO `cdw_assignments` (`assignment_id`, `user_id`, `cdc_id`, `assigned_a
 (44, 67, 36, '2026-07-25 05:24:10'),
 (45, 67, 37, '2026-07-25 05:24:10'),
 (46, 52, 25, '2026-07-25 06:56:48'),
-(48, 68, 35, '2026-07-25 07:14:05');
+(48, 68, 35, '2026-07-25 07:14:05'),
+(49, 76, 39, '2026-09-28 03:14:22');
 
 -- --------------------------------------------------------
 
@@ -209,62 +232,145 @@ CREATE TABLE `children` (
   `sex` varchar(10) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `religion` varchar(100) DEFAULT NULL,
+  `first_language` varchar(50) DEFAULT NULL,
+  `second_language` varchar(50) DEFAULT NULL,
+  `is_registered` enum('Yes','No') DEFAULT NULL,
+  `mother_name` varchar(150) DEFAULT NULL,
+  `mother_occupation` varchar(150) DEFAULT NULL,
+  `mother_address` text DEFAULT NULL,
+  `mother_contact_home` varchar(20) DEFAULT NULL,
+  `mother_contact_work` varchar(20) DEFAULT NULL,
+  `father_name` varchar(150) DEFAULT NULL,
+  `father_occupation` varchar(150) DEFAULT NULL,
+  `father_address` text DEFAULT NULL,
+  `father_contact_home` varchar(20) DEFAULT NULL,
+  `father_contact_work` varchar(20) DEFAULT NULL,
+  `emergency_contact_name` varchar(150) DEFAULT NULL,
+  `emergency_contact_relationship` varchar(50) DEFAULT NULL,
+  `emergency_contact_home` varchar(20) DEFAULT NULL,
+  `emergency_contact_work` varchar(20) DEFAULT NULL,
   `guardian_name` varchar(150) DEFAULT NULL,
   `contact_number` varchar(20) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `cdc_id` int(11) DEFAULT NULL,
   `access_code` varchar(20) DEFAULT NULL,
-  `is_deleted` tinyint(1) DEFAULT 0
+  `is_deleted` tinyint(1) DEFAULT 0,
+  `deleted_by` int(11) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `birth_order` int(11) DEFAULT NULL,
+  `born_at` enum('Hospital','Health Center','Home') DEFAULT NULL,
+  `has_eccd_card` tinyint(1) DEFAULT 0,
+  `has_mother_child_book` tinyint(1) DEFAULT 0,
+  `has_other_health_record` varchar(150) DEFAULT NULL,
+  `vaccine_bcg` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_dpt` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_opv` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_hepab` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_measles` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_others_name` varchar(100) DEFAULT NULL,
+  `vaccine_others_status` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `deformity_hare_lip` tinyint(1) DEFAULT 0,
+  `deformity_cross_eyed` tinyint(1) DEFAULT 0,
+  `deformity_deaf` tinyint(1) DEFAULT 0,
+  `deformity_blind` tinyint(1) DEFAULT 0,
+  `deformity_disabled_leg` tinyint(1) DEFAULT 0,
+  `deformity_disabled_arm_hand` tinyint(1) DEFAULT 0,
+  `deformity_fingers_toes` tinyint(1) DEFAULT 0,
+  `problem_behavior` tinyint(1) DEFAULT 0,
+  `problem_speaking` tinyint(1) DEFAULT 0,
+  `problem_hearing` tinyint(1) DEFAULT 0,
+  `problem_vision` tinyint(1) DEFAULT 0,
+  `is_left_handed` enum('Yes','No') DEFAULT NULL,
+  `learns_at_home_with` varchar(255) DEFAULT NULL,
+  `plays_with_older_siblings` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `plays_with_younger_siblings` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `plays_with_neighbors` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `has_meal_before_school` enum('Always','Most of the time','Sometimes','Rarely','Never') DEFAULT NULL,
+  `food_normally_eaten` varchar(255) DEFAULT NULL,
+  `has_baon` enum('Money','Food','Both','None','Don''t Know') DEFAULT NULL,
+  `travel_time_to_dcc_minutes` int(11) DEFAULT NULL,
+  `travel_mode_to_dcc` enum('Walking','Private Vehicle','Public Transportation') DEFAULT NULL,
+  `travel_time_to_ncdc_minutes` int(11) DEFAULT NULL,
+  `travel_mode_to_ncdc` enum('Walking','Private Vehicle','Public Transportation') DEFAULT NULL,
+  `public_transport_type` varchar(255) DEFAULT NULL,
+  `goes_to_school_with` varchar(255) DEFAULT NULL,
+  `siblings_info` text DEFAULT NULL,
+  `eccd_experience_info` text DEFAULT NULL,
+  `birth_registered` enum('Yes','No') DEFAULT NULL,
+  `no_of_siblings` int(11) DEFAULT NULL,
+  `birthplace` varchar(255) DEFAULT NULL,
+  `ethnicity` varchar(100) DEFAULT NULL,
+  `breastfeeding_status` enum('Yes','No') DEFAULT NULL,
+  `breastfeeding_type` enum('Exclusive','Mixed') DEFAULT NULL,
+  `breastfed_months` int(11) DEFAULT NULL,
+  `supplementary_feeding_days` int(11) DEFAULT NULL,
+  `has_disability_impairment` enum('Yes','No') DEFAULT NULL,
+  `disability_referral_details` text DEFAULT NULL,
+  `disability_impairment_info` text DEFAULT NULL,
+  `is_listahanan_identified` tinyint(1) DEFAULT 0,
+  `is_pantawid_beneficiary` tinyint(1) DEFAULT 0,
+  `pantawid_household_id` varchar(100) DEFAULT NULL,
+  `participation_fee_paid_amount` decimal(10,2) DEFAULT NULL,
+  `parent_counterpart_type` enum('Cash','In Kind','None','Cash/In Kind') DEFAULT NULL,
+  `school_year` varchar(20) DEFAULT NULL,
+  `scheduled_session` enum('Morning','Afternoon') DEFAULT NULL,
+  `attendance_status` enum('Continuing','Dropped Out','Graduated') DEFAULT NULL,
+  `dropout_reason` enum('Illness','Transfer of Residence','Others') DEFAULT NULL,
+  `dropout_reason_other` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `children`
 --
 
-INSERT INTO `children` (`child_id`, `first_name`, `middle_name`, `last_name`, `birthdate`, `sex`, `address`, `religion`, `guardian_name`, `contact_number`, `created_at`, `cdc_id`, `access_code`, `is_deleted`) VALUES
-(69, 'Angela', 'Reyes', 'Santos', '2022-06-15', 'Female', 'Aniban I, Bacoor', 'Christian', NULL, NULL, '2026-07-17 14:22:23', 25, 'CH-2263', 0),
-(70, 'Joshua', 'Cruz', 'Mendoza', '2022-05-24', 'Male', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-17 14:23:04', 25, 'CH-8864', 0),
-(71, 'Camille', 'Lopez', 'Garcia', '2022-10-17', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-17 14:23:48', 25, 'CH-2423', 0),
-(72, 'Nathaniel', 'Ramos', 'Bautista', '2023-08-30', 'Male', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-17 14:24:21', 25, 'CH-6212', 0),
-(73, 'Sophia', 'Villanueva', 'Flores', '2023-10-31', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-17 14:24:54', 25, 'CH-7845', 0),
-(74, 'Maria', '', 'Santos', '2023-11-15', 'Female', 'Block 5 Lot 8, Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-17 14:27:29', 25, 'CH-2353', 0),
-(75, 'Gabriel', '', 'Perez', '2022-09-20', 'Male', 'Zapote III, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-17 14:28:02', 25, 'CH-2816', 0),
-(76, 'Noah', '', 'Fernandez', '2023-08-22', 'Male', 'Block 8 Lot 7, Aniban I, Bacoor City', 'Roman Catholic', NULL, NULL, '2026-07-17 14:29:20', 25, 'CH-7144', 0),
-(77, 'Ava', '', 'Morales', '2022-12-19', 'Female', 'Narra Street, Aniban I, Bacoor City', 'Roman Catholic', NULL, NULL, '2026-07-17 14:29:52', 25, 'CH-5533', 0),
-(78, 'Isabella', '', 'Lopez', '2022-01-25', 'Female', 'Phase 4, Ilang-Ilang St., Aniban I, Bacoor City', 'Roman Catholic', NULL, NULL, '2026-07-17 14:31:06', 25, 'CH-2349', 0),
-(79, 'Mari', '', 'Navales', '2023-09-27', 'Female', 'Palico 1, Imus', 'Iglesia ni Cristo', NULL, NULL, '2026-07-18 06:22:31', 27, 'CH-7807', 0),
-(80, 'Jayvee', '', '', '2024-06-16', 'Female', 'Aniban II, Bacoor', 'Christian', NULL, NULL, '2026-07-18 07:12:54', 27, 'CH-2990', 0),
-(81, 'Allaiza', '', '', '2024-05-16', 'Female', 'Talaba 1, City of Bacoor', 'Christian', NULL, NULL, '2026-07-18 07:17:23', 27, 'CH-9571', 0),
-(82, 'Mitch', '', 'Pacinio', '2024-04-10', 'Female', 'Talaba 4', 'Roman Catholic', NULL, NULL, '2026-07-18 08:34:25', 29, 'CH-5163', 0),
-(83, 'Miles', '', 'Perez', '2026-12-08', 'Female', 'Talaba 4', 'Roman Catholic', NULL, NULL, '2026-07-18 08:36:47', 29, 'CH-4945', 0),
-(84, 'Rachel', '', 'Rosal', '2026-02-14', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-18 08:55:46', 32, 'CH-4749', 0),
-(85, 'Loraiine', '', 'Palenzuela', '2024-06-17', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-18 08:56:19', 32, 'CH-1987', 0),
-(86, 'Francis', '', 'Rosaros', '2023-04-14', 'Male', 'Molino I, Bacoor', 'Baptist', NULL, NULL, '2026-07-18 08:56:49', 32, 'CH-4307', 0),
-(87, 'Renz', '', 'Sarmiento', '2025-02-06', 'Male', 'Aniban I, Bacoor', 'Christian', NULL, NULL, '2026-07-18 08:57:32', 32, 'CH-1072', 0),
-(88, 'Benmar', '', 'Rivera', '2023-01-20', 'Male', 'Aniban I, Bacoor', 'Iglesia ni Cristo', NULL, NULL, '2026-07-18 08:58:58', 32, 'CH-2873', 0),
-(89, 'John', 'Michael', 'Santos', '2025-01-18', 'Male', 'Aniban I, Bacoor', 'Christian', NULL, NULL, '2026-07-18 09:00:18', 32, 'CH-8893', 0),
-(90, 'Jhames', '', 'Ryan', '2025-02-18', 'Male', 'Aniban I, Bacoor', 'Born Again Christian', NULL, NULL, '2026-07-18 09:01:18', 32, 'CH-8095', 0),
-(91, 'Andrea', '', 'Santos', '2023-01-22', 'Female', 'Molino 2, Bacoor', 'Islam', NULL, NULL, '2026-07-18 09:01:52', 32, 'CH-7642', 0),
-(92, 'Kiko', '', 'Pangilinan', '2024-02-18', 'Male', 'Molino 2, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-18 09:02:22', 32, 'CH-3957', 0),
-(93, 'Mica', '', 'Miranda', '2023-12-02', 'Female', 'Aniban I, Bacoor', 'Islam', NULL, NULL, '2026-07-18 09:03:23', 32, 'CH-7390', 0),
-(94, 'Sharmaine', '', 'Romero', '2026-03-12', 'Female', 'Alima 1', 'Islam', NULL, NULL, '2026-07-18 09:27:26', 33, 'CH-9874', 0),
-(95, 'Marie', '', 'Mar', '2025-12-16', 'Female', 'Alima 1', 'Christian', NULL, NULL, '2026-07-18 09:28:06', 33, 'CH-6089', 0),
-(96, 'EA', 'Osorio', 'Deguzman', '2025-06-12', 'Male', 'Maliksi 3, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-20 11:03:09', 27, 'CH-5067', 0),
-(97, 'ariston', 'leo', 'pedroso', '2024-06-04', 'Male', 'Bayan Luma IV, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-24 13:55:47', 25, 'CH-3833', 0),
-(98, 'Miguel', 'Santos', 'Dela Cruz', '2023-03-08', 'Male', 'Blk 5 Lot 12, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:26:41', 36, 'CH-9269', 0),
-(99, 'Sofia', 'Ramos', 'Gonzales', '2022-10-28', 'Female', 'Purok 2, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:27:32', 36, 'CH-6790', 0),
-(100, 'Ethan', 'Cruz', 'Villanueva', '2021-09-25', 'Male', 'Villanueva', 'Iglesia ni Cristo', NULL, NULL, '2026-07-25 05:28:07', 36, 'CH-3592', 0),
-(101, 'Ysabel', 'Marie', 'Fernandez', '2024-10-16', 'Female', 'Purok 4, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:28:39', 36, 'CH-3672', 0),
-(102, 'Gabriel', 'Torres', 'Aquino', '2023-03-10', 'Male', 'Blk 2 Lot 9, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:29:17', 36, 'CH-4245', 0),
-(103, 'Althea', 'Mae', 'Reyes', '2023-04-19', 'Female', 'Purok 1, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:29:51', 36, 'CH-4518', 0),
-(104, 'Joshua', 'Bautista', 'Santos', '2022-12-14', 'Male', 'Blk 6 Lot 15, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:30:32', 36, 'CH-5402', 0),
-(105, 'Nicole', 'Anne', 'Mendoza', '2024-06-25', 'Female', 'Purok 3, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:31:04', 36, 'CH-5748', 0),
-(106, 'Rafael', 'Domingo', 'Pascual', '2023-06-28', 'Male', 'Blk 9 Lot 4, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:31:39', 36, 'CH-1188', 0),
-(107, 'Zoe', 'Isabel', 'Navarro', '2023-07-11', 'Female', 'Purok 5, Talaba I, Bacoor, Cavite', 'Born Again Christian', NULL, NULL, '2026-07-25 05:32:12', 36, 'CH-9635', 0),
-(108, 'Renz', 'Lim', 'Cullen', '2024-05-23', 'Male', 'Blk 9 Lot 10, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, '2026-07-25 05:33:18', 36, 'CH-6268', 0),
-(109, 'julia', '', 'montes', '2023-06-13', 'Female', 'Molino 5, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-25 08:12:17', 35, 'CH-9440', 0),
-(110, 'asdasd', 'asdasd', 'dasd', '2023-06-14', 'Female', 'asdasdasd', 'Roman Catholic', NULL, NULL, '2026-07-25 08:15:57', 35, 'CH-1696', 0),
-(111, 'julia', '', 'benigno', '2023-05-18', 'Female', 'Molino 2, Bacoor', 'Roman Catholic', NULL, NULL, '2026-07-25 08:22:05', 35, 'CH-5503', 0);
+INSERT INTO `children` (`child_id`, `first_name`, `middle_name`, `last_name`, `birthdate`, `sex`, `address`, `religion`, `first_language`, `second_language`, `is_registered`, `mother_name`, `mother_occupation`, `mother_address`, `mother_contact_home`, `mother_contact_work`, `father_name`, `father_occupation`, `father_address`, `father_contact_home`, `father_contact_work`, `emergency_contact_name`, `emergency_contact_relationship`, `emergency_contact_home`, `emergency_contact_work`, `guardian_name`, `contact_number`, `created_at`, `cdc_id`, `access_code`, `is_deleted`, `deleted_by`, `deleted_at`, `birth_order`, `born_at`, `has_eccd_card`, `has_mother_child_book`, `has_other_health_record`, `vaccine_bcg`, `vaccine_dpt`, `vaccine_opv`, `vaccine_hepab`, `vaccine_measles`, `vaccine_others_name`, `vaccine_others_status`, `deformity_hare_lip`, `deformity_cross_eyed`, `deformity_deaf`, `deformity_blind`, `deformity_disabled_leg`, `deformity_disabled_arm_hand`, `deformity_fingers_toes`, `problem_behavior`, `problem_speaking`, `problem_hearing`, `problem_vision`, `is_left_handed`, `learns_at_home_with`, `plays_with_older_siblings`, `plays_with_younger_siblings`, `plays_with_neighbors`, `has_meal_before_school`, `food_normally_eaten`, `has_baon`, `travel_time_to_dcc_minutes`, `travel_mode_to_dcc`, `travel_time_to_ncdc_minutes`, `travel_mode_to_ncdc`, `public_transport_type`, `goes_to_school_with`, `siblings_info`, `eccd_experience_info`, `birth_registered`, `no_of_siblings`, `birthplace`, `ethnicity`, `breastfeeding_status`, `breastfeeding_type`, `breastfed_months`, `supplementary_feeding_days`, `has_disability_impairment`, `disability_referral_details`, `disability_impairment_info`, `is_listahanan_identified`, `is_pantawid_beneficiary`, `pantawid_household_id`, `participation_fee_paid_amount`, `parent_counterpart_type`, `school_year`, `scheduled_session`, `attendance_status`, `dropout_reason`, `dropout_reason_other`) VALUES
+(69, 'Angela', 'Reyes', 'Santos', '2022-06-15', 'Female', 'Aniban I, Bacoor', 'Christian', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:22:23', 25, 'CH-2263', 1, 52, '2026-08-05 16:33:13', NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(70, 'Joshua', 'Cruz', 'Mendoza', '2022-05-24', 'Male', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:23:04', 25, 'CH-8864', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(71, 'Camille', 'Lopez', 'Garcia', '2022-10-17', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:23:48', 25, 'CH-2423', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(72, 'Nathaniel', 'Ramos', 'Bautista', '2023-08-30', 'Male', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:24:21', 25, 'CH-6212', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(73, 'Sophia', 'Villanueva', 'Flores', '2023-10-31', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:24:54', 25, 'CH-7845', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(74, 'Maria', '', 'Santos', '2023-11-15', 'Female', 'Block 5 Lot 8, Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:27:29', 25, 'CH-2353', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(75, 'Gabriel', '', 'Perez', '2022-09-20', 'Male', 'Zapote III, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:28:02', 25, 'CH-2816', 1, 52, '2026-08-11 20:52:21', NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(76, 'Noah', '', 'Fernandez', '2023-08-22', 'Male', 'Block 8 Lot 7, Aniban I, Bacoor City', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:29:20', 25, 'CH-7144', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(77, 'Ava', '', 'Morales', '2022-12-19', 'Female', 'Narra Street, Aniban I, Bacoor City', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:29:52', 25, 'CH-5533', 1, 52, '2026-08-10 20:48:03', NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(78, 'Isabella', '', 'Lopez', '2022-01-25', 'Female', 'Phase 4, Ilang-Ilang St., Aniban I, Bacoor City', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-17 14:31:06', 25, 'CH-2349', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(79, 'Mari', '', 'Navales', '2023-09-27', 'Female', 'Palico 1, Imus', 'Iglesia ni Cristo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 06:22:31', 27, 'CH-7807', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(80, 'Jayvee', '', '', '2024-06-16', 'Female', 'Aniban II, Bacoor', 'Christian', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 07:12:54', 27, 'CH-2990', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(81, 'Allaiza', '', '', '2024-05-16', 'Female', 'Talaba 1, City of Bacoor', 'Christian', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 07:17:23', 27, 'CH-9571', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(82, 'Mitch', '', 'Pacinio', '2024-04-10', 'Female', 'Talaba 4', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 08:34:25', 29, 'CH-5163', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(83, 'Miles', '', 'Perez', '2026-12-08', 'Female', 'Talaba 4', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 08:36:47', 29, 'CH-4945', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(84, 'Rachel', '', 'Rosal', '2026-02-14', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 08:55:46', 32, 'CH-4749', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(85, 'Loraiine', '', 'Palenzuela', '2024-06-17', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 08:56:19', 32, 'CH-1987', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(86, 'Francis', '', 'Rosaros', '2023-04-14', 'Male', 'Molino I, Bacoor', 'Baptist', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 08:56:49', 32, 'CH-4307', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(87, 'Renz', '', 'Sarmiento', '2025-02-06', 'Male', 'Aniban I, Bacoor', 'Christian', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 08:57:32', 32, 'CH-1072', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(88, 'Benmar', '', 'Rivera', '2023-01-20', 'Male', 'Aniban I, Bacoor', 'Iglesia ni Cristo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 08:58:58', 32, 'CH-2873', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(89, 'John', 'Michael', 'Santos', '2025-01-18', 'Male', 'Aniban I, Bacoor', 'Christian', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 09:00:18', 32, 'CH-8893', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(90, 'Jhames', '', 'Ryan', '2025-02-18', 'Male', 'Aniban I, Bacoor', 'Born Again Christian', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 09:01:18', 32, 'CH-8095', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(91, 'Andrea', '', 'Santos', '2023-01-22', 'Female', 'Molino 2, Bacoor', 'Islam', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 09:01:52', 32, 'CH-7642', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(92, 'Kiko', '', 'Pangilinan', '2024-02-18', 'Male', 'Molino 2, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 09:02:22', 32, 'CH-3957', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(93, 'Mica', '', 'Miranda', '2023-12-02', 'Female', 'Aniban I, Bacoor', 'Islam', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 09:03:23', 32, 'CH-7390', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(94, 'Sharmaine', '', 'Romero', '2026-03-12', 'Female', 'Alima 1', 'Islam', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 09:27:26', 33, 'CH-9874', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(95, 'Marie', '', 'Mar', '2025-12-16', 'Female', 'Alima 1', 'Christian', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-18 09:28:06', 33, 'CH-6089', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(96, 'EA', 'Osorio', 'Deguzman', '2025-06-12', 'Male', 'Maliksi 3, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-20 11:03:09', 27, 'CH-5067', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(97, 'ariston', 'leo', 'pedroso', '2024-06-04', 'Male', 'Bayan Luma IV, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-24 13:55:47', 25, 'CH-3833', 1, 52, '2026-08-06 22:06:13', NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(98, 'Miguel', 'Santos', 'Dela Cruz', '2023-03-08', 'Male', 'Blk 5 Lot 12, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:26:41', 36, 'CH-9269', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(99, 'Sofia', 'Ramos', 'Gonzales', '2022-10-28', 'Female', 'Purok 2, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:27:32', 36, 'CH-6790', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(100, 'Ethan', 'Cruz', 'Villanueva', '2021-09-25', 'Male', 'Villanueva', 'Iglesia ni Cristo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:28:07', 36, 'CH-3592', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(101, 'Ysabel', 'Marie', 'Fernandez', '2024-10-16', 'Female', 'Purok 4, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:28:39', 36, 'CH-3672', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(102, 'Gabriel', 'Torres', 'Aquino', '2023-03-10', 'Male', 'Blk 2 Lot 9, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:29:17', 36, 'CH-4245', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(103, 'Althea', 'Mae', 'Reyes', '2023-04-19', 'Female', 'Purok 1, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:29:51', 36, 'CH-4518', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(104, 'Joshua', 'Bautista', 'Santos', '2022-12-14', 'Male', 'Blk 6 Lot 15, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:30:32', 36, 'CH-5402', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(105, 'Nicole', 'Anne', 'Mendoza', '2024-06-25', 'Female', 'Purok 3, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:31:04', 36, 'CH-5748', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(106, 'Rafael', 'Domingo', 'Pascual', '2023-06-28', 'Male', 'Blk 9 Lot 4, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:31:39', 36, 'CH-1188', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(107, 'Zoe', 'Isabel', 'Navarro', '2023-07-11', 'Female', 'Purok 5, Talaba I, Bacoor, Cavite', 'Born Again Christian', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:32:12', 36, 'CH-9635', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(108, 'Renz', 'Lim', 'Cullen', '2024-05-23', 'Male', 'Blk 9 Lot 10, Talaba I, Bacoor, Cavite', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 05:33:18', 36, 'CH-6268', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(109, 'julia', '', 'montes', '2023-06-13', 'Female', 'Molino 5, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 08:12:17', 35, 'CH-9440', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(110, 'asdasd', 'asdasd', 'dasd', '2023-06-14', 'Female', 'asdasdasd', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 08:15:57', 35, 'CH-1696', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(111, 'julia', '', 'benigno', '2023-05-18', 'Female', 'Molino 2, Bacoor', 'Roman Catholic', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-07-25 08:22:05', 35, 'CH-5503', 0, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(112, 'Ben', 'Pereo', 'Hidalgo', '2023-06-13', 'Male', 'Aniban I, Bacoor', 'Roman Catholic', 'Pangasinan', 'Kapampangan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-17 08:12:34', 25, 'CH-6395', 0, NULL, NULL, NULL, 'Hospital', 0, 0, NULL, 'Yes', 'Yes', 'Yes', NULL, NULL, NULL, 'Yes', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(113, 'miles', 'Ocampo', 'Perez', '2023-06-13', 'Female', 'Aniban I, Bacoor', 'Born Again Christian', NULL, NULL, 'Yes', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-09-18 05:03:08', 25, 'CH-2875', 0, NULL, NULL, 1, 'Hospital', 0, 1, NULL, 'Don\'t Know', 'Don\'t Know', 'Don\'t Know', 'Don\'t Know', 'Don\'t Know', NULL, NULL, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 'Yes', 'Mother/Father/Both', 'Sometimes', 'Always', 'Always', 'Always', 'Chicken', NULL, 20, 'Walking', 11, 'Walking', 'School bus', 'Mother', NULL, 'Nursery: Private Day Care; Kindergarten: Private Day Care; Preparatory: Private Day Care', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(116, 'helena', 'mary', 'cruz', '2021-06-15', 'Female', 'Aniban I, Bacoor', 'Roman Catholic', 'Tagalog', 'Bisaya/Cebuano', 'Yes', 'julia', 'Business owner', 'Aniban I', '09181234565', '09181234567', NULL, NULL, NULL, NULL, NULL, 'Toto Cruz', 'Father', '09181234565', '09181234565', NULL, NULL, '2026-09-25 04:58:03', 25, 'CH-1677', 0, NULL, NULL, 2, 'Hospital', 1, 0, NULL, 'Don\'t Know', 'Don\'t Know', 'Don\'t Know', 'Don\'t Know', 'Don\'t Know', NULL, 'Yes', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 'Mother/Father/Both', NULL, NULL, NULL, 'Most of the time', 'Fruits, Cereals', 'Food', 10, 'Walking', 10, 'Walking', 'Tricycle, Pedicab', 'Mother', NULL, 'Nursery: Public Day Care\r\nKindergarten: Public Day Care\r\nPreparatory: Public Day Care', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(117, 'Lei', 'Olongapo', 'Reyes', '2024-06-04', 'Female', 'Bayan Luma IV, Bacoor', 'Roman Catholic', 'Tagalog', 'Bisaya/Cebuano', 'Yes', '', '', '', '', '', 'Lucio', 'Construction Worker', 'Bayan Luma IV, Bacoor', '09123456789', '09123456777', 'Lucio Alberio', 'Father', '09123456789', '09123456777', NULL, NULL, '2026-09-28 03:25:29', 39, 'CH-8644', 0, NULL, NULL, 3, 'Hospital', 1, 1, NULL, 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', NULL, 'Don\'t Know', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Tricycle', 'Mother', 'Rio Alberio / Elementary', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -279,25 +385,55 @@ CREATE TABLE `child_health_information` (
   `allergies` text DEFAULT NULL,
   `comorbidities` text DEFAULT NULL,
   `medical_history_file_path` varchar(255) DEFAULT NULL,
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `born_at` enum('Hospital','Health Center','Home') DEFAULT NULL,
+  `learns_at_home_with` varchar(255) DEFAULT NULL,
+  `plays_with_older_siblings` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `plays_with_younger_siblings` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `plays_with_neighbors` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `has_meal_before_school` enum('Always','Most of the time','Sometimes','Rarely','Never') DEFAULT NULL,
+  `food_normally_eaten` varchar(255) DEFAULT NULL,
+  `has_baon` enum('Money','Food','Both','None','Don''t Know') DEFAULT NULL,
+  `travel_time_to_dcc_minutes` int(11) DEFAULT NULL,
+  `travel_mode_to_dcc` enum('Walking','Private Vehicle','Public Transportation') DEFAULT NULL,
+  `travel_time_to_ncdc_minutes` int(11) DEFAULT NULL,
+  `travel_mode_to_ncdc` enum('Walking','Private Vehicle','Public Transportation') DEFAULT NULL,
+  `public_transport_type` varchar(255) DEFAULT NULL,
+  `goes_to_school_with` varchar(255) DEFAULT NULL,
+  `has_eccd_card` tinyint(1) DEFAULT NULL,
+  `has_mother_child_book` tinyint(1) DEFAULT NULL,
+  `has_other_health_record` varchar(150) DEFAULT NULL,
+  `vaccine_bcg` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_dpt` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_opv` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_hepab` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_measles` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_others_name` varchar(100) DEFAULT NULL,
+  `vaccine_others_status` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `is_left_handed` enum('Yes','No') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `child_health_information`
 --
 
-INSERT INTO `child_health_information` (`health_info_id`, `child_id`, `vaccination_card_file_path`, `allergies`, `comorbidities`, `medical_history_file_path`, `updated_at`) VALUES
-(52, 75, '../uploads/1784305525_vacc_example_of_vaccination_card.jpg', 'Yes - Seafood', 'Yes - Asthma', '../uploads/1784305525_med_example_of_medical_history.jpg', '2026-07-17 16:25:44'),
-(53, 79, '', 'sea foods', '', '', '2026-07-18 06:22:31'),
-(54, 80, '', 'None', '', '', '2026-07-18 07:12:54'),
-(55, 81, '', 'None', '', '', '2026-07-18 07:17:23'),
-(56, 96, '', '', '', '', '2026-07-20 11:03:43'),
-(57, 108, '', '', '', '', '2026-07-25 05:34:19'),
-(58, 107, '', '', '', '', '2026-07-25 05:42:02'),
-(59, 104, '../uploads/1784964123_vacc_example_of_vaccination_card.jpg', 'Yes - Peanut', 'Yes - Asthma', '../uploads/1784964123_med_example_of_medical_history.jpg', '2026-07-25 07:22:36'),
-(60, 109, '', 'Yes - Milk', 'Yes - Asthma', '', '2026-07-25 08:12:17'),
-(61, 110, '', 'asdasd', 'asdasd', '', '2026-07-25 08:15:57'),
-(62, 111, '../uploads/1784967959_vacc_example_of_vaccination_card.jpg', 'Yes - Peanut', 'Yes - Asthma', '../uploads/1784967959_med_example_of_medical_history.jpg', '2026-07-25 08:26:20');
+INSERT INTO `child_health_information` (`health_info_id`, `child_id`, `vaccination_card_file_path`, `allergies`, `comorbidities`, `medical_history_file_path`, `updated_at`, `born_at`, `learns_at_home_with`, `plays_with_older_siblings`, `plays_with_younger_siblings`, `plays_with_neighbors`, `has_meal_before_school`, `food_normally_eaten`, `has_baon`, `travel_time_to_dcc_minutes`, `travel_mode_to_dcc`, `travel_time_to_ncdc_minutes`, `travel_mode_to_ncdc`, `public_transport_type`, `goes_to_school_with`, `has_eccd_card`, `has_mother_child_book`, `has_other_health_record`, `vaccine_bcg`, `vaccine_dpt`, `vaccine_opv`, `vaccine_hepab`, `vaccine_measles`, `vaccine_others_name`, `vaccine_others_status`, `is_left_handed`) VALUES
+(52, 75, '../uploads/1784305525_vacc_example_of_vaccination_card.jpg', 'Yes - Seafood', 'Yes - Asthma', '../uploads/1784305525_med_example_of_medical_history.jpg', '2026-07-17 16:25:44', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(53, 79, '', 'sea foods', '', '', '2026-07-18 06:22:31', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(54, 80, '', 'None', '', '', '2026-07-18 07:12:54', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(55, 81, '', 'None', '', '', '2026-07-18 07:17:23', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(56, 96, '', '', '', '', '2026-07-20 11:03:43', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(57, 108, '', '', '', '', '2026-07-25 05:34:19', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(58, 107, '', '', '', '', '2026-07-25 05:42:02', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(59, 104, '../uploads/1784964123_vacc_example_of_vaccination_card.jpg', 'Yes - Peanut', 'Yes - Asthma', '../uploads/1784964123_med_example_of_medical_history.jpg', '2026-07-25 07:22:36', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(60, 109, '', 'Yes - Milk', 'Yes - Asthma', '', '2026-07-25 08:12:17', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(61, 110, '', 'asdasd', 'asdasd', '', '2026-07-25 08:15:57', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(62, 111, '../uploads/1784967959_vacc_example_of_vaccination_card.jpg', 'Yes - Peanut', 'Yes - Asthma', '../uploads/1784967959_med_example_of_medical_history.jpg', '2026-07-25 08:26:20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(63, 113, '', '', '', '', '2026-09-18 05:17:28', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(64, 112, '', '', '', '', '2026-09-24 10:40:38', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(65, 116, '', '', '', '', '2026-09-26 14:12:53', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(66, 70, '', '', '', '', '2026-09-27 15:52:57', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(67, 117, '', '', '', '', '2026-09-28 03:39:07', 'Hospital', '', 'Always', 'Always', 'Always', 'Always', '', 'Money', NULL, 'Walking', NULL, 'Walking', '', '', 0, 1, '', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', '', 'Yes', 'No');
 
 -- --------------------------------------------------------
 
@@ -318,21 +454,91 @@ CREATE TABLE `child_health_information_requests` (
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `reviewed_by` int(11) DEFAULT NULL,
   `reviewed_at` datetime DEFAULT NULL,
-  `review_remarks` text DEFAULT NULL
+  `review_remarks` text DEFAULT NULL,
+  `birth_order` int(11) DEFAULT NULL,
+  `born_at` enum('Hospital','Health Center','Home') DEFAULT NULL,
+  `siblings_info` text DEFAULT NULL,
+  `eccd_experience_info` text DEFAULT NULL,
+  `learns_at_home_with` varchar(255) DEFAULT NULL,
+  `plays_with_older_siblings` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `plays_with_younger_siblings` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `plays_with_neighbors` enum('Always','Sometimes','Rarely','Never') DEFAULT NULL,
+  `has_meal_before_school` enum('Always','Most of the time','Sometimes','Rarely','Never') DEFAULT NULL,
+  `food_normally_eaten` varchar(255) DEFAULT NULL,
+  `has_baon` enum('Money','Food','Both','None','Don''t Know') DEFAULT NULL,
+  `travel_time_to_dcc_minutes` int(11) DEFAULT NULL,
+  `travel_mode_to_dcc` enum('Walking','Private Vehicle','Public Transportation') DEFAULT NULL,
+  `travel_time_to_ncdc_minutes` int(11) DEFAULT NULL,
+  `travel_mode_to_ncdc` enum('Walking','Private Vehicle','Public Transportation') DEFAULT NULL,
+  `public_transport_type` varchar(255) DEFAULT NULL,
+  `goes_to_school_with` varchar(255) DEFAULT NULL,
+  `has_eccd_card` tinyint(1) DEFAULT NULL,
+  `has_mother_child_book` tinyint(1) DEFAULT NULL,
+  `has_other_health_record` varchar(150) DEFAULT NULL,
+  `vaccine_bcg` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_dpt` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_opv` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_hepab` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_measles` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `vaccine_others_name` varchar(100) DEFAULT NULL,
+  `vaccine_others_status` enum('Yes','No','Don''t Know') DEFAULT NULL,
+  `is_left_handed` enum('Yes','No') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `child_health_information_requests`
 --
 
-INSERT INTO `child_health_information_requests` (`request_id`, `child_id`, `guardian_id`, `vaccination_card_file_path`, `medical_history`, `medical_history_file_path`, `allergies`, `comorbidities`, `status`, `submitted_at`, `reviewed_by`, `reviewed_at`, `review_remarks`) VALUES
-(11, 75, 54, '../uploads/1784305440_vacc_example_of_vaccination_card.jpg', '', '', 'Yes - Egg', 'Yes - Anemia', 'Rejected', '2026-07-17 16:24:00', 52, '2026-07-18 00:24:37', 'Incomplete or missing required information'),
-(12, 75, 54, '../uploads/1784305525_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784305525_med_example_of_medical_history.jpg', 'Yes - Seafood', 'Yes - Asthma', 'Approved', '2026-07-17 16:25:25', 52, '2026-07-18 00:25:44', NULL),
-(13, 104, 69, '../uploads/1784963998_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784963998_med_example_of_medical_history.jpg', 'Yes - Seafood', 'Yes - Asthma', 'Rejected', '2026-07-25 07:19:58', 67, '2026-07-25 15:20:23', 'Incomplete or missing required information'),
-(14, 104, 69, '../uploads/1784964050_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784964050_med_example_of_medical_history.jpg', '', '', 'Rejected', '2026-07-25 07:20:50', 67, '2026-07-25 15:21:26', 'please ppaki specify ppo'),
-(15, 104, 69, '../uploads/1784964123_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784964123_med_example_of_medical_history.jpg', 'Yes - Peanut', 'Yes - Asthma', 'Approved', '2026-07-25 07:22:03', 67, '2026-07-25 15:22:36', NULL),
-(16, 111, 70, '../uploads/1784967849_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784967849_med_example_of_medical_history.jpg', 'Yes - Peanut', 'Yes - Asthma', 'Rejected', '2026-07-25 08:24:09', 68, '2026-07-25 16:25:25', 'Incomplete or missing required information'),
-(17, 111, 70, '../uploads/1784967959_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784967959_med_example_of_medical_history.jpg', 'Yes - Peanut', 'Yes - Asthma', 'Approved', '2026-07-25 08:25:59', 68, '2026-07-25 16:26:20', NULL);
+INSERT INTO `child_health_information_requests` (`request_id`, `child_id`, `guardian_id`, `vaccination_card_file_path`, `medical_history`, `medical_history_file_path`, `allergies`, `comorbidities`, `status`, `submitted_at`, `reviewed_by`, `reviewed_at`, `review_remarks`, `birth_order`, `born_at`, `siblings_info`, `eccd_experience_info`, `learns_at_home_with`, `plays_with_older_siblings`, `plays_with_younger_siblings`, `plays_with_neighbors`, `has_meal_before_school`, `food_normally_eaten`, `has_baon`, `travel_time_to_dcc_minutes`, `travel_mode_to_dcc`, `travel_time_to_ncdc_minutes`, `travel_mode_to_ncdc`, `public_transport_type`, `goes_to_school_with`, `has_eccd_card`, `has_mother_child_book`, `has_other_health_record`, `vaccine_bcg`, `vaccine_dpt`, `vaccine_opv`, `vaccine_hepab`, `vaccine_measles`, `vaccine_others_name`, `vaccine_others_status`, `is_left_handed`) VALUES
+(11, 75, 54, '../uploads/1784305440_vacc_example_of_vaccination_card.jpg', '', '', 'Yes - Egg', 'Yes - Anemia', 'Rejected', '2026-07-17 16:24:00', 52, '2026-07-18 00:24:37', 'Incomplete or missing required information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(12, 75, 54, '../uploads/1784305525_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784305525_med_example_of_medical_history.jpg', 'Yes - Seafood', 'Yes - Asthma', 'Approved', '2026-07-17 16:25:25', 52, '2026-07-18 00:25:44', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(13, 104, 69, '../uploads/1784963998_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784963998_med_example_of_medical_history.jpg', 'Yes - Seafood', 'Yes - Asthma', 'Rejected', '2026-07-25 07:19:58', 67, '2026-07-25 15:20:23', 'Incomplete or missing required information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(14, 104, 69, '../uploads/1784964050_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784964050_med_example_of_medical_history.jpg', '', '', 'Rejected', '2026-07-25 07:20:50', 67, '2026-07-25 15:21:26', 'please ppaki specify ppo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(15, 104, 69, '../uploads/1784964123_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784964123_med_example_of_medical_history.jpg', 'Yes - Peanut', 'Yes - Asthma', 'Approved', '2026-07-25 07:22:03', 67, '2026-07-25 15:22:36', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(16, 111, 70, '../uploads/1784967849_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784967849_med_example_of_medical_history.jpg', 'Yes - Peanut', 'Yes - Asthma', 'Rejected', '2026-07-25 08:24:09', 68, '2026-07-25 16:25:25', 'Incomplete or missing required information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(17, 111, 70, '../uploads/1784967959_vacc_example_of_vaccination_card.jpg', '', '../uploads/1784967959_med_example_of_medical_history.jpg', 'Yes - Peanut', 'Yes - Asthma', 'Approved', '2026-07-25 08:25:59', 68, '2026-07-25 16:26:20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(18, 77, 53, '../uploads/1785712421_vacc_example_of_vaccination_card.jpg', '', '../uploads/1785712421_med_example_of_medical_history.jpg', '', '', 'Rejected', '2026-08-02 23:13:41', 52, '2026-08-03 07:16:32', 'Incomplete or missing required information', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(19, 75, 54, '', '', '', 'Yes - Insect Bite', 'No', 'Pending', '2026-09-24 22:11:48', NULL, NULL, NULL, 12, '', '', '', '', 'Always', 'Always', 'Never', '', '', '', NULL, '', NULL, '', '', '', 0, 0, '', '', '', '', '', '', '', '', ''),
+(20, 70, 64, '', '', '', 'No', 'No', 'Rejected', '2026-09-24 22:13:31', 52, '2026-09-25 06:14:35', 'Submitted information does not match the child\'s records', 2, 'Hospital', 'alexia', '', '', 'Always', 'Never', 'Sometimes', 'Most of the time', '', 'Money', NULL, '', NULL, '', '', '', 0, 0, '', 'Yes', 'Yes', 'Yes', 'No', 'Yes', '', 'Yes', ''),
+(21, 117, 77, NULL, NULL, NULL, NULL, NULL, 'Approved', '2026-09-28 03:38:38', 76, '2026-09-28 11:39:07', NULL, 3, 'Hospital', 'Rio Alberio / Elementary', '', '', 'Always', 'Always', 'Always', 'Always', '', 'Money', NULL, 'Walking', NULL, 'Walking', '', '', 0, 1, '', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes', '', 'Yes', 'No');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `child_intake_requests`
+--
+
+CREATE TABLE `child_intake_requests` (
+  `request_id` int(11) NOT NULL,
+  `child_id` int(11) NOT NULL,
+  `guardian_id` int(11) NOT NULL,
+  `birth_registered` enum('Yes','No') DEFAULT NULL,
+  `no_of_siblings` int(11) DEFAULT NULL,
+  `birthplace` varchar(255) DEFAULT NULL,
+  `ethnicity` varchar(100) DEFAULT NULL,
+  `breastfeeding_status` enum('Yes','No') DEFAULT NULL,
+  `breastfeeding_type` enum('Exclusive','Mixed') DEFAULT NULL,
+  `breastfed_months` int(11) DEFAULT NULL,
+  `supplementary_feeding_days` int(11) DEFAULT NULL,
+  `has_disability_impairment` enum('Yes','No') DEFAULT NULL,
+  `disability_referral_details` text DEFAULT NULL,
+  `disability_impairment_info` text DEFAULT NULL,
+  `is_listahanan_identified` tinyint(1) DEFAULT 0,
+  `is_pantawid_beneficiary` tinyint(1) DEFAULT 0,
+  `pantawid_household_id` varchar(100) DEFAULT NULL,
+  `participation_fee_paid_amount` decimal(10,2) DEFAULT NULL,
+  `parent_counterpart_type` enum('Cash','In Kind','None','Cash/In Kind') DEFAULT NULL,
+  `school_year` varchar(20) DEFAULT NULL,
+  `scheduled_session` enum('Morning','Afternoon') DEFAULT NULL,
+  `attendance_status` enum('Continuing','Dropped Out','Graduated') DEFAULT NULL,
+  `dropout_reason` enum('Illness','Transfer of Residence','Others') DEFAULT NULL,
+  `dropout_reason_other` varchar(255) DEFAULT NULL,
+  `status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
+  `submitted_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `reviewed_by` int(11) DEFAULT NULL,
+  `reviewed_at` datetime DEFAULT NULL,
+  `review_remarks` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -365,9 +571,9 @@ INSERT INTO `deworming_records` (`deworm_id`, `child_id`, `deworming_date`, `att
 (63, 71, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-07-17 14:49:17', 0),
 (64, 78, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-07-17 14:49:17', 0),
 (65, 70, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-07-17 14:49:17', 0),
-(66, 77, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-07-17 14:49:17', 0),
-(67, 75, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-07-17 14:49:17', 0),
-(68, 69, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-07-17 14:49:17', 0),
+(66, 77, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-08-10 12:48:03', 1),
+(67, 75, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-08-11 12:52:21', 1),
+(68, 69, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-08-05 08:33:13', 1),
 (69, 74, '2026-07-14', 'Taken', 'Albendazole', '400mg', 'Taken', 52, '2026-07-17 14:49:17', '2026-07-17 14:49:17', 0),
 (70, 93, '2026-02-18', 'Taken', 'albendazole', '400mg', 'Taken', 61, '2026-07-18 09:15:55', '2026-07-18 09:15:55', 0),
 (71, 85, '2026-02-18', 'Taken', 'albendazole', '400mg', 'Taken', 61, '2026-07-18 09:15:55', '2026-07-18 09:15:55', 0),
@@ -436,50 +642,50 @@ CREATE TABLE `feeding_records` (
 --
 
 INSERT INTO `feeding_records` (`feeding_record_id`, `child_id`, `feeding_date`, `attendance`, `remarks`, `recorded_by`, `created_at`, `updated_at`, `is_deleted`) VALUES
-(147, 69, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
-(148, 77, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
+(147, 69, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-08-05 08:33:13', 1),
+(148, 77, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-08-10 12:48:03', 1),
 (149, 71, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
-(150, 75, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
+(150, 75, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-08-11 12:52:21', 1),
 (151, 78, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
 (152, 70, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
 (153, 74, '2026-07-06', 'Present', 'N/A', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
 (154, 72, '2026-07-06', 'Absent', 'Absent', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
 (155, 76, '2026-07-06', 'Absent', 'Absent', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
 (156, 73, '2026-07-06', 'Absent', 'Absent', 52, '2026-07-17 14:34:12', '2026-07-17 14:34:12', 0),
-(157, 69, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
-(158, 77, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
+(157, 69, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-08-05 08:33:13', 1),
+(158, 77, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-08-10 12:48:03', 1),
 (159, 71, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
-(160, 75, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
+(160, 75, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-08-11 12:52:21', 1),
 (161, 78, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
 (162, 70, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
 (163, 74, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
 (164, 72, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
 (165, 76, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
 (166, 73, '2026-07-07', 'Present', 'Finished', 52, '2026-07-17 14:35:52', '2026-07-17 14:35:52', 0),
-(167, 69, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
-(168, 77, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
+(167, 69, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-08-05 08:33:13', 1),
+(168, 77, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-08-10 12:48:03', 1),
 (169, 71, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
-(170, 75, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
+(170, 75, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-08-11 12:52:21', 1),
 (171, 78, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
 (172, 70, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
 (173, 74, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
 (174, 72, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
 (175, 76, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
 (176, 73, '2026-07-08', 'Present', 'Finished', 52, '2026-07-17 14:38:09', '2026-07-17 14:38:09', 0),
-(177, 69, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
-(178, 77, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
+(177, 69, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-08-05 08:33:13', 1),
+(178, 77, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-08-10 12:48:03', 1),
 (179, 71, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
-(180, 75, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
+(180, 75, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-08-11 12:52:21', 1),
 (181, 78, '2026-07-09', 'Absent', 'Absent', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
 (182, 70, '2026-07-09', 'Absent', 'Absent', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
 (183, 74, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
 (184, 72, '2026-07-09', 'Absent', 'Absent', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
 (185, 76, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
 (186, 73, '2026-07-09', 'Present', 'Finished', 52, '2026-07-17 14:40:32', '2026-07-17 14:40:32', 0),
-(187, 69, '2026-07-10', 'Present', 'Finished', 52, '2026-07-17 14:41:14', '2026-07-17 14:41:14', 0),
-(188, 77, '2026-07-10', 'Present', 'Finished', 52, '2026-07-17 14:41:14', '2026-07-17 14:41:14', 0),
+(187, 69, '2026-07-10', 'Present', 'Finished', 52, '2026-07-17 14:41:14', '2026-08-05 08:33:13', 1),
+(188, 77, '2026-07-10', 'Present', 'Finished', 52, '2026-07-17 14:41:14', '2026-08-10 12:48:03', 1),
 (189, 71, '2026-07-10', 'Present', 'Finished', 52, '2026-07-17 14:41:14', '2026-07-17 14:41:14', 0),
-(190, 75, '2026-07-10', 'Present', 'Finished', 52, '2026-07-17 14:41:14', '2026-07-17 14:41:14', 0),
+(190, 75, '2026-07-10', 'Present', 'Finished', 52, '2026-07-17 14:41:14', '2026-08-11 12:52:21', 1),
 (191, 78, '2026-07-10', 'Absent', 'Absent', 52, '2026-07-17 14:41:14', '2026-07-17 14:41:14', 0),
 (192, 70, '2026-07-10', 'Absent', 'Absent', 52, '2026-07-17 14:41:14', '2026-07-17 14:41:14', 0),
 (193, 74, '2026-07-10', 'Present', 'Finished', 52, '2026-07-17 14:41:14', '2026-07-17 14:41:14', 0),
@@ -1470,7 +1676,10 @@ INSERT INTO `guardians` (`guardian_id`, `child_id`, `user_id`, `first_name`, `mi
 (34, 70, 64, 'Filo', NULL, 'Mendoza', 'Uncle', '09173451122', 'filomendoza@gmail.com', 'Aniban II, Bacoor', NULL, '2026-07-22 12:16:30', '2026-07-22 12:16:30'),
 (35, 69, 65, 'fill', NULL, 'santos', 'Father', '09098847865', 'fillsantos@gmail.com', 'Molino 5, Bacoor', NULL, '2026-07-24 04:29:36', '2026-07-24 04:29:36'),
 (36, 104, 69, 'heaven', NULL, 'santos', 'Aunt', '09098847865', 'heavensantos@gmail.com', 'Bayan Luma IV, Bacoor', NULL, '2026-07-25 07:18:38', '2026-07-25 07:18:38'),
-(37, 111, 70, 'ernesto', NULL, 'benigno', 'Father', '09181234562', 'ernestobenigno@gmail.com', 'Aniban I, Bacoor', NULL, '2026-07-25 08:23:04', '2026-07-25 08:23:04');
+(37, 111, 70, 'ernesto', NULL, 'benigno', 'Father', '09181234562', 'ernestobenigno@gmail.com', 'Aniban I, Bacoor', NULL, '2026-07-25 08:23:04', '2026-07-25 08:23:04'),
+(38, 71, 71, 'elio', NULL, 'garcia', 'Uncle', '09098847865', 'eliogarcia@gmail.com', 'Aniban I, Bacoor', NULL, '2026-08-27 08:06:09', '2026-08-27 08:06:09'),
+(42, 116, 75, 'julia', NULL, 'cruz', 'Mother', '09181234565', 'juliacruz@gmail.com', 'Aniban I, Bacoor', '2026-09-25 05:04:17', '2026-09-25 05:04:17', '2026-09-25 05:04:17'),
+(43, 117, 77, 'Lucio', NULL, 'Alberio', 'Father', '09123456789', 'lucioalberio@gmail.com', 'Bayan Luma IV, Bacoor', '2026-09-28 03:34:15', '2026-09-28 03:34:15', '2026-09-28 03:34:15');
 
 -- --------------------------------------------------------
 
@@ -1587,9 +1796,9 @@ INSERT INTO `milk_feeding_records` (`milk_record_id`, `child_id`, `feeding_date`
 (144, 71, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-07-17 14:41:37', 0),
 (145, 78, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-07-17 14:41:37', 0),
 (146, 70, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-07-17 14:41:37', 0),
-(147, 77, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-07-17 14:41:37', 0),
-(148, 75, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-07-17 14:41:37', 0),
-(149, 69, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-07-17 14:41:37', 0),
+(147, 77, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-08-10 12:48:03', 1),
+(148, 75, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-08-11 12:52:21', 1),
+(149, 69, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-08-05 08:33:13', 1),
 (150, 74, '2026-07-06', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:37', '2026-07-17 14:41:37', 0),
 (151, 72, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
 (152, 76, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
@@ -1597,9 +1806,9 @@ INSERT INTO `milk_feeding_records` (`milk_record_id`, `child_id`, `feeding_date`
 (154, 71, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
 (155, 78, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
 (156, 70, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
-(157, 77, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
-(158, 75, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
-(159, 69, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
+(157, 77, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-08-10 12:48:03', 1),
+(158, 75, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-08-11 12:52:21', 1),
+(159, 69, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-08-05 08:33:13', 1),
 (160, 74, '2026-07-07', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:41:51', '2026-07-17 14:41:51', 0),
 (161, 72, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
 (162, 76, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
@@ -1607,9 +1816,9 @@ INSERT INTO `milk_feeding_records` (`milk_record_id`, `child_id`, `feeding_date`
 (164, 71, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
 (165, 78, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
 (166, 70, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
-(167, 77, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
-(168, 75, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
-(169, 69, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
+(167, 77, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-08-10 12:48:03', 1),
+(168, 75, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-08-11 12:52:21', 1),
+(169, 69, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-08-05 08:33:13', 1),
 (170, 74, '2026-07-08', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:09', '2026-07-17 14:42:09', 0),
 (171, 72, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
 (172, 76, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
@@ -1617,9 +1826,9 @@ INSERT INTO `milk_feeding_records` (`milk_record_id`, `child_id`, `feeding_date`
 (174, 71, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
 (175, 78, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
 (176, 70, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
-(177, 77, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
-(178, 75, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
-(179, 69, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
+(177, 77, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-08-10 12:48:03', 1),
+(178, 75, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-08-11 12:52:21', 1),
+(179, 69, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-08-05 08:33:13', 1),
 (180, 74, '2026-07-09', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:42:24', '2026-07-17 14:42:24', 0),
 (181, 72, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
 (182, 76, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
@@ -1627,9 +1836,9 @@ INSERT INTO `milk_feeding_records` (`milk_record_id`, `child_id`, `feeding_date`
 (184, 71, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
 (185, 78, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
 (186, 70, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
-(187, 77, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
-(188, 75, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
-(189, 69, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
+(187, 77, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-08-10 12:48:03', 1),
+(188, 75, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-08-11 12:52:21', 1),
+(189, 69, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-08-05 08:33:13', 1),
 (190, 74, '2026-07-10', 'Present', 'Whole Milk', '1 cup', 'Finished', 52, '2026-07-17 14:45:27', '2026-07-17 14:45:27', 0),
 (191, 93, '2026-02-18', 'Present', 'Whole Milk', '1/4 cup', 'Finished', 61, '2026-07-18 09:15:25', '2026-07-18 09:15:25', 0),
 (192, 85, '2026-02-18', 'Present', 'Whole Milk', '1/4 cup', 'Finished', 61, '2026-07-18 09:15:25', '2026-07-18 09:15:25', 0),
@@ -1701,7 +1910,10 @@ INSERT INTO `parent_child_links` (`link_id`, `parent_id`, `child_id`, `linked_at
 (31, 64, 70, '2026-07-22 12:16:30'),
 (32, 65, 69, '2026-07-24 04:29:36'),
 (33, 69, 104, '2026-07-25 07:18:38'),
-(34, 70, 111, '2026-07-25 08:23:04');
+(34, 70, 111, '2026-07-25 08:23:04'),
+(35, 71, 71, '2026-08-27 08:06:09'),
+(39, 75, 116, '2026-09-25 05:04:17'),
+(40, 77, 117, '2026-09-28 03:34:15');
 
 -- --------------------------------------------------------
 
@@ -1738,7 +1950,8 @@ INSERT INTO `referrals` (`referral_id`, `guidance_id`, `child_id`, `generated_by
 (12, 119, 72, 52, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', '', '2026-07-20', 'Sent', '2026-07-20 19:43:28', NULL, NULL, NULL, '2026-07-20 11:43:28', '2026-07-20 11:43:28'),
 (13, 120, 76, 52, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Social Welfare Office', '', '2026-07-21', 'Sent', '2026-07-21 20:33:21', NULL, NULL, NULL, '2026-07-21 12:33:21', '2026-07-21 12:33:21'),
 (14, 142, 69, 52, 'Overweight', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Services', 'oki', '2026-07-24', 'Viewed', '2026-07-24 12:31:15', '2026-07-24 12:31:32', NULL, NULL, '2026-07-24 04:31:15', '2026-07-24 04:31:32'),
-(15, 155, 111, 68, 'Moderately Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', 'hahahhaa', '2026-07-25', 'Viewed', '2026-07-25 16:41:46', '2026-07-25 16:41:57', NULL, NULL, '2026-07-25 08:41:46', '2026-07-25 08:41:57');
+(15, 155, 111, 68, 'Moderately Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', 'hahahhaa', '2026-07-25', 'Viewed', '2026-07-25 16:41:46', '2026-07-25 16:41:57', NULL, NULL, '2026-07-25 08:41:46', '2026-07-25 08:41:57'),
+(16, 143, 72, 52, 'Severely Wasted', 'Final Follow-up Reminder: Child still needs nutritional attention based on Endline assessment.', 'City Health Office', '', '2026-08-11', 'Sent', '2026-08-11 21:04:25', NULL, NULL, NULL, '2026-08-11 13:04:25', '2026-08-11 13:04:25');
 
 -- --------------------------------------------------------
 
@@ -1905,34 +2118,72 @@ CREATE TABLE `users` (
   `contact_number` varchar(20) DEFAULT NULL,
   `address` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `last_active` datetime DEFAULT NULL
+  `last_active` datetime DEFAULT NULL,
+  `sex` enum('Male','Female') DEFAULT NULL,
+  `birthday` date DEFAULT NULL,
+  `religion` varchar(100) DEFAULT NULL,
+  `ethnicity` varchar(100) DEFAULT NULL,
+  `civil_status` enum('Single','Married','Separated','Widow/Widower','Live-in') DEFAULT NULL,
+  `no_of_children` int(11) DEFAULT NULL,
+  `home_number` varchar(30) DEFAULT NULL,
+  `office_number` varchar(30) DEFAULT NULL,
+  `fax_number` varchar(30) DEFAULT NULL,
+  `educational_background` enum('Elementary Undergraduate','Elementary Graduate','High School Undergraduate','High School Graduate','College Undergraduate','College Graduate','With Masteral Units','Post Graduate','Vocational') DEFAULT NULL,
+  `degree` varchar(150) DEFAULT NULL,
+  `eligibility` varchar(255) DEFAULT NULL,
+  `eligibility_other` varchar(150) DEFAULT NULL,
+  `years_as_cdw` decimal(4,1) DEFAULT NULL,
+  `compensation_type` varchar(255) DEFAULT NULL,
+  `terms_of_employment` enum('Plantilla','Contract of Service','Casual','Co-Terminus w/ Hiring Authority','Voluntary') DEFAULT NULL,
+  `compensation_barangay_amount` decimal(10,2) DEFAULT NULL,
+  `compensation_city_amount` decimal(10,2) DEFAULT NULL,
+  `compensation_ngo_amount` decimal(10,2) DEFAULT NULL,
+  `compensation_parents_amount` decimal(10,2) DEFAULT NULL,
+  `compensation_source_other` varchar(150) DEFAULT NULL,
+  `compensation_source_other_amount` decimal(10,2) DEFAULT NULL,
+  `cdw_status` enum('Accredited','Not Accredited','Accredited but Expired') DEFAULT NULL,
+  `cdw_date_accredited` date DEFAULT NULL,
+  `cdw_accreditation_no` varchar(50) DEFAULT NULL,
+  `cdw_accreditation_level` enum('1','2','3') DEFAULT NULL,
+  `total_children_served` int(11) DEFAULT NULL,
+  `sessions_per_day` enum('1','2','3','4') DEFAULT NULL,
+  `hours_per_session` enum('1','2','2.5','3') DEFAULT NULL,
+  `age_of_children_handled` varchar(100) DEFAULT NULL,
+  `hours_staying_in_center` enum('1-2 hrs','2.5-3 hrs','4-5 hrs','6-7 hrs','8 hours') DEFAULT NULL,
+  `sessions_conducted_with` enum('With reference materials','Without reference materials') DEFAULT NULL,
+  `trainings_attended` text DEFAULT NULL,
+  `courses_attended` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `role_id`, `first_name`, `last_name`, `email`, `password`, `contact_number`, `address`, `created_at`, `last_active`) VALUES
-(1, 1, 'Admin', 'User', 'admin@gmail.com', '$2y$10$SmQayTFX.bE5RVii6Lr.5eDTogM5AP/cAwN4HXd8A1dfEbrPvwLnW', '09285567789', 'Niog II', '2026-03-25 22:04:10', '2026-07-25 16:47:29'),
-(52, 2, 'Anna', 'Natividad', 'annanatividad@gmail.com', '$2y$10$Mgs8FZUOx.qApKb8bk5tsevWJnNZv.SNsTj5ODSnEOyBFrUkqeUF.', '09050349835', 'Aniban II, Bacoor', '2026-07-17 14:20:33', '2026-07-25 14:57:35'),
-(53, 3, 'Pryx', 'Morales', 'pryxmorales@gmail.com', '$2y$10$uB2fOSXN92LUkFkddpAzsuY1XeS0N8wUp8K3YkSx0/HjmwdB7lRfK', '09181234562', 'Aniban I, Bacoor', '2026-07-17 15:36:05', '2026-07-17 23:49:47'),
-(54, 3, 'phoenix', 'perez', 'phoenixperez@gmail.com', '$2y$10$cBQ1eHXbRXMcmajF/0siMedx4pk1.kQXvKejgx8sL9rxS0udMOsIm', '09285567789', 'Aniban I, Bacoor', '2026-07-17 15:51:39', '2026-07-18 17:31:05'),
-(55, 2, 'Thea', 'Alberio', 'theaalberio@gmail.com', '$2y$10$IdStkSupwrPp4ZKhrxgJhePIxWoI/LWoqYbHCa0Sxx.lTtH8lg2G.', '09650547420', 'Palico 1, Imus', '2026-07-18 06:19:35', '2026-07-20 19:27:03'),
-(56, 3, 'Majorie', 'Cortez', 'marjcortez@gmail.com', '$2y$10$2upc/9GG/q/aXchrIBanse38yLcVWYPs8KPpbjqqNoJ4rjC6WMKlC', '09650547420', 'Palico 1, Imus', '2026-07-18 06:25:55', '2026-07-18 15:46:15'),
-(57, 2, 'Princess', 'Mendoza', 'princessmendoza@gmail.com', '$2y$10$elP2KLU/hBHgACP8wkKkQe1mT2eepjMRxA1Hi6.AbaLOoLJUCjf.q', '09123456789', 'Talaba 4', '2026-07-18 08:32:32', '2026-07-18 16:48:06'),
-(58, 3, 'Jessica', 'Perez', 'jessicaperez@gmail.com', '$2y$10$IvyNLaRgbQZUpukAMgAkyeLQ4Vu3uU2cDQFDX8.KWfwcy0BC/cH1K', '09173451122', 'Talaba 4', '2026-07-18 08:43:05', '2026-07-18 16:43:30'),
-(59, 2, 'Keanna', 'Montero', 'keannamontero@gmail.com', '$2y$10$ktTEkm3MBtfK/XrVcsX1eOfvNyU/34c5jP.GzzhmyvcQqKVllPLHq', '09123456789', 'Panapaan 3', '2026-07-18 08:46:49', NULL),
-(60, 2, 'Eric', 'Pelogo', 'ericpelogo@gmail.com', '$2y$10$1YSmk6FGRthlOSUQqVwWzetOC5kvV4zejlNO3o4dZTOGXTnjubZRm', '09285567789', 'Panapaan 3', '2026-07-18 08:47:57', NULL),
-(61, 2, 'dean', 'rosaros', 'deanrosaros@gmail.com', '$2y$10$c4l6gzp5DwA18mQbIwUN8.wp5m9T7siWWWs6p3tfBtwZc4WPuKuIK', '09972511791', 'Aniban I, Bacoor', '2026-07-18 08:54:09', '2026-07-18 17:19:02'),
-(62, 3, 'Rosita', 'sandilantan', 'rositasandilantan@gmail.com', '$2y$10$H5lcvZ63X825jcfSEd0Hx.qGCmgyYRdpf6ytyZBjNv5ocbq4sd0LK', '09181234562', 'Aniban II, Bacoor', '2026-07-18 09:20:26', '2026-07-18 17:20:58'),
-(63, 2, 'Angelo', 'Oroceo', 'angelooroceo@gmail.com', '$2y$10$1cEp0Qbzeu6Y4jSnLVacqeqgqk6W68DaVcpXLfr/OyTNcx4FniuYy', '09173451122', 'Molino 2, Bacoor', '2026-07-18 09:25:09', '2026-07-18 17:29:41'),
-(64, 3, 'Filo', 'Mendoza', 'filomendoza@gmail.com', '$2y$10$71kkgeJLNxzpBW1PPrXLceHz516KzGqRSCLttd0XeB3KmbdNg9p0W', '09173451122', 'Aniban II, Bacoor', '2026-07-22 12:16:30', '2026-07-24 12:26:49'),
-(65, 3, 'fill', 'santos', 'fillsantos@gmail.com', '$2y$10$0yFOjZp4sPrd2CLMBSnQdeKT0YFBE7ZU0gEMSYWiv56ZuHm18kh8q', '09098847865', 'Molino 5, Bacoor', '2026-07-24 04:29:36', '2026-07-25 13:12:20'),
-(66, 2, 'july', 'smith', 'julysmith@gmail.com', '$2y$10$ydJXPbD0xNi.CVXbPrhKkuhGX56P9m3cuJP0H3lz4QJtQ4GZpjzCK', '09285567789', 'Aniban I, Bacoor', '2026-07-24 14:14:16', '2026-07-25 14:57:45'),
-(67, 2, 'zai', 'akimoto', 'zaiakimoto@gmail.com', '$2y$10$EfuBkjy1vBvHEw6D23BDw.H0InrJL/ov3M6xENv3OSEGUu2dNFus2', '09285567700', 'Queen\'s Row Central Subd., Bacoor City, Cavite', '2026-07-25 05:24:10', '2026-07-25 15:52:41'),
-(68, 2, 'ryder', 'winona', 'ryderwinona@gmail.com', '$2y$10$CfgswTvx8wTkOH3H3poptu68HIB5Jwj9Ym/1bpnlnDD0Xbyujry8i', '09123456789', 'Bayan Luma IV, Bacoor', '2026-07-25 07:14:05', '2026-07-25 16:47:19'),
-(69, 3, 'heaven', 'santos', 'heavensantos@gmail.com', '$2y$10$qtxaPmeyVVNY3wh3j3HTTuagcxNwVThAIAesaIUhthj1Z1Z5tJ2ve', '09098847865', 'Bayan Luma IV, Bacoor', '2026-07-25 07:18:38', '2026-07-25 16:01:26'),
-(70, 3, 'ernesto', 'benigno', 'ernestobenigno@gmail.com', '$2y$10$CxlmQZtiEGbI0v4ORcLGlOyJ3//T4yytGYezCYQ1VtZNyESe/.HJm', '09181234562', 'Aniban I, Bacoor', '2026-07-25 08:23:04', '2026-07-25 16:45:44');
+INSERT INTO `users` (`user_id`, `role_id`, `first_name`, `last_name`, `email`, `password`, `contact_number`, `address`, `created_at`, `last_active`, `sex`, `birthday`, `religion`, `ethnicity`, `civil_status`, `no_of_children`, `home_number`, `office_number`, `fax_number`, `educational_background`, `degree`, `eligibility`, `eligibility_other`, `years_as_cdw`, `compensation_type`, `terms_of_employment`, `compensation_barangay_amount`, `compensation_city_amount`, `compensation_ngo_amount`, `compensation_parents_amount`, `compensation_source_other`, `compensation_source_other_amount`, `cdw_status`, `cdw_date_accredited`, `cdw_accreditation_no`, `cdw_accreditation_level`, `total_children_served`, `sessions_per_day`, `hours_per_session`, `age_of_children_handled`, `hours_staying_in_center`, `sessions_conducted_with`, `trainings_attended`, `courses_attended`) VALUES
+(1, 1, 'Admin', 'User', 'admin@gmail.com', '$2y$10$SmQayTFX.bE5RVii6Lr.5eDTogM5AP/cAwN4HXd8A1dfEbrPvwLnW', '09285567789', 'Niog II', '2026-03-25 22:04:10', '2026-09-28 16:31:34', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(52, 2, 'Anna', 'Natividad', 'annanatividad@gmail.com', '$2y$10$Mgs8FZUOx.qApKb8bk5tsevWJnNZv.SNsTj5ODSnEOyBFrUkqeUF.', '09050349835', 'Aniban II, Bacoor', '2026-07-17 14:20:33', '2026-09-30 10:27:36', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(53, 3, 'Pryx', 'Morales', 'pryxmorales@gmail.com', '$2y$10$uB2fOSXN92LUkFkddpAzsuY1XeS0N8wUp8K3YkSx0/HjmwdB7lRfK', '09181234562', 'Aniban I, Bacoor', '2026-07-17 15:36:05', '2026-08-03 07:24:18', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(54, 3, 'phoenix', 'perez', 'phoenixperez@gmail.com', '$2y$10$cBQ1eHXbRXMcmajF/0siMedx4pk1.kQXvKejgx8sL9rxS0udMOsIm', '09285567789', 'Aniban I, Bacoor', '2026-07-17 15:51:39', '2026-09-25 06:11:48', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(55, 2, 'Thea', 'Alberio', 'theaalberio@gmail.com', '$2y$10$IdStkSupwrPp4ZKhrxgJhePIxWoI/LWoqYbHCa0Sxx.lTtH8lg2G.', '09650547420', 'Palico 1, Imus', '2026-07-18 06:19:35', '2026-07-20 19:27:03', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(56, 3, 'Majorie', 'Cortez', 'marjcortez@gmail.com', '$2y$10$2upc/9GG/q/aXchrIBanse38yLcVWYPs8KPpbjqqNoJ4rjC6WMKlC', '09650547420', 'Palico 1, Imus', '2026-07-18 06:25:55', '2026-07-18 15:46:15', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(57, 2, 'Princess', 'Mendoza', 'princessmendoza@gmail.com', '$2y$10$elP2KLU/hBHgACP8wkKkQe1mT2eepjMRxA1Hi6.AbaLOoLJUCjf.q', '09123456789', 'Talaba 4', '2026-07-18 08:32:32', '2026-07-18 16:48:06', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(58, 3, 'Jessica', 'Perez', 'jessicaperez@gmail.com', '$2y$10$IvyNLaRgbQZUpukAMgAkyeLQ4Vu3uU2cDQFDX8.KWfwcy0BC/cH1K', '09173451122', 'Talaba 4', '2026-07-18 08:43:05', '2026-07-18 16:43:30', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(59, 2, 'Keanna', 'Montero', 'keannamontero@gmail.com', '$2y$10$ktTEkm3MBtfK/XrVcsX1eOfvNyU/34c5jP.GzzhmyvcQqKVllPLHq', '09123456789', 'Panapaan 3', '2026-07-18 08:46:49', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(60, 2, 'Eric', 'Pelogo', 'ericpelogo@gmail.com', '$2y$10$1YSmk6FGRthlOSUQqVwWzetOC5kvV4zejlNO3o4dZTOGXTnjubZRm', '09285567789', 'Panapaan 3', '2026-07-18 08:47:57', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(61, 2, 'dean', 'rosaros', 'deanrosaros@gmail.com', '$2y$10$c4l6gzp5DwA18mQbIwUN8.wp5m9T7siWWWs6p3tfBtwZc4WPuKuIK', '09972511791', 'Aniban I, Bacoor', '2026-07-18 08:54:09', '2026-07-18 17:19:02', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(62, 3, 'Rosita', 'sandilantan', 'rositasandilantan@gmail.com', '$2y$10$H5lcvZ63X825jcfSEd0Hx.qGCmgyYRdpf6ytyZBjNv5ocbq4sd0LK', '09181234562', 'Aniban II, Bacoor', '2026-07-18 09:20:26', '2026-07-18 17:20:58', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(63, 2, 'Angelo', 'Oroceo', 'angelooroceo@gmail.com', '$2y$10$1cEp0Qbzeu6Y4jSnLVacqeqgqk6W68DaVcpXLfr/OyTNcx4FniuYy', '09173451122', 'Molino 2, Bacoor', '2026-07-18 09:25:09', '2026-07-18 17:29:41', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(64, 3, 'Filo', 'Mendoza', 'filomendoza@gmail.com', '$2y$10$71kkgeJLNxzpBW1PPrXLceHz516KzGqRSCLttd0XeB3KmbdNg9p0W', '09173451122', 'Aniban II, Bacoor', '2026-07-22 12:16:30', '2026-09-25 06:14:56', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(65, 3, 'fill', 'santos', 'fillsantos@gmail.com', '$2y$10$0yFOjZp4sPrd2CLMBSnQdeKT0YFBE7ZU0gEMSYWiv56ZuHm18kh8q', '09098847865', 'Molino 5, Bacoor', '2026-07-24 04:29:36', '2026-07-25 13:12:20', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(66, 2, 'july', 'smith', 'julysmith@gmail.com', '$2y$10$ydJXPbD0xNi.CVXbPrhKkuhGX56P9m3cuJP0H3lz4QJtQ4GZpjzCK', '09285567789', 'Aniban I, Bacoor', '2026-07-24 14:14:16', '2026-07-25 14:57:45', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(67, 2, 'zai', 'akimoto', 'zaiakimoto@gmail.com', '$2y$10$EfuBkjy1vBvHEw6D23BDw.H0InrJL/ov3M6xENv3OSEGUu2dNFus2', '09285567700', 'Queen\'s Row Central Subd., Bacoor City, Cavite', '2026-07-25 05:24:10', '2026-07-25 15:52:41', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(68, 2, 'ryder', 'winona', 'ryderwinona@gmail.com', '$2y$10$CfgswTvx8wTkOH3H3poptu68HIB5Jwj9Ym/1bpnlnDD0Xbyujry8i', '09123456789', 'Bayan Luma IV, Bacoor', '2026-07-25 07:14:05', '2026-07-25 16:47:19', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(69, 3, 'heaven', 'santos', 'heavensantos@gmail.com', '$2y$10$qtxaPmeyVVNY3wh3j3HTTuagcxNwVThAIAesaIUhthj1Z1Z5tJ2ve', '09098847865', 'Bayan Luma IV, Bacoor', '2026-07-25 07:18:38', '2026-07-25 16:01:26', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(70, 3, 'ernesto', 'benigno', 'ernestobenigno@gmail.com', '$2y$10$CxlmQZtiEGbI0v4ORcLGlOyJ3//T4yytGYezCYQ1VtZNyESe/.HJm', '09181234562', 'Aniban I, Bacoor', '2026-07-25 08:23:04', '2026-07-25 16:45:44', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(71, 3, 'elio', 'garcia', 'eliogarcia@gmail.com', '$2y$10$hhBR2mHTgUPrvJZpXSG9HupGp7sFCjLQXsIY8RmUMnVApI53w5LMm', '09098847865', 'Aniban I, Bacoor', '2026-08-27 08:06:09', '2026-08-27 16:07:29', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(75, 3, 'julia', 'cruz', 'juliacruz@gmail.com', '$2y$10$D8tbVrtJbsfHWSNT40SBDO6K8j32Cv/dNGEMQhg1.tuxrSZ.9xHVO', '09181234565', 'Aniban I, Bacoor', '2026-09-25 05:04:17', '2026-09-25 13:04:36', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(76, 2, 'Maria', 'Alberio', 'mariaalberio@gmail.com', '$2y$10$f4hIc/tWAg5QPlsu6HFb..Cl4kdYt4.YPW.Lp72VFYKvJ9S6dAoo2', '09181234565', 'Bayan Luma IV, Bacoor', '2026-09-28 03:14:22', '2026-09-29 22:04:05', 'Female', '2001-10-23', 'Christian', NULL, 'Married', 5, '09090439848', '09090439855', 'N/A', 'Vocational', NULL, 'Licensure Examination for Teachers', NULL, 3.0, 'Salary', 'Voluntary', NULL, 0.00, NULL, NULL, NULL, NULL, 'Accredited', '2017-06-27', '123', NULL, NULL, '3', '2.5', '2 years old, 3 years old', '6-7 hrs', 'With reference materials', NULL, NULL),
+(77, 3, 'Lucio', 'Alberio', 'lucioalberio@gmail.com', '$2y$10$fJb6b3F3Hpl/nvMmVwKAVOcHHorKqw5J.vptdbtE.Zsx6KzYKUMou', '09123456789', 'Bayan Luma IV, Bacoor', '2026-09-28 03:34:15', '2026-09-28 16:38:59', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -1964,7 +2215,8 @@ ALTER TABLE `cdw_assignments`
 -- Indexes for table `children`
 --
 ALTER TABLE `children`
-  ADD PRIMARY KEY (`child_id`);
+  ADD PRIMARY KEY (`child_id`),
+  ADD KEY `fk_children_deleted_by` (`deleted_by`);
 
 --
 -- Indexes for table `child_health_information`
@@ -1977,6 +2229,12 @@ ALTER TABLE `child_health_information`
 -- Indexes for table `child_health_information_requests`
 --
 ALTER TABLE `child_health_information_requests`
+  ADD PRIMARY KEY (`request_id`);
+
+--
+-- Indexes for table `child_intake_requests`
+--
+ALTER TABLE `child_intake_requests`
   ADD PRIMARY KEY (`request_id`);
 
 --
@@ -2146,37 +2404,43 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `anthropometric_records`
 --
 ALTER TABLE `anthropometric_records`
-  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=164;
+  MODIFY `record_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=168;
 
 --
 -- AUTO_INCREMENT for table `cdc`
 --
 ALTER TABLE `cdc`
-  MODIFY `cdc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `cdc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `cdw_assignments`
 --
 ALTER TABLE `cdw_assignments`
-  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `assignment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `children`
 --
 ALTER TABLE `children`
-  MODIFY `child_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=112;
+  MODIFY `child_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
 
 --
 -- AUTO_INCREMENT for table `child_health_information`
 --
 ALTER TABLE `child_health_information`
-  MODIFY `health_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `health_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `child_health_information_requests`
 --
 ALTER TABLE `child_health_information_requests`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `child_intake_requests`
+--
+ALTER TABLE `child_intake_requests`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `deworming_records`
@@ -2236,7 +2500,7 @@ ALTER TABLE `growth_wflh`
 -- AUTO_INCREMENT for table `guardians`
 --
 ALTER TABLE `guardians`
-  MODIFY `guardian_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `guardian_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `intervention_guidance`
@@ -2260,13 +2524,13 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `parent_child_links`
 --
 ALTER TABLE `parent_child_links`
-  MODIFY `link_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `link_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `referrals`
 --
 ALTER TABLE `referrals`
-  MODIFY `referral_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `referral_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `referral_comments`
@@ -2302,7 +2566,7 @@ ALTER TABLE `submitted_reports`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- Constraints for dumped tables
@@ -2321,6 +2585,12 @@ ALTER TABLE `anthropometric_records`
 ALTER TABLE `cdw_assignments`
   ADD CONSTRAINT `cdw_assignments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `cdw_assignments_ibfk_2` FOREIGN KEY (`cdc_id`) REFERENCES `cdc` (`cdc_id`);
+
+--
+-- Constraints for table `children`
+--
+ALTER TABLE `children`
+  ADD CONSTRAINT `fk_children_deleted_by` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `child_health_information`
