@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
     header("Location: ../login.php");
@@ -799,7 +800,7 @@ mysqli_stmt_close($stmt_deworm);
     <div class="terminal-summary-card">
         <div class="summary-label">HFA</div>
         <div class="terminal-summary-value <?php echo h(status_class($latest_record['hfa_status'])); ?>">
-            <?php echo h(safe_value($latest_record['hfa_status'])); ?>
+            <?php echo h(safe_value(statusLabel($latest_record['hfa_status']))); ?>
         </div>
     </div>
 
@@ -864,7 +865,7 @@ mysqli_stmt_close($stmt_deworm);
                                     <td><?php echo h(safe_value($row['edema_grade'])); ?></td>
                                     <td><?php echo h(safe_value($row['muac_status'])); ?></td>
                                     <td><?php echo h(safe_value($row['wfa_status'])); ?></td>
-                                    <td><?php echo h(safe_value($row['hfa_status'])); ?></td>
+                                    <td><?php echo h(safe_value(statusLabel($row['hfa_status']))); ?></td>
                                     <td><?php echo h(safe_value($row['wflh_status'])); ?></td>
                                 </tr>
                             <?php endforeach; ?>

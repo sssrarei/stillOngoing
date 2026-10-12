@@ -49,41 +49,60 @@ function getLatestSubmittedWMRPerCDC($conn) {
     return $reports;
 }
 
+function getAllSubmittedWMRs($conn) {
+    $reports = array();
+    $result = mysqli_query($conn, "
+        SELECT submitted_report_id, cdc_id, submitted_at, report_type, report_payload
+        FROM submitted_reports
+        WHERE LOWER(report_type) = 'wmr'
+        ORDER BY submitted_at ASC, submitted_report_id ASC
+    ");
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $reports[] = $row;
+        }
+    }
+    return $reports;
+}
+
+function normalizeStatusLabel($status) {
+    $status = trim((string)$status);
+    $map = array(
+        'wasted' => 'Moderately Wasted',
+        'moderately wasted' => 'Moderately Wasted',
+        'severely wasted' => 'Severely Wasted',
+        'underweight' => 'Underweight',
+        'moderately underweight' => 'Underweight',
+        'severely underweight' => 'Severely Underweight',
+        'stunted' => 'Stunted',
+        'moderately stunted' => 'Stunted',
+        'severely stunted' => 'Severely Stunted',
+        'overweight' => 'Overweight',
+        'obese' => 'Obese',
+        'normal' => 'Normal',
+        'tall' => 'Normal'
+    );
+    $key = strtolower($status);
+    return isset($map[$key]) ? $map[$key] : '';
+}
+
 function getFinalRiskStatus($wfa_status, $hfa_status, $wflh_status) {
-    $wfa_status = trim((string)$wfa_status);
-    $hfa_status = trim((string)$hfa_status);
-    $wflh_status = trim((string)$wflh_status);
+    $all = array(
+        normalizeStatusLabel($wfa_status),
+        normalizeStatusLabel($hfa_status),
+        normalizeStatusLabel($wflh_status)
+    );
 
-    if ($wflh_status === 'Severely Wasted') {
-        return 'Severely Wasted';
-    }
+    // Most serious first (same idea as nnc_get_overall_status)
+    $priority = array(
+        'Severely Wasted', 'Severely Underweight', 'Obese', 'Severely Stunted',
+        'Moderately Wasted', 'Underweight', 'Overweight', 'Stunted'
+    );
 
-    if ($wfa_status === 'Severely Underweight') {
-        return 'Severely Underweight';
-    }
-
-    if ($wflh_status === 'Moderately Wasted') {
-        return 'Moderately Wasted';
-    }
-
-    if ($wfa_status === 'Underweight') {
-        return 'Underweight';
-    }
-
-    if ($wflh_status === 'Obese') {
-        return 'Obese';
-    }
-
-    if ($wflh_status === 'Overweight') {
-        return 'Overweight';
-    }
-
-    if ($hfa_status === 'Severely Stunted') {
-        return 'Severely Stunted';
-    }
-
-    if ($hfa_status === 'Stunted') {
-        return 'Stunted';
+    foreach ($priority as $p) {
+        if (in_array($p, $all, true)) {
+            return $p;
+        }
     }
 
     return 'Normal';
@@ -96,7 +115,9 @@ function isAtRiskFinalStatus($final_status) {
         $final_status === 'Moderately Wasted' ||
         $final_status === 'Severely Wasted' ||
         $final_status === 'Overweight' ||
-        $final_status === 'Obese'
+        $final_status === 'Obese' ||
+        $final_status === 'Stunted' ||
+        $final_status === 'Severely Stunted'
     );
 }
 
@@ -133,6 +154,12 @@ function getInterventionCategoryFromFinalStatus($final_status) {
 | counting / risk logic above or below.
 |--------------------------------------------------------------------------
 */
+function getStatusDisplayLabel($status_key) {
+    if ($status_key === 'Severely Stunted') { return 'Severely Low Height'; }
+    if ($status_key === 'Stunted') { return 'Low Height'; }
+    return $status_key;
+}
+
 function getStatusVisual($status_key) {
     $map = array(
         'Normal' => array(
@@ -163,12 +190,12 @@ function getStatusVisual($status_key) {
         'Stunted' => array(
             'icon' => '📉',
             'tone' => 'tone-amber',
-            'desc' => 'Final overall status is stunted'
+            'desc' => 'Final overall status is low height'
         ),
         'Severely Stunted' => array(
             'icon' => '📉',
             'tone' => 'tone-red',
-            'desc' => 'Final overall status is severely stunted'
+            'desc' => 'Final overall status is severely low height'
         ),
         'Moderately Wasted' => array(
             'icon' => '🔶',
@@ -296,7 +323,7 @@ if ($cdw_result && mysqli_num_rows($cdw_result) > 0) {
     $total_cdws = (int)$cdw_row['total'];
 }
 
-$children_query = "SELECT COUNT(*) AS total FROM children";
+$children_query = "SELECT COUNT(*) AS total FROM children WHERE is_deleted = 0";
 $children_result = mysqli_query($conn, $children_query);
 if ($children_result && mysqli_num_rows($children_result) > 0) {
     $children_row = mysqli_fetch_assoc($children_result);
@@ -516,78 +543,92 @@ if ($sent_intervention_result) {
 | One final pinaka-risk status per child
 |--------------------------------------------------------------------------
 */
-$latest_wmr_reports = getLatestSubmittedWMRPerCDC($conn);
+/*
+ * Status shown here = SNAPSHOT inside submitted WMRs (what the CDW sent),
+ * never the live anthropometric_records row. Editing a record in CDW does
+ * nothing here until a new WMR is submitted.
+ * Per child we keep the newest measurement (date_recorded, then newest report).
+ */
 $processed_children = array();
-
-foreach ($latest_wmr_reports as $wmr_report) {
+$latest_snapshot = array();
+foreach (getAllSubmittedWMRs($conn) as $wmr_report) {
     $payload = decodeReportPayload($wmr_report['report_payload']);
-    $submitted_rows = isset($payload['submitted_rows']) && is_array($payload['submitted_rows'])
-        ? $payload['submitted_rows']
-        : array();
+    $rows_in_report = isset($payload['submitted_rows']) && is_array($payload['submitted_rows'])
+        ? $payload['submitted_rows'] : array();
 
-    foreach ($submitted_rows as $row) {
-        $child_id = isset($row['child_id']) ? (int)$row['child_id'] : 0;
-        $child_name = isset($row['child_name']) ? trim($row['child_name']) : '';
-        $cdc_name = isset($row['cdc_name']) ? trim($row['cdc_name']) : '';
-
-        $wfa_status = isset($row['wfa_status']) ? trim($row['wfa_status']) : '';
-        $hfa_status = isset($row['hfa_status']) ? trim($row['hfa_status']) : '';
-        $wflh_status = isset($row['wflh_status']) ? trim($row['wflh_status']) : '';
-
-        if ($child_name === '') {
-            $child_name = 'Unknown Child';
-        }
-
-        if ($cdc_name === '') {
-            $cdc_name = 'Unknown CDC';
-        }
-
-        $child_key = $child_id > 0 ? 'child_' . $child_id : md5($child_name . '|' . $cdc_name . '|' . $wmr_report['submitted_report_id']);
-
-        if (isset($processed_children[$child_key])) {
+    foreach ($rows_in_report as $r) {
+        $cid = isset($r['child_id']) ? (int)$r['child_id'] : 0;
+        if ($cid <= 0) {
             continue;
         }
-        $processed_children[$child_key] = true;
+        $r['_report_id'] = (int)$wmr_report['submitted_report_id'];
+        $r['_date'] = isset($r['date_recorded']) ? strtotime($r['date_recorded']) : 0;
 
-        $final_status = getFinalRiskStatus($wfa_status, $hfa_status, $wflh_status);
-
-                $current_report_id = (int)$wmr_report['submitted_report_id'];
-
-            if (isAtRiskFinalStatus($final_status)) {
-                if (!isset($at_risk_child_keys[$child_key])) {
-                    $modal_at_risk[] = array(
-                        'primary' => $child_name,
-                        'secondary' => $cdc_name,
-                        'tag' => $final_status,
-                        'tagTone' => getStatusVisual($final_status)['tone']
-                    );
-                }
-
-                $at_risk_child_keys[$child_key] = true;
-
-                $intervention_category = getInterventionCategoryFromFinalStatus($final_status);
-
-                if ($intervention_category !== null) {
-                    $current_result_key = $child_key . '|report_' . $current_report_id . '|category_' . $intervention_category;
-
-                    if (!isset($sent_intervention_result_keys[$current_result_key]) && !isset($pending_review_child_keys[$current_result_key])) {
-                        $modal_pending[] = array(
-                            'primary' => $child_name,
-                            'secondary' => $cdc_name . ' — ' . $intervention_category,
-                            'tag' => null,
-                            'tagTone' => ''
-                        );
-                    }
-
-                    if (!isset($sent_intervention_result_keys[$current_result_key])) {
-                        $pending_review_child_keys[$current_result_key] = true;
-                    }
-                }
+        // reports are ordered oldest -> newest, so >= lets a newer report win ties
+        if (!isset($latest_snapshot[$cid]) || $r['_date'] >= $latest_snapshot[$cid]['_date']) {
+            $latest_snapshot[$cid] = $r;
+        }
+    }
 }
 
-            if (!isset($status_summary[$final_status])) {
-                continue;
+// skip children that were deleted since
+$deleted_ids = array();
+$del_res = mysqli_query($conn, "SELECT child_id FROM children WHERE is_deleted = 1");
+if ($del_res) {
+    while ($d = mysqli_fetch_assoc($del_res)) {
+        $deleted_ids[(int)$d['child_id']] = true;
+    }
+}
+
+foreach ($latest_snapshot as $child_id => $row) {
+    if (isset($deleted_ids[$child_id])) {
+        continue;
+    }
+    {
+        $row['child_name'] = isset($row['child_name']) ? $row['child_name'] : '';
+        $row['cdc_name'] = isset($row['cdc_name']) ? $row['cdc_name'] : '';
+        $row['wfa_status'] = isset($row['wfa_status']) ? $row['wfa_status'] : '';
+        $row['hfa_status'] = isset($row['hfa_status']) ? $row['hfa_status'] : '';
+        $row['wflh_status'] = isset($row['wflh_status']) ? $row['wflh_status'] : '';
+        $current_report_id = $row['_report_id'];
+
+        $child_name = trim($row['child_name']) !== '' ? trim($row['child_name']) : 'Unknown Child';
+        $cdc_name = !empty($row['cdc_name']) ? trim($row['cdc_name']) : 'Unknown CDC';
+        $child_key = 'child_' . $child_id;
+
+        $final_status = getFinalRiskStatus($row['wfa_status'], $row['hfa_status'], $row['wflh_status']);
+
+        if (isAtRiskFinalStatus($final_status)) {
+            if (!isset($at_risk_child_keys[$child_key])) {
+                $modal_at_risk[] = array(
+                    'primary' => $child_name,
+                    'secondary' => $cdc_name,
+                    'tag' => getStatusDisplayLabel($final_status),
+                    'tagTone' => getStatusVisual($final_status)['tone']
+                );
             }
+            $at_risk_child_keys[$child_key] = true;
+
+            $intervention_category = getInterventionCategoryFromFinalStatus($final_status);
+
+            if ($intervention_category !== null) {
+                $current_result_key = $child_key . '|report_' . $current_report_id . '|category_' . $intervention_category;
+
+                if (!isset($sent_intervention_result_keys[$current_result_key]) && !isset($pending_review_child_keys[$current_result_key])) {
+                    $modal_pending[] = array(
+                        'primary' => $child_name,
+                        'secondary' => $cdc_name . ' — ' . $intervention_category,
+                        'tag' => null,
+                        'tagTone' => ''
+                    );
+                    $pending_review_child_keys[$current_result_key] = true;
+                }
+            }
+        }
+
+        if (!isset($status_summary[$final_status])) {
+            continue;
+        }
 
         $status_summary[$final_status]['count']++;
         $status_summary[$final_status]['children'][] = array(
@@ -1146,7 +1187,7 @@ if ($intervention_alerts_result) {
                             <div class="nss-head">
                                 <div class="nss-title-group">
                                     <span class="nss-dot"></span>
-                                    <h4><?php echo htmlspecialchars($status_key); ?></h4>
+                                    <h4><?php echo htmlspecialchars(getStatusDisplayLabel($status_key)); ?></h4>
                                 </div>
                                 <div class="nss-count"><?php echo (int) $status_data['count']; ?></div>
                             </div>

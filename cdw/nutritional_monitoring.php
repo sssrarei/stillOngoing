@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if ($_SESSION['role_id'] != 2) {
     header("Location: ../login.php");
@@ -363,7 +364,7 @@ include __DIR__ . '/../includes/auth.php';
 
                     <div class="status-card <?php echo status_class($latest_record['hfa_status']); ?>">
                         <span class="status-title">HFA</span>
-                        <span class="status-value"><?php echo safe_value($latest_record['hfa_status']); ?></span>
+                        <span class="status-value"><?php echo safe_value(statusLabel($latest_record['hfa_status'])); ?></span>
                     </div>
 
                     <div class="status-card <?php echo status_class($latest_record['wflh_status']); ?>">
@@ -415,7 +416,7 @@ include __DIR__ . '/../includes/auth.php';
                                     <td><?php echo safe_value($row['edema_grade']); ?></td>
                                     <td><?php echo safe_value($row['muac_status']); ?></td>
                                     <td><?php echo safe_value($row['wfa_status']); ?></td>
-                                    <td><?php echo safe_value($row['hfa_status']); ?></td>
+                                    <td><?php echo safe_value(statusLabel($row['hfa_status'])); ?></td>
                                     <td><?php echo safe_value($row['wflh_status']); ?></td>
                                 </tr>
                             <?php } ?>

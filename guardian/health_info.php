@@ -4,6 +4,7 @@ ini_set('display_errors', 1);
 
 include '../includes/auth.php';
 include '../config/database.php';
+require_once '../includes/eccd_form2.php';
 
 if($_SESSION['role_id'] != 3){
     header("Location: ../login.php");
@@ -236,35 +237,39 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_health_info']))
         $message = "You already have a pending health information submission waiting for CDW review.";
         $message_type = 'error';
     } else {
-        $birth_order_input = trim($_POST['birth_order'] ?? '');
-$siblings_info_input = trim($_POST['siblings_info'] ?? '');
-$eccd_experience_info_input = trim($_POST['eccd_experience_info'] ?? '');
+        /* Form 2 items answered by the guardian (validated in includes/eccd_form2.php) */
+        $form_errors = array();
 
-$born_at_input = trim($_POST['born_at'] ?? '');
-$learns_at_home_with_input = trim($_POST['learns_at_home_with'] ?? '');
-$plays_with_older_siblings_input = trim($_POST['plays_with_older_siblings'] ?? '');
-$plays_with_younger_siblings_input = trim($_POST['plays_with_younger_siblings'] ?? '');
-$plays_with_neighbors_input = trim($_POST['plays_with_neighbors'] ?? '');
-$has_meal_before_school_input = trim($_POST['has_meal_before_school'] ?? '');
-$food_normally_eaten_input = trim($_POST['food_normally_eaten'] ?? '');
-$has_baon_input = trim($_POST['has_baon'] ?? '');
-$travel_time_to_dcc_minutes_input = trim($_POST['travel_time_to_dcc_minutes'] ?? '');
-$travel_mode_to_dcc_input = trim($_POST['travel_mode_to_dcc'] ?? '');
-$travel_time_to_ncdc_minutes_input = trim($_POST['travel_time_to_ncdc_minutes'] ?? '');
-$travel_mode_to_ncdc_input = trim($_POST['travel_mode_to_ncdc'] ?? '');
-$public_transport_type_input = trim($_POST['public_transport_type'] ?? '');
-$goes_to_school_with_input = trim($_POST['goes_to_school_with'] ?? '');
-$has_eccd_card_input = isset($_POST['has_eccd_card']) ? 1 : 0;
-$has_mother_child_book_input = isset($_POST['has_mother_child_book']) ? 1 : 0;
-$has_other_health_record_input = trim($_POST['has_other_health_record'] ?? '');
-$vaccine_bcg_input = trim($_POST['vaccine_bcg'] ?? '');
-$vaccine_dpt_input = trim($_POST['vaccine_dpt'] ?? '');
-$vaccine_opv_input = trim($_POST['vaccine_opv'] ?? '');
-$vaccine_hepab_input = trim($_POST['vaccine_hepab'] ?? '');
-$vaccine_measles_input = trim($_POST['vaccine_measles'] ?? '');
-$vaccine_others_name_input = trim($_POST['vaccine_others_name'] ?? '');
-$vaccine_others_status_input = trim($_POST['vaccine_others_status'] ?? '');
-$is_left_handed_input = trim($_POST['is_left_handed'] ?? '');
+        $birth_order_input = (string) (eccd_f2_int($_POST['birth_order'] ?? '', 1, 99) ?? '');
+
+        $siblings_info_input = (string) (eccd_collect_siblings($_POST, $form_errors) ?? '');
+        $eccd_experience_info_input = (string) (eccd_collect_ece($_POST) ?? '');
+
+        $born_at_input = (string) (eccd_f2_pick($_POST['born_at'] ?? '', eccd_f2_born_at_options()) ?? '');
+        $learns_at_home_with_input = (string) (eccd_f2_pick_many($_POST['learns_at_home_with'] ?? array(), eccd_f2_learns_options()) ?? '');
+        $plays_with_older_siblings_input = (string) (eccd_f2_pick($_POST['plays_with_older_siblings'] ?? '', eccd_f2_frequency_options()) ?? '');
+        $plays_with_younger_siblings_input = (string) (eccd_f2_pick($_POST['plays_with_younger_siblings'] ?? '', eccd_f2_frequency_options()) ?? '');
+        $plays_with_neighbors_input = (string) (eccd_f2_pick($_POST['plays_with_neighbors'] ?? '', eccd_f2_frequency_options()) ?? '');
+        $has_meal_before_school_input = (string) (eccd_f2_pick($_POST['has_meal_before_school'] ?? '', eccd_f2_meal_options()) ?? '');
+        $food_normally_eaten_input = (string) (eccd_f2_pick_many($_POST['food_normally_eaten'] ?? array(), eccd_f2_food_options()) ?? '');
+        $has_baon_input = (string) (eccd_f2_pick($_POST['has_baon'] ?? '', eccd_f2_baon_options()) ?? '');
+        $travel_time_to_dcc_minutes_input = (string) (eccd_f2_int($_POST['travel_time_to_dcc_minutes'] ?? '', 0, 1440) ?? '');
+        $travel_mode_to_dcc_input = (string) (eccd_f2_pick($_POST['travel_mode_to_dcc'] ?? '', eccd_f2_travel_modes()) ?? '');
+        $travel_time_to_ncdc_minutes_input = (string) (eccd_f2_int($_POST['travel_time_to_ncdc_minutes'] ?? '', 0, 1440) ?? '');
+        $travel_mode_to_ncdc_input = (string) (eccd_f2_pick($_POST['travel_mode_to_ncdc'] ?? '', eccd_f2_travel_modes()) ?? '');
+        $public_transport_type_input = (string) (eccd_f2_pick_many($_POST['public_transport_type'] ?? array(), eccd_f2_transport_options()) ?? '');
+        $goes_to_school_with_input = (string) (eccd_f2_pick_many($_POST['goes_to_school_with'] ?? array(), eccd_f2_goes_with_options()) ?? '');
+        $has_eccd_card_input = isset($_POST['has_eccd_card']) ? 1 : 0;
+        $has_mother_child_book_input = isset($_POST['has_mother_child_book']) ? 1 : 0;
+        $has_other_health_record_input = (string) (eccd_f2_text($_POST['has_other_health_record'] ?? '', 150) ?? '');
+        $vaccine_bcg_input = (string) (eccd_f2_pick($_POST['vaccine_bcg'] ?? '', eccd_f2_vaccine_answers()) ?? '');
+        $vaccine_dpt_input = (string) (eccd_f2_pick($_POST['vaccine_dpt'] ?? '', eccd_f2_vaccine_answers()) ?? '');
+        $vaccine_opv_input = (string) (eccd_f2_pick($_POST['vaccine_opv'] ?? '', eccd_f2_vaccine_answers()) ?? '');
+        $vaccine_hepab_input = (string) (eccd_f2_pick($_POST['vaccine_hepab'] ?? '', eccd_f2_vaccine_answers()) ?? '');
+        $vaccine_measles_input = (string) (eccd_f2_pick($_POST['vaccine_measles'] ?? '', eccd_f2_vaccine_answers()) ?? '');
+        $vaccine_others_name_input = (string) (eccd_f2_text($_POST['vaccine_others_name'] ?? '', 100) ?? '');
+        $vaccine_others_status_input = (string) (eccd_f2_pick($_POST['vaccine_others_status'] ?? '', eccd_f2_vaccine_answers()) ?? '');
+        $is_left_handed_input = (string) (eccd_f2_pick($_POST['is_left_handed'] ?? '', eccd_f2_yes_no()) ?? '');
 
 if ($travel_mode_to_dcc_input !== 'Public Transportation' && $travel_mode_to_ncdc_input !== 'Public Transportation') {
     $public_transport_type_input = '';
@@ -274,7 +279,11 @@ $birth_order_value = ($birth_order_input !== '') ? (int)$birth_order_input : nul
 $travel_time_to_dcc_value = ($travel_time_to_dcc_minutes_input !== '') ? (int)$travel_time_to_dcc_minutes_input : null;
 $travel_time_to_ncdc_value = ($travel_time_to_ncdc_minutes_input !== '') ? (int)$travel_time_to_ncdc_minutes_input : null;
 
-      if(
+      if(!empty($form_errors)){
+            $message = implode(' ', $form_errors);
+            $message_type = 'error';
+
+        } elseif(
             $birth_order_input === '' && $siblings_info_input === '' && $eccd_experience_info_input === ''
             && $born_at_input === '' && $learns_at_home_with_input === ''
             && $plays_with_older_siblings_input === '' && $plays_with_younger_siblings_input === '' && $plays_with_neighbors_input === ''
@@ -338,39 +347,49 @@ $travel_time_to_ncdc_value = ($travel_time_to_ncdc_minutes_input !== '') ? (int)
                 $message = "Prepare error: " . $conn->error;
                 $message_type = 'error';
             } else {
-               $insert_stmt->bind_param(
-                "iiissssssssssisisssiisssssssss",
-                $child_id,
-                $guardian_user_id,
-                $birth_order_value,
-                $born_at_input,
-                $siblings_info_input,
-                $eccd_experience_info_input,
-                $learns_at_home_with_input,
-                $plays_with_older_siblings_input,
-                $plays_with_younger_siblings_input,
-                $plays_with_neighbors_input,
-                $has_meal_before_school_input,
-                $food_normally_eaten_input,
-                $has_baon_input,
-                $travel_time_to_dcc_value,
-                $travel_mode_to_dcc_input,
-                $travel_time_to_ncdc_value,
-                $travel_mode_to_ncdc_input,
-                $public_transport_type_input,
-                $goes_to_school_with_input,
-                $has_eccd_card_input,
-                $has_mother_child_book_input,
-                $has_other_health_record_input,
-                $vaccine_bcg_input,
-                $vaccine_dpt_input,
-                $vaccine_opv_input,
-                $vaccine_hepab_input,
-                $vaccine_measles_input,
-                $vaccine_others_name_input,
-                $vaccine_others_status_input,
-                $is_left_handed_input
-            );
+               // empty answers are saved as NULL (ENUM columns reject '' on strict servers)
+               $insert_values = array(
+                    $child_id,
+                    $guardian_user_id,
+                    $birth_order_value,
+                    $born_at_input,
+                    $siblings_info_input,
+                    $eccd_experience_info_input,
+                    $learns_at_home_with_input,
+                    $plays_with_older_siblings_input,
+                    $plays_with_younger_siblings_input,
+                    $plays_with_neighbors_input,
+                    $has_meal_before_school_input,
+                    $food_normally_eaten_input,
+                    $has_baon_input,
+                    $travel_time_to_dcc_value,
+                    $travel_mode_to_dcc_input,
+                    $travel_time_to_ncdc_value,
+                    $travel_mode_to_ncdc_input,
+                    $public_transport_type_input,
+                    $goes_to_school_with_input,
+                    $has_eccd_card_input,
+                    $has_mother_child_book_input,
+                    $has_other_health_record_input,
+                    $vaccine_bcg_input,
+                    $vaccine_dpt_input,
+                    $vaccine_opv_input,
+                    $vaccine_hepab_input,
+                    $vaccine_measles_input,
+                    $vaccine_others_name_input,
+                    $vaccine_others_status_input,
+                    $is_left_handed_input
+                );
+                foreach ($insert_values as $iv_key => $iv_val) {
+                    if ($iv_val === '') {
+                        $insert_values[$iv_key] = null;
+                    }
+                }
+
+                $insert_stmt->bind_param(
+                    "iiissssssssssisisssiisssssssss",
+                    ...$insert_values
+                );
 
                 if($insert_stmt->execute()){
                     $message = "Health information successfully submitted to CDW.";
@@ -778,6 +797,8 @@ $travel_time_to_ncdc_value = ($travel_time_to_ncdc_minutes_input !== '') ? (int)
     }
 </style>
     </style>
+    <?php echo eccd_f2_css(); ?>
+    <style>.eccd-hint{font-size:12px;color:#777;margin:2px 0 8px;}</style>
 </head>
 <body class="<?php echo ($theme_mode === 'dark') ? 'dark-mode' : ''; ?>">
 
@@ -1024,227 +1045,116 @@ $travel_time_to_ncdc_value = ($travel_time_to_ncdc_minutes_input !== '') ? (int)
 
                     <form method="POST" enctype="multipart/form-data" class="health-form" id="healthUpdateForm"<?php echo $latest_submission_approved ? ' style="display:none;"' : ''; ?>>
 
-                        <div class="form-group">
+                        <div class="form-group full">
                             <label class="form-label">Birth Order</label>
-                            <input type="number" min="1" name="birth_order" class="form-text-input">
+                            <input type="number" min="1" max="99" name="birth_order" class="form-text-input" style="max-width:160px;">
                         </div>
 
                         <div class="form-group full">
-                            <label class="form-label">Siblings Info</label>
-                            <textarea name="siblings_info" class="form-control" placeholder="Names/ages of siblings"></textarea>
+                            <label class="form-label">Born at</label>
+                            <?php echo eccd_radio_group('born_at', eccd_f2_born_at_options(), '', 4); ?>
                         </div>
 
                         <div class="form-group full">
-                            <label class="form-label">Past ECCD Experience</label>
-                            <textarea name="eccd_experience_info" class="form-control" placeholder="e.g. Service type, service, dates"></textarea>
+                            <label class="form-label">Siblings</label>
+                            <div class="eccd-hint">One row per sibling (up to 6): age, Male/Female, In School/Out of School. Leave blank if none.</div>
+                            <?php echo eccd_render_siblings(''); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Born At</label>
-                            <select name="born_at" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Hospital">Hospital</option>
-                                <option value="Health Center">Health Center</option>
-                                <option value="Home">Home</option>
-                            </select>
+                        <div class="form-group full">
+                            <label class="form-label">Prior Early Childhood Experience</label>
+                            <div class="eccd-hint">Choose what the child attended for each level. Leave a level blank if none.</div>
+                            <?php echo eccd_render_ece(''); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Learns at Home With</label>
-                            <input type="text" name="learns_at_home_with" class="form-text-input">
+                        <div class="form-group full">
+                            <label class="form-label">Learns at Home with</label>
+                            <?php echo eccd_checkbox_group('learns_at_home_with', eccd_f2_learns_options(), array(), 4); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Plays with Older Siblings</label>
-                            <select name="plays_with_older_siblings" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Always">Always</option>
-                                <option value="Sometimes">Sometimes</option>
-                                <option value="Rarely">Rarely</option>
-                                <option value="Never">Never</option>
-                            </select>
+                        <div class="form-group full">
+                            <label class="form-label">Play/Interacts with Older Siblings</label>
+                            <?php echo eccd_radio_group('plays_with_older_siblings', eccd_f2_frequency_options(), '', 4); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Plays with Younger Siblings</label>
-                            <select name="plays_with_younger_siblings" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Always">Always</option>
-                                <option value="Sometimes">Sometimes</option>
-                                <option value="Rarely">Rarely</option>
-                                <option value="Never">Never</option>
-                            </select>
+                        <div class="form-group full">
+                            <label class="form-label">Play/Interacts with Younger Siblings</label>
+                            <?php echo eccd_radio_group('plays_with_younger_siblings', eccd_f2_frequency_options(), '', 4); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Plays with Neighbors</label>
-                            <select name="plays_with_neighbors" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Always">Always</option>
-                                <option value="Sometimes">Sometimes</option>
-                                <option value="Rarely">Rarely</option>
-                                <option value="Never">Never</option>
-                            </select>
+                        <div class="form-group full">
+                            <label class="form-label">Play/Interacts with Neighbors of Same Age</label>
+                            <?php echo eccd_radio_group('plays_with_neighbors', eccd_f2_frequency_options(), '', 4); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Has Meal Before School</label>
-                            <select name="has_meal_before_school" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Always">Always</option>
-                                <option value="Most of the time">Most of the time</option>
-                                <option value="Sometimes">Sometimes</option>
-                                <option value="Rarely">Rarely</option>
-                                <option value="Never">Never</option>
-                            </select>
+                        <div class="form-group full">
+                            <label class="form-label">Has Meal Before Going To School</label>
+                            <?php echo eccd_radio_group('has_meal_before_school', eccd_f2_meal_options(), '', 5); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Food Normally Eaten</label>
-                            <input type="text" name="food_normally_eaten" class="form-text-input">
+                        <div class="form-group full">
+                            <label class="form-label">Food Normally Eaten by Child</label>
+                            <?php echo eccd_checkbox_group('food_normally_eaten', eccd_f2_food_options(), array(), 5); ?>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group full">
                             <label class="form-label">Has Baon</label>
-                            <select name="has_baon" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Money">Money</option>
-                                <option value="Food">Food</option>
-                                <option value="Both">Both</option>
-                                <option value="None">None</option>
-                                <option value="Don't Know">Don't Know</option>
-                            </select>
+                            <?php echo eccd_radio_group('has_baon', eccd_f2_baon_options(), '', 5); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Travel Time to DCC (minutes)</label>
-                            <input type="number" min="0" name="travel_time_to_dcc_minutes" class="form-text-input">
+                        <div class="form-group full">
+                            <label class="form-label">Travel Time from Home to DCC (mins)</label>
+                            <input type="number" min="0" max="1440" name="travel_time_to_dcc_minutes" class="form-text-input" style="max-width:160px;">
+                            <div class="eccd-hint" style="margin-top:10px;">Mode</div>
+                            <?php echo eccd_radio_group('travel_mode_to_dcc', eccd_f2_travel_modes(), '', 3); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Travel Mode to DCC</label>
-                            <select name="travel_mode_to_dcc" id="travelModeToDcc" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Walking">Walking</option>
-                                <option value="Private Vehicle">Private Vehicle</option>
-                                <option value="Public Transportation">Public Transportation</option>
-                            </select>
+                        <div class="form-group full">
+                            <label class="form-label">Travel Time from Home to NCDC (mins)</label>
+                            <input type="number" min="0" max="1440" name="travel_time_to_ncdc_minutes" class="form-text-input" style="max-width:160px;">
+                            <div class="eccd-hint" style="margin-top:10px;">Mode</div>
+                            <?php echo eccd_radio_group('travel_mode_to_ncdc', eccd_f2_travel_modes(), '', 3); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Travel Time to NCDC (minutes)</label>
-                            <input type="number" min="0" name="travel_time_to_ncdc_minutes" class="form-text-input">
+                        <div class="form-group full">
+                            <label class="form-label">Public Transportation (if the mode is Public Transportation)</label>
+                            <?php echo eccd_checkbox_group('public_transport_type', eccd_f2_transport_options(), array(), 5); ?>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Travel Mode to NCDC</label>
-                            <select name="travel_mode_to_ncdc" id="travelModeToNcdc" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Walking">Walking</option>
-                                <option value="Private Vehicle">Private Vehicle</option>
-                                <option value="Public Transportation">Public Transportation</option>
-                            </select>
+                        <div class="form-group full">
+                            <label class="form-label">Goes to School with</label>
+                            <?php echo eccd_checkbox_group('goes_to_school_with', eccd_f2_goes_with_options(), array(), 4); ?>
                         </div>
 
-                        <div class="form-group" id="publicTransportTypeGroup" style="display:none;">
-                            <label class="form-label">Public Transport Type</label>
-                            <input type="text" name="public_transport_type" id="publicTransportType" class="form-text-input" placeholder="e.g. Tricycle, Jeepney">
+                        <div class="form-group full">
+                            <label class="form-label">Does the Child have:</label>
+                            <div class="eccd-options cols-3">
+                                <label class="eccd-opt" for="has_eccd_card"><input type="checkbox" id="has_eccd_card" name="has_eccd_card" value="1"> <span>ECCD Card</span></label>
+                                <label class="eccd-opt" for="has_mother_child_book"><input type="checkbox" id="has_mother_child_book" name="has_mother_child_book" value="1"> <span>Mother &amp; Child book</span></label>
+                            </div>
+                            <div class="eccd-hint" style="margin-top:10px;">Others, please specify</div>
+                            <input type="text" name="has_other_health_record" maxlength="150" class="form-text-input" style="max-width:420px;">
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">Goes to School With</label>
-                            <input type="text" name="goes_to_school_with" class="form-text-input">
+                        <div class="form-group full">
+                            <label class="form-label">Vaccination and Other Health Data</label>
+                            <?php
+                            foreach (eccd_f2_vaccines() as $field => $label) {
+                                echo eccd_f2_render_row_radios($label, $field, eccd_f2_vaccine_answers(), '');
+                            }
+                            ?>
+                            <div class="eccd-vacc-row">
+                                <span class="eccd-vacc-label">Others</span>
+                                <div style="flex:1;min-width:0;">
+                                    <input type="text" name="vaccine_others_name" maxlength="100" class="form-text-input" placeholder="Others, please specify vaccine" style="margin-bottom:8px;max-width:420px;">
+                                    <?php echo eccd_radio_group('vaccine_others_status', eccd_f2_vaccine_answers(), '', 3); ?>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label">
-                                <input type="checkbox" name="has_eccd_card" value="1"> Has ECCD Card
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <input type="checkbox" name="has_mother_child_book" value="1"> Has Mother-Child Book
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Other Health Record</label>
-                            <input type="text" name="has_other_health_record" class="form-text-input">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Vaccine — BCG</label>
-                            <select name="vaccine_bcg" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                                <option value="Don't Know">Don't Know</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Vaccine — DPT</label>
-                            <select name="vaccine_dpt" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                                <option value="Don't Know">Don't Know</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Vaccine — OPV</label>
-                            <select name="vaccine_opv" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                                <option value="Don't Know">Don't Know</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Vaccine — Hepatitis B</label>
-                            <select name="vaccine_hepab" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                                <option value="Don't Know">Don't Know</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Vaccine — Measles</label>
-                            <select name="vaccine_measles" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                                <option value="Don't Know">Don't Know</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Vaccine — Others (Name)</label>
-                            <input type="text" name="vaccine_others_name" class="form-text-input" placeholder="e.g. Rotavirus">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Vaccine — Others (Status)</label>
-                            <select name="vaccine_others_status" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                                <option value="Don't Know">Don't Know</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Left-Handed</label>
-                            <select name="is_left_handed" class="form-control form-select">
-                                <option value="">Select answer</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
+                        <div class="form-group full">
+                            <label class="form-label">Left Handed</label>
+                            <?php echo eccd_radio_group('is_left_handed', eccd_f2_yes_no(), '', 4); ?>
                         </div>
 
                         <div class="form-actions">
@@ -1344,6 +1254,7 @@ window.addEventListener('resize', function () {
     }
 });
 </script>
+<?php echo eccd_f2_js(); ?>
 
 </body>
 </html>

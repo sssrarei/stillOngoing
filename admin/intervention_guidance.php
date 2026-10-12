@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 include '../includes/intervention_helper.php';
 
 if ($_SESSION['role_id'] != 1) {
@@ -1775,7 +1776,7 @@ if ($selected_report_id > 0) {
 
                                         <td><?php echo h($child['wfa_status']); ?></td>
 
-                                        <td><?php echo h($child['hfa_status']); ?></td>
+                                        <td><?php echo h(statusLabel($child['hfa_status'])); ?></td>
 
                                         <td><?php echo h($child['wflh_status']); ?></td>
 

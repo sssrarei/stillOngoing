@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
     header("Location: ../login.php");
@@ -688,7 +689,7 @@ if ($status === 'submitted') {
                                         <?php echo h(safe_value($row['wfa_status'] ?? '')); ?>
                                     </td>
                                     <td class="<?php echo h(status_class($row['hfa_status'] ?? '')); ?>">
-                                        <?php echo h(safe_value($row['hfa_status'] ?? '')); ?>
+                                        <?php echo h(safe_value(statusLabel($row['hfa_status'] ?? ''))); ?>
                                     </td>
                                     <td class="<?php echo h(status_class($row['wflh_status'] ?? '')); ?>">
                                         <?php echo h(safe_value($row['wflh_status'] ?? '')); ?>

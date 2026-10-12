@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if($_SESSION['role_id'] != 2){
     header("Location: ../login.php");
@@ -985,7 +986,7 @@ th:last-child{
             <div class="concern-text">
                 <?php
                 if($highest_value > 0){
-                    echo htmlspecialchars($highest_label) . " (" . $highest_pct . "%)";
+                    echo htmlspecialchars(statusLabel($highest_label)) . " (" . $highest_pct . "%)";
                 } else {
                     echo "No major concern identified up to the selected month.";
                 }
@@ -1003,8 +1004,8 @@ th:last-child{
                         <th>Severely Underweight</th>
                         <th>Overweight</th>
                         <th>Obese</th>
-                        <th>Stunted</th>
-                        <th>Severely Stunted</th>
+                        <th>Low Height</th>
+                        <th>Severely Low Height</th>
                         <th>Moderately Wasted</th>
                         <th>Severely Wasted</th>
                     </tr>

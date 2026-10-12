@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 include '../includes/intervention_helper.php';
 
 if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
@@ -1142,7 +1143,7 @@ if ($status === 'submitted') {
                         <tr>
                             <td><?php echo h($child_preview['child_name']); ?></td>
                             <td><?php echo h($child_preview['endline_wfa']); ?></td>
-                            <td><?php echo h($child_preview['endline_hfa']); ?></td>
+                            <td><?php echo h(statusLabel($child_preview['endline_hfa'])); ?></td>
                             <td><?php echo h($child_preview['endline_wflh']); ?></td>
                             <td><?php echo h($child_preview['intervention_category']); ?></td>
                         </tr>
@@ -1340,17 +1341,17 @@ if ($status === 'submitted') {
 
                                     <td><?php echo h($baseline_date !== 'N/A' ? format_date_value($baseline_date, 'N/A') : 'N/A'); ?></td>
                                     <td class="<?php echo h(status_class($baseline_wfa)); ?>"><?php echo h($baseline_wfa); ?></td>
-                                    <td class="<?php echo h(status_class($baseline_hfa)); ?>"><?php echo h($baseline_hfa); ?></td>
+                                    <td class="<?php echo h(status_class($baseline_hfa)); ?>"><?php echo h(statusLabel($baseline_hfa)); ?></td>
                                     <td class="<?php echo h(status_class($baseline_wflh)); ?>"><?php echo h($baseline_wflh); ?></td>
 
                                     <td><?php echo h($midline_date !== 'N/A' ? format_date_value($midline_date, 'N/A') : 'N/A'); ?></td>
                                     <td class="<?php echo h(status_class($midline_wfa)); ?>"><?php echo h($midline_wfa); ?></td>
-                                    <td class="<?php echo h(status_class($midline_hfa)); ?>"><?php echo h($midline_hfa); ?></td>
+                                    <td class="<?php echo h(status_class($midline_hfa)); ?>"><?php echo h(statusLabel($midline_hfa)); ?></td>
                                     <td class="<?php echo h(status_class($midline_wflh)); ?>"><?php echo h($midline_wflh); ?></td>
 
                                     <td><?php echo h($endline_date !== 'N/A' ? format_date_value($endline_date, 'N/A') : 'N/A'); ?></td>
                                     <td class="<?php echo h(status_class($endline_wfa)); ?>"><?php echo h($endline_wfa); ?></td>
-                                    <td class="<?php echo h(status_class($endline_hfa)); ?>"><?php echo h($endline_hfa); ?></td>
+                                    <td class="<?php echo h(status_class($endline_hfa)); ?>"><?php echo h(statusLabel($endline_hfa)); ?></td>
                                     <td class="<?php echo h(status_class($endline_wflh)); ?>"><?php echo h($endline_wflh); ?></td>
 
                                     <td><?php echo h($improvement); ?></td>

@@ -39,6 +39,13 @@ function assessment_type_label($assessment_type){
 }
 }
 
+function hfa_display_label($status){
+    $status = trim((string)$status);
+    if($status === 'Severely Stunted'){ return 'Severely Low Height'; }
+    if($status === 'Stunted'){ return 'Low Height'; }
+    return $status;
+}
+
 function fetch_wmr_rows($conn, $cdc_id, $date_from, $date_to, $assessment_type){
     $rows = [];
 
@@ -901,7 +908,7 @@ if($data['error'] !== ''){
                                 <td><?php echo htmlspecialchars($row['edema_grade'] ?: '--'); ?></td>
                                 <td><span class="status-text"><?php echo htmlspecialchars($row['muac_status'] ?: '--'); ?></span></td>
                                 <td><span class="status-text"><?php echo htmlspecialchars($row['wfa_status']); ?></span></td>
-                                <td><span class="status-text"><?php echo htmlspecialchars($row['hfa_status']); ?></span></td>
+                                <td><span class="status-text"><?php echo htmlspecialchars(hfa_display_label($row['hfa_status'])); ?></span></td>
                                 <td><span class="status-text"><?php echo htmlspecialchars($row['wflh_status']); ?></span></td>                            </tr>
                         <?php } ?>
                     </tbody>

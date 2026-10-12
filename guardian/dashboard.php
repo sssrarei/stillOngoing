@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 checkRole(3);
 
 $current_page = 'dashboard';
@@ -467,7 +468,7 @@ $upcoming_events = $event_stmt->get_result();
 
                             <div class="status-panel">
                                 <div class="status-badge <?php echo $status_class; ?>">
-                                    <?php echo htmlspecialchars($current_status); ?>
+                                    <?php echo htmlspecialchars(statusLabel($current_status)); ?>
                                 </div>
                                 <div class="status-note <?php echo $status_class; ?>">
                                     <?php echo htmlspecialchars($status_note); ?>
@@ -530,7 +531,7 @@ $upcoming_events = $event_stmt->get_result();
                                                 <td><?php echo htmlspecialchars(number_format((float)$row['weight'], 2)); ?> kg</td>
                                                 <td><?php echo htmlspecialchars(number_format((float)$row['height'], 2)); ?> cm</td>
                                                 <td class="table-status <?php echo $row_class; ?>">
-                                                    <?php echo htmlspecialchars($row_status); ?>
+                                                    <?php echo htmlspecialchars(statusLabel($row_status)); ?>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -706,14 +707,14 @@ else{
                 </div>
 
                 <div class="guide-item">
-                    <div class="guide-title alert">Stunted</div>
+                    <div class="guide-title alert">Low Height</div>
                     <div class="guide-text">
                         Child is shorter than normal for their age and may have delayed growth.
                     </div>
                 </div>
 
                 <div class="guide-item">
-                    <div class="guide-title alert">Severely Stunted</div>
+                    <div class="guide-title alert">Severely Low Height</div>
                     <div class="guide-text">
                         Child is much shorter than expected for their age.
                     </div>

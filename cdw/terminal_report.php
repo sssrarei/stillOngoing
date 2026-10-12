@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 2) {
     header("Location: ../login.php");
@@ -433,15 +434,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_report'])) {
                                 <td><?php echo h($row['child_name']); ?></td>
                                 <td><?php echo h($row['baseline_date_display']); ?></td>
                                 <td><span class="status-chip"><?php echo h($row['baseline_wfa']); ?></span></td>
-                                <td><span class="status-chip"><?php echo h($row['baseline_hfa']); ?></span></td>
+                                <td><span class="status-chip"><?php echo h(statusLabel($row['baseline_hfa'])); ?></span></td>
                                 <td><span class="status-chip"><?php echo h($row['baseline_wflh']); ?></span></td>
                                 <td><?php echo h($row['midline_date_display']); ?></td>
                                 <td><span class="status-chip"><?php echo h($row['midline_wfa']); ?></span></td>
-                                <td><span class="status-chip"><?php echo h($row['midline_hfa']); ?></span></td>
+                                <td><span class="status-chip"><?php echo h(statusLabel($row['midline_hfa'])); ?></span></td>
                                 <td><span class="status-chip"><?php echo h($row['midline_wflh']); ?></span></td>
                                 <td><?php echo h($row['endline_date_display']); ?></td>
                                 <td><span class="status-chip"><?php echo h($row['endline_wfa']); ?></span></td>
-                                <td><span class="status-chip"><?php echo h($row['endline_hfa']); ?></span></td>
+                                <td><span class="status-chip"><?php echo h(statusLabel($row['endline_hfa'])); ?></span></td>
                                 <td><span class="status-chip"><?php echo h($row['endline_wflh']); ?></span></td>
                             </tr>
                         <?php } ?>

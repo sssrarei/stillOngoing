@@ -780,5 +780,116 @@ window.addEventListener('resize', function () {
 });
 </script>
 
+<script>
+/* Send chat messages without reloading the page (no jump to the top). */
+(function () {
+    function showChatError(form, text) {
+        var box = form.parentNode.querySelector('.chat-js-error');
+        if (!box) {
+            box = document.createElement('div');
+            box.className = 'chat-js-error';
+            box.style.cssText = 'margin:0 0 10px;padding:10px 12px;border-radius:10px;background:#fdeaea;color:#b42318;border:1px solid #efb0b0;font-size:13px;font-weight:600;';
+            form.parentNode.insertBefore(box, form);
+        }
+        box.textContent = text;
+    }
+
+    function clearChatError(form) {
+        var box = form.parentNode.querySelector('.chat-js-error');
+        if (box) { box.parentNode.removeChild(box); }
+    }
+
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!form || !form.classList || !form.classList.contains('comment-form')) { return; }
+        if (!window.fetch || !window.FormData || !window.DOMParser) { return; } // old browser: normal submit
+
+        var submitBtn = form.querySelector('button[type="submit"][name]');
+        var textarea = form.querySelector('textarea[name="message"]');
+        var fileInput = form.querySelector('input[type="file"]');
+        var idInput = form.querySelector('input[name="referral_id"]');
+        if (!submitBtn || !textarea || !idInput) { return; }
+
+        var hasText = textarea.value.trim() !== '';
+        var hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+
+        e.preventDefault();
+        if (!hasText && !hasFile) { return; }
+        if (form.getAttribute('data-sending') === '1') { return; }
+
+        form.setAttribute('data-sending', '1');
+        var oldLabel = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        clearChatError(form);
+
+        var data = new FormData(form);
+        data.append(submitBtn.name, '1');
+
+        fetch(window.location.href, { method: 'POST', body: data, credentials: 'same-origin' })
+            .then(function (res) {
+                if (!res.ok) { throw new Error('bad status'); }
+                var finalUrl = res.url || '';
+                return res.text().then(function (html) { return { html: html, url: finalUrl }; });
+            })
+            .then(function (r) {
+                var doc = new DOMParser().parseFromString(r.html, 'text/html');
+                var referralId = idInput.value;
+
+                // find the same chat form in the fresh page, then take the thread right above it
+                var forms = doc.querySelectorAll('form.comment-form');
+                var freshForm = null;
+                for (var i = 0; i < forms.length; i++) {
+                    var rid = forms[i].querySelector('input[name="referral_id"]');
+                    if (rid && rid.value === referralId) { freshForm = forms[i]; break; }
+                }
+                if (!freshForm || !freshForm.previousElementSibling) { throw new Error('thread not found'); }
+
+                var freshThread = freshForm.previousElementSibling;
+                var oldThread = form.previousElementSibling;
+                // skip the error box we may have inserted
+                while (oldThread && oldThread.classList.contains('chat-js-error')) {
+                    oldThread = oldThread.previousElementSibling;
+                }
+                if (!oldThread) { throw new Error('old thread not found'); }
+
+                oldThread.parentNode.replaceChild(document.importNode(freshThread, true), oldThread);
+
+                var newList = form.parentNode.querySelector('.comment-list');
+                if (newList) { newList.scrollTop = newList.scrollHeight; }
+
+                if (/[?&](reply_error|comment_error)=/.test(r.url)) {
+                    var m = r.url.match(/[?&](?:reply_error|comment_error)=([^&#]*)/);
+                    showChatError(form, m ? decodeURIComponent(m[1].replace(/\+/g, ' ')) : 'Hindi naipadala ang mensahe.');
+                } else {
+                    textarea.value = '';
+                    if (fileInput) {
+                        fileInput.value = '';
+                        var icon = fileInput.previousElementSibling;
+                        if (icon) { icon.textContent = '\uD83D\uDCF7'; }
+                    }
+                }
+            })
+            .catch(function () {
+                // anything unexpected: fall back to the normal (reloading) submit so the message is never lost
+                var hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = submitBtn.name;
+                hidden.value = '1';
+                form.appendChild(hidden);
+                form.removeAttribute('data-sending');
+                HTMLFormElement.prototype.submit.call(form);
+            })
+            .then(function () {
+                if (form.getAttribute('data-sending') === '1') {
+                    form.removeAttribute('data-sending');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = oldLabel;
+                }
+            });
+    });
+})();
+</script>
+
 </body>
 </html>

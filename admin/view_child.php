@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
     header("Location: ../login.php");
@@ -318,269 +319,84 @@ if (!$child) {
     die('Child record not found.');
 }
 
-$guardian = null;
-
-if (table_exists($conn, 'parent_child_links') && table_exists($conn, 'guardians') && table_exists($conn, 'users')) {
-    $guardian_sql = "
-        SELECT 
-            g.*,
-            u.first_name AS user_first_name,
-            u.last_name AS user_last_name,
-            u.email AS user_email
-        FROM parent_child_links pcl
-        INNER JOIN users u
-            ON pcl.parent_id = u.user_id
-        LEFT JOIN guardians g
-            ON g.user_id = u.user_id
-        WHERE pcl.child_id = ?
-        LIMIT 1
-    ";
-
-    $guardian_stmt = mysqli_prepare($conn, $guardian_sql);
-
-    if ($guardian_stmt) {
-        mysqli_stmt_bind_param($guardian_stmt, 'i', $child_id);
-        mysqli_stmt_execute($guardian_stmt);
-        $guardian_result = mysqli_stmt_get_result($guardian_stmt);
-
-        if ($guardian_result && mysqli_num_rows($guardian_result) > 0) {
-            $guardian = mysqli_fetch_assoc($guardian_result);
-        }
-
-        mysqli_stmt_close($guardian_stmt);
-    }
-}
-
-$health_info = null;
-
-if (table_exists($conn, 'child_health_information')) {
-    $health_sql = "
-        SELECT *
-        FROM child_health_information
-        WHERE child_id = ?
-        LIMIT 1
-    ";
-
-    $health_stmt = mysqli_prepare($conn, $health_sql);
-    if ($health_stmt) {
-        mysqli_stmt_bind_param($health_stmt, 'i', $child_id);
-        mysqli_stmt_execute($health_stmt);
-        $health_result = mysqli_stmt_get_result($health_stmt);
-        if ($health_result) {
-            $health_info = mysqli_fetch_assoc($health_result);
-        }
-        mysqli_stmt_close($health_stmt);
-    }
-}
-
 /*
-    Fallback:
-    If official child_health_information is empty or outdated,
-    get the latest approved guardian health submission for display.
+    Everything below comes from the Individual Child Report that the CDW
+    submitted (snapshot saved inside submitted_reports). Nothing here is read
+    live from the CDW's records, so the admin only sees data after the CDW
+    has submitted the report.
 */
-if (table_exists($conn, 'child_health_information_requests')) {
-    $request_sql = "
-        SELECT *
-        FROM child_health_information_requests
-        WHERE child_id = ?
-          AND status = 'Approved'
-        ORDER BY submitted_at DESC, request_id DESC
-        LIMIT 1
+$snapshot = null;
+$snapshot_report = null;
+$snapshot_notice = '';
+$found_old_format = false;
+
+if (table_exists($conn, 'submitted_reports')) {
+    $like_child = '%"child_id":' . $child_id . ',%';
+
+    $report_sql = "
+        SELECT submitted_report_id, submitted_at, status, report_payload
+        FROM submitted_reports
+        WHERE LOWER(report_type) = 'individual_child'
+          AND status IN ('submitted', 'saved_to_child_profile')
+          AND report_payload LIKE ?
+        ORDER BY submitted_at DESC, submitted_report_id DESC
     ";
 
-    $request_stmt = mysqli_prepare($conn, $request_sql);
+    $report_stmt = mysqli_prepare($conn, $report_sql);
 
-    if ($request_stmt) {
-        mysqli_stmt_bind_param($request_stmt, 'i', $child_id);
-        mysqli_stmt_execute($request_stmt);
-        $request_result = mysqli_stmt_get_result($request_stmt);
+    if ($report_stmt) {
+        mysqli_stmt_bind_param($report_stmt, 's', $like_child);
+        mysqli_stmt_execute($report_stmt);
+        $report_result = mysqli_stmt_get_result($report_stmt);
 
-        if ($request_result && mysqli_num_rows($request_result) > 0) {
-            $latest_request = mysqli_fetch_assoc($request_result);
+        if ($report_result) {
+            while ($report_row = mysqli_fetch_assoc($report_result)) {
+                $decoded = json_decode((string)$report_row['report_payload'], true);
 
-            if (!is_array($health_info)) {
-                $health_info = [];
-            }
+                if (!is_array($decoded) || (int)($decoded['child_id'] ?? 0) !== $child_id) {
+                    continue;
+                }
 
-            if (!empty($latest_request['vaccination_card_file_path'])) {
-                $health_info['vaccination_card_file_path'] = $latest_request['vaccination_card_file_path'];
-            }
+                if (isset($decoded['profile_sections']) && is_array($decoded['profile_sections'])) {
+                    $snapshot = $decoded;
+                    $snapshot_report = $report_row;
+                    break;
+                }
 
-            if (!empty($latest_request['allergies'])) {
-                $health_info['allergies'] = $latest_request['allergies'];
-            }
-
-            if (!empty($latest_request['comorbidities'])) {
-                $health_info['comorbidities'] = $latest_request['comorbidities'];
-            }
-
-            if (!empty($latest_request['medical_history_file_path'])) {
-                $health_info['medical_history_file_path'] = $latest_request['medical_history_file_path'];
+                $found_old_format = true;
             }
         }
 
-        mysqli_stmt_close($request_stmt);
+        mysqli_stmt_close($report_stmt);
     }
 }
 
-$anthro_columns = get_table_columns($conn, 'anthropometric_records');
-$anthro_order_parts = [];
-
-if (has_column($anthro_columns, 'date_recorded')) {
-    $anthro_order_parts[] = 'date_recorded DESC';
-}
-if (has_column($anthro_columns, 'anthropometric_id')) {
-    $anthro_order_parts[] = 'anthropometric_id DESC';
-}
-if (empty($anthro_order_parts)) {
-    $anthro_order_parts[] = 'child_id DESC';
+if ($snapshot === null) {
+    $snapshot_notice = $found_old_format
+        ? 'The Individual Child Report for this child was submitted before the report was updated, so it has no full details. Please ask the CDW to submit the Individual Child Report again.'
+        : 'The CDW has not submitted the Individual Child Report for this child yet. The full child data will appear here once it is submitted.';
 }
 
-$anthro_sql = "
-    SELECT *
-    FROM anthropometric_records
-    WHERE child_id = ?
-    ORDER BY " . implode(', ', $anthro_order_parts);
+$profile_sections = $snapshot ? $snapshot['profile_sections'] : [];
+$anthro_history = ($snapshot && isset($snapshot['anthropometric_rows']) && is_array($snapshot['anthropometric_rows'])) ? $snapshot['anthropometric_rows'] : [];
+$feeding_rows = ($snapshot && isset($snapshot['feeding_rows']) && is_array($snapshot['feeding_rows'])) ? $snapshot['feeding_rows'] : [];
+$milk_rows = ($snapshot && isset($snapshot['milk_rows']) && is_array($snapshot['milk_rows'])) ? $snapshot['milk_rows'] : [];
+$deworming_rows = ($snapshot && isset($snapshot['deworming_rows']) && is_array($snapshot['deworming_rows'])) ? $snapshot['deworming_rows'] : [];
+$latest_anthro = !empty($anthro_history) ? $anthro_history[0] : null;
 
-$anthro_history = [];
-$latest_anthro = null;
-
-$anthro_stmt = mysqli_prepare($conn, $anthro_sql);
-if ($anthro_stmt) {
-    mysqli_stmt_bind_param($anthro_stmt, 'i', $child_id);
-    mysqli_stmt_execute($anthro_stmt);
-    $anthro_result = mysqli_stmt_get_result($anthro_stmt);
-
-    if ($anthro_result) {
-        while ($row = mysqli_fetch_assoc($anthro_result)) {
-            $anthro_history[] = $row;
-        }
-    }
-
-    mysqli_stmt_close($anthro_stmt);
-}
-
-if (!empty($anthro_history)) {
-    $latest_anthro = $anthro_history[0];
-}
-
-$feeding_rows = [];
-
-if (table_exists($conn, 'feeding_records') && table_exists($conn, 'feeding_record_items')) {
-    $feeding_sql = "
-        SELECT
-            fr.feeding_record_id,
-            fr.feeding_date,
-            fr.attendance,
-            fr.remarks,
-            GROUP_CONCAT(
-                CASE
-                    WHEN fi.food_item_name IS NOT NULL AND fi.food_item_name != '' THEN
-                        CONCAT(
-                            COALESCE(fg.food_group_name, 'Uncategorized'),
-                            ': ',
-                            fi.food_item_name,
-                            CASE
-                                WHEN fri.measurement_text IS NOT NULL AND fri.measurement_text != '' 
-                                    THEN CONCAT(' (', fri.measurement_text, ')')
-                                WHEN fri.quantity IS NOT NULL 
-                                    THEN CONCAT(' (', CAST(fri.quantity AS CHAR), ')')
-                                ELSE ''
-                            END
-                        )
-                    ELSE NULL
-                END
-                ORDER BY fri.feeding_item_id ASC
-                SEPARATOR '||'
-            ) AS food_details
-        FROM feeding_records fr
-        LEFT JOIN feeding_record_items fri 
-            ON fr.feeding_record_id = fri.feeding_record_id
-        LEFT JOIN food_groups fg 
-            ON fri.food_group_id = fg.food_group_id
-        LEFT JOIN food_items fi 
-            ON fri.food_item_id = fi.food_item_id
-        WHERE fr.child_id = ?
-        GROUP BY 
-            fr.feeding_record_id,
-            fr.feeding_date,
-            fr.attendance,
-            fr.remarks
-        ORDER BY fr.feeding_date DESC, fr.feeding_record_id DESC
-    ";
-
-    $feeding_stmt = mysqli_prepare($conn, $feeding_sql);
-
-    if ($feeding_stmt) {
-        mysqli_stmt_bind_param($feeding_stmt, 'i', $child_id);
-        mysqli_stmt_execute($feeding_stmt);
-        $feeding_result = mysqli_stmt_get_result($feeding_stmt);
-
-        if ($feeding_result) {
-            while ($row = mysqli_fetch_assoc($feeding_result)) {
-                $feeding_rows[] = $row;
-            }
-        }
-
-        mysqli_stmt_close($feeding_stmt);
-    }
-}
-
-$milk_rows = [];
-if (table_exists($conn, 'milk_feeding_records')) {
-    $milk_cols = get_table_columns($conn, 'milk_feeding_records');
-    $milk_date_col = first_existing_column($milk_cols, ['feeding_date', 'date_recorded', 'record_date', 'date']);
-    $milk_order = $milk_date_col ? "`$milk_date_col` DESC" : "child_id DESC";
-
-    $milk_sql = "SELECT * FROM milk_feeding_records WHERE child_id = ? ORDER BY $milk_order";
-    $milk_stmt = mysqli_prepare($conn, $milk_sql);
-
-    if ($milk_stmt) {
-        mysqli_stmt_bind_param($milk_stmt, 'i', $child_id);
-        mysqli_stmt_execute($milk_stmt);
-        $milk_result = mysqli_stmt_get_result($milk_stmt);
-
-        if ($milk_result) {
-            while ($row = mysqli_fetch_assoc($milk_result)) {
-                $milk_rows[] = $row;
-            }
-        }
-
-        mysqli_stmt_close($milk_stmt);
-    }
-}
-
-$deworming_rows = [];
-if (table_exists($conn, 'deworming_records')) {
-    $deworm_cols = get_table_columns($conn, 'deworming_records');
-    $deworm_date_col = first_existing_column($deworm_cols, ['deworming_date', 'date_recorded', 'record_date', 'date']);
-    $deworm_order = $deworm_date_col ? "`$deworm_date_col` DESC" : "child_id DESC";
-
-    $deworm_sql = "SELECT * FROM deworming_records WHERE child_id = ? ORDER BY $deworm_order";
-    $deworm_stmt = mysqli_prepare($conn, $deworm_sql);
-
-    if ($deworm_stmt) {
-        mysqli_stmt_bind_param($deworm_stmt, 'i', $child_id);
-        mysqli_stmt_execute($deworm_stmt);
-        $deworm_result = mysqli_stmt_get_result($deworm_stmt);
-
-        if ($deworm_result) {
-            while ($row = mysqli_fetch_assoc($deworm_result)) {
-                $deworming_rows[] = $row;
-            }
-        }
-
-        mysqli_stmt_close($deworm_stmt);
-    }
-}
+$snapshot_birthdate = $snapshot ? ($snapshot['birthdate'] ?? ($child['birthdate'] ?? '')) : ($child['birthdate'] ?? '');
 
 $growth_points = [];
 $anthro_history_asc = array_reverse($anthro_history);
 
 foreach ($anthro_history_asc as $row) {
     $record_date_raw = !empty($row['date_recorded']) ? $row['date_recorded'] : '';
+    $age_x = (isset($row['age_months']) && $row['age_months'] !== '' && $row['age_months'] !== null)
+        ? (int)$row['age_months']
+        : age_in_months($snapshot_birthdate, $record_date_raw);
+
     $growth_points[] = [
-        'x' => age_in_months($child['birthdate'], $record_date_raw),
+        'x' => $age_x,
         'height' => isset($row['height']) && is_numeric($row['height']) ? $row['height'] : '',
         'weight' => isset($row['weight']) && is_numeric($row['weight']) ? $row['weight'] : '',
         'date' => format_date_value($record_date_raw),
@@ -591,7 +407,7 @@ foreach ($anthro_history_asc as $row) {
 $weight_chart = build_svg_chart($growth_points, 'weight', 'Weight', 'kg', '#3b82f6');
 $height_chart = build_svg_chart($growth_points, 'height', 'Height', 'cm', '#22c55e');
 
-$child_name = get_full_name_from_row($child);
+$child_name = ($snapshot && !empty($snapshot['child_name'])) ? $snapshot['child_name'] : get_full_name_from_row($child);
 $latest_wfa = !empty($latest_anthro['wfa_status']) ? $latest_anthro['wfa_status'] : '-';
 $latest_hfa = !empty($latest_anthro['hfa_status']) ? $latest_anthro['hfa_status'] : '-';
 $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_status'] : '-';
@@ -625,104 +441,31 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
             <div class="view-tab active">Full Child Data</div>
         </div>
 
+        <?php if ($snapshot) { ?>
+        <div class="view-card" style="margin-bottom:18px;">
+            <div class="view-card-body">
+                <strong>Submitted by CDW:</strong>
+                <?php echo h(!empty($snapshot_report['submitted_at']) ? date('M d, Y g:i A', strtotime($snapshot_report['submitted_at'])) : '-'); ?>
+                &nbsp;|&nbsp; This is the Individual Child Report exactly as the CDW submitted it.
+            </div>
+        </div>
+
         <div class="view-card">
             <div class="view-card-header">Child Information</div>
             <div class="view-card-body">
                 <div class="profile-grid">
-                    <div class="mini-card">
-                        <div class="mini-card-header">Child Profile</div>
-                        <div class="mini-card-body">
-                            <div class="detail-list">
-                                <div class="detail-item"><strong>Child Name:</strong> <?php echo h($child_name); ?></div>
-                                <div class="detail-item"><strong>Sex:</strong> <?php echo h(normalize_sex($child['sex'] ?? '')); ?></div>
-                                <div class="detail-item"><strong>Birthdate:</strong> <?php echo h(format_date_value($child['birthdate'] ?? '')); ?></div>
-                                <div class="detail-item"><strong>Age:</strong> <?php echo h(calculate_age_display($child['birthdate'] ?? '')); ?></div>
-                                <div class="detail-item"><strong>CDC:</strong> <?php echo h($child['cdc_name'] ?? '-'); ?></div>
-                                <div class="detail-item"><strong>Address:</strong> <?php echo h($child['address'] ?? '-'); ?></div>
+                    <?php foreach ($profile_sections as $section) { ?>
+                        <div class="mini-card">
+                            <div class="mini-card-header"><?php echo h($section['title'] ?? ''); ?></div>
+                            <div class="mini-card-body">
+                                <div class="detail-list">
+                                    <?php foreach (($section['rows'] ?? []) as $r) { ?>
+                                        <div class="detail-item"><strong><?php echo h($r['label'] ?? ''); ?>:</strong> <?php echo nl2br(h($r['value'] ?? '')); ?></div>
+                                    <?php } ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="mini-card">
-                        <div class="mini-card-header">Guardian Information</div>
-                        <div class="mini-card-body">
-                            <div class="detail-list">
-                                <?php if ($guardian) { ?>
-                                    <?php
-                                        $guardian_name_display = get_full_name_from_row($guardian);
-
-                                        if ($guardian_name_display === 'N/A' || $guardian_name_display === '-') {
-                                            $guardian_name_display = trim(($guardian['user_first_name'] ?? '') . ' ' . ($guardian['user_last_name'] ?? ''));
-                                        }
-
-                                        if ($guardian_name_display === '') {
-                                            $guardian_name_display = '-';
-                                        }
-
-                                        $guardian_email_display = !empty($guardian['email'])
-                                            ? $guardian['email']
-                                            : ($guardian['user_email'] ?? '-');
-
-                                        $guardian_contact_display = !empty($guardian['contact_number'])
-                                            ? $guardian['contact_number']
-                                            : ($child['contact_number'] ?? '-');
-
-                                        $guardian_address_display = !empty($guardian['address'])
-                                            ? $guardian['address']
-                                            : ($child['address'] ?? '-');
-                                    ?>
-
-                                    <div class="detail-item"><strong>Guardian Name:</strong> <?php echo h($guardian_name_display); ?></div>
-                                    <div class="detail-item"><strong>Email:</strong> <?php echo h($guardian_email_display); ?></div>
-                                    <div class="detail-item"><strong>Contact Number:</strong> <?php echo h($guardian_contact_display); ?></div>
-                                    <div class="detail-item"><strong>Address:</strong> <?php echo h($guardian_address_display); ?></div>
-                                <?php } else { ?>
-                                    <div class="detail-item"><strong>Guardian Name:</strong> <?php echo h($child['guardian_name'] ?? '-'); ?></div>
-                                    <div class="detail-item"><strong>Contact Number:</strong> <?php echo h($child['guardian_contact'] ?? ($child['contact_number'] ?? '-')); ?></div>
-                                    <div class="detail-item"><strong>Address:</strong> <?php echo h($child['address'] ?? '-'); ?></div>
-                                <?php } ?>
-                            </div>
-                        </div>
-                    </div>
-
-                <div class="mini-card">
-    <div class="mini-card-header">Health Information</div>
-    <div class="mini-card-body">
-        <div class="detail-list">
-
-            <div class="detail-item">
-                <strong>Vaccination Card File:</strong>
-                <?php if (!empty($health_info['vaccination_card_file_path'])) { ?>
-                    <a href="<?php echo h($health_info['vaccination_card_file_path']); ?>" target="_blank">
-                        View Attached File
-                    </a>
-                <?php } else { ?>
-                    -
-                <?php } ?>
-            </div>
-
-            <div class="detail-item">
-                <strong>Allergies / Allergen:</strong> <?php echo h($health_info['allergies'] ?? '-'); ?>
-            </div>
-
-            <div class="detail-item">
-                <strong>Comorbidities:</strong> <?php echo h($health_info['comorbidities'] ?? '-'); ?>
-            </div>
-
-            <div class="detail-item">
-                <strong>Medical History File:</strong>
-                <?php if (!empty($health_info['medical_history_file_path'])) { ?>
-                    <a href="<?php echo h($health_info['medical_history_file_path']); ?>" target="_blank">
-                        View Attached File
-                    </a>
-                <?php } else { ?>
-                    -
-                <?php } ?>
-            </div>
-
-        </div>
-    </div>
-</div>
+                    <?php } ?>
 
                     <div class="mini-card">
                         <div class="mini-card-header">Latest Nutritional Status</div>
@@ -733,35 +476,41 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
                                     <?php echo h(format_date_value($latest_anthro['date_recorded'] ?? '')); ?>
                                 </div>
                                 <div class="detail-item">
+                                    <strong>Assessment Type:</strong> <?php echo h($latest_anthro['assessment_type'] ?? '-'); ?>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Age in Months:</strong> <?php echo h($latest_anthro['age_months'] ?? '-'); ?>
+                                </div>
+                                <div class="detail-item">
                                     <strong>WFA:</strong>
                                     <span class="<?php echo h(status_class($latest_wfa)); ?>"><?php echo h($latest_wfa); ?></span>
                                 </div>
                                 <div class="detail-item">
                                     <strong>HFA:</strong>
-                                    <span class="<?php echo h(status_class($latest_hfa)); ?>"><?php echo h($latest_hfa); ?></span>
+                                    <span class="<?php echo h(status_class($latest_hfa)); ?>"><?php echo h(statusLabel($latest_hfa)); ?></span>
                                 </div>
                                 <div class="detail-item">
                                     <strong>WFL/H:</strong>
                                     <span class="<?php echo h(status_class($latest_wflh)); ?>"><?php echo h($latest_wflh); ?></span>
                                 </div>
                                 <div class="detail-item">
-                                    <strong>Height:</strong> <?php echo h($latest_anthro['height'] ?? '-'); ?>
+                                    <strong>Height:</strong> <?php echo h($latest_anthro['height'] ?? '-'); ?> cm
                                 </div>
                                 <div class="detail-item">
-                                    <strong>Weight:</strong> <?php echo h($latest_anthro['weight'] ?? '-'); ?>
+                                    <strong>Weight:</strong> <?php echo h($latest_anthro['weight'] ?? '-'); ?> kg
                                 </div>
                                 <div class="detail-item">
-                                    <strong>MUAC:</strong> <?php echo h($latest_anthro['muac'] ?? '-'); ?>
+                                    <strong>MUAC:</strong> <?php echo h($latest_anthro['muac'] ?? '-'); ?> cm
                                 </div>
                                 <div class="detail-item">
-    <strong>Edema:</strong> <?php echo h($latest_anthro['edema_status'] ?? '-'); ?>
-</div>
-<div class="detail-item">
-    <strong>Grade:</strong> <?php echo h($latest_anthro['edema_grade'] ?? '-'); ?>
-</div>
-<div class="detail-item">
-    <strong>MUAC Status:</strong> <?php echo h($latest_anthro['muac_status'] ?? '-'); ?>
-</div>
+                                    <strong>Edema:</strong> <?php echo h($latest_anthro['edema_status'] ?? '-'); ?>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Grade:</strong> <?php echo h($latest_anthro['edema_grade'] ?? '-'); ?>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>MUAC Status:</strong> <?php echo h($latest_anthro['muac_status'] ?? '-'); ?>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -778,6 +527,7 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
                             <thead>
                                 <tr>
                                     <th>Date Recorded</th>
+                                    <th>Age in Months</th>
                                     <th>Assessment Type</th>
                                     <th>Height</th>
                                     <th>Weight</th>
@@ -794,6 +544,7 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
                                 <?php foreach ($anthro_history as $row) { ?>
                                     <tr>
                                         <td><?php echo h(format_date_value($row['date_recorded'] ?? '')); ?></td>
+                                        <td><?php echo h(($row['age_months'] ?? '') !== '' ? $row['age_months'] : age_in_months($snapshot_birthdate, $row['date_recorded'] ?? '')); ?></td>
                                         <td><?php echo h($row['assessment_type'] ?? '-'); ?></td>
                                         <td><?php echo h($row['height'] ?? '-'); ?></td>
                                         <td><?php echo h($row['weight'] ?? '-'); ?></td>
@@ -802,7 +553,7 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
                                         <td><?php echo h($row['edema_grade'] ?? '-'); ?></td>
                                         <td><?php echo h($row['muac_status'] ?? '-'); ?></td>
                                         <td class="<?php echo h(status_class($row['wfa_status'] ?? '')); ?>"><?php echo h($row['wfa_status'] ?? '-'); ?></td>
-                                        <td class="<?php echo h(status_class($row['hfa_status'] ?? '')); ?>"><?php echo h($row['hfa_status'] ?? '-'); ?></td>
+                                        <td class="<?php echo h(status_class($row['hfa_status'] ?? '')); ?>"><?php echo h(statusLabel($row['hfa_status'] ?? '-')); ?></td>
                                         <td class="<?php echo h(status_class($row['wflh_status'] ?? '')); ?>"><?php echo h($row['wflh_status'] ?? '-'); ?></td>
                                     </tr>
                                 <?php } ?>
@@ -836,7 +587,9 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
                                         <td><?php echo h($row['attendance'] ?? '-'); ?></td>
                                         <td class="food-details-cell">
                                             <?php
-                                                if (!empty($row['food_details'])) {
+                                                if (strtolower((string)($row['attendance'] ?? '')) === 'absent') {
+                                                    echo 'Absent';
+                                                } elseif (!empty($row['food_details'])) {
                                                     $foods = explode('||', $row['food_details']);
 
                                                     foreach ($foods as $food) {
@@ -949,6 +702,15 @@ $latest_wflh = !empty($latest_anthro['wflh_status']) ? $latest_anthro['wflh_stat
                 </div>
             </div>
         </div>
+
+        <?php } else { ?>
+        <div class="view-card">
+            <div class="view-card-header">Child Information</div>
+            <div class="view-card-body">
+                <div class="empty-section"><?php echo h($snapshot_notice); ?></div>
+            </div>
+        </div>
+        <?php } ?>
 
         <div class="back-wrap">
             <a href="child_records.php" class="back-link">Back to Child Records</a>

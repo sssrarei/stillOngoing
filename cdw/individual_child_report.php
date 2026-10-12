@@ -66,6 +66,14 @@ function calculate_age_months($birthdate, $record_date = null)
     }
 }
 
+function hfa_display_label($status)
+{
+    $status = trim((string) $status);
+    if ($status === 'Severely Stunted') return 'Severely Low Height';
+    if ($status === 'Stunted') return 'Low Height';
+    return $status;
+}
+
 function status_class($status)
 {
     $status = strtolower(trim((string) $status));
@@ -102,6 +110,205 @@ function status_class($status)
     }
 
     return 'status-default';
+}
+
+function na_value($value)
+{
+    $value = trim((string) $value);
+    return ($value === '') ? 'N/A' : $value;
+}
+
+function yes_no_value($value)
+{
+    return !empty($value) ? 'Yes' : 'No';
+}
+
+function minutes_value($value)
+{
+    $value = trim((string) $value);
+    return ($value === '') ? 'N/A' : $value . ' min';
+}
+
+function checked_labels_value(array $flags)
+{
+    $checked = [];
+    foreach ($flags as $label => $is_checked) {
+        if (!empty($is_checked)) {
+            $checked[] = $label;
+        }
+    }
+    return empty($checked) ? 'None' : implode(', ', $checked);
+}
+
+/*
+ * One single source for everything shown under the child's profile.
+ * The CDW report page AND the snapshot that is sent to CSWD both use this,
+ * so the admin side always shows exactly what the CDW submitted.
+ */
+function build_profile_sections($child, $child_full_name, $guardian_full_name, $birthdate_display, $age_months_now)
+{
+    $guardian_is_linked = ($guardian_full_name !== 'No guardian linked yet');
+
+    $guardian_contact = 'N/A';
+    $guardian_address = 'N/A';
+    if ($guardian_is_linked) {
+        $guardian_contact = !empty($child['guardian_contact_number'])
+            ? $child['guardian_contact_number']
+            : na_value($child['contact_number'] ?? '');
+        $guardian_address = !empty($child['guardian_address'])
+            ? $child['guardian_address']
+            : na_value($child['address'] ?? '');
+    }
+
+    $f = function ($label, $value, $full = false) {
+        return ['label' => $label, 'value' => (string) $value, 'full' => $full];
+    };
+
+    return [
+        [
+            'title' => 'Child Profile',
+            'rows' => [
+                $f('Child Name', $child_full_name),
+                $f('Access Code', na_value($child['access_code'] ?? '')),
+                $f('Birthdate', $birthdate_display),
+                $f('Age', calculate_age_text($child['birthdate'] ?? '')),
+                $f('Age in Months', $age_months_now),
+                $f('Sex', na_value($child['sex'] ?? '')),
+                $f('Religion', na_value($child['religion'] ?? '')),
+                $f('Registered (Yes/No)', na_value($child['is_registered'] ?? '')),
+                $f('Birth Order', na_value($child['birth_order'] ?? '')),
+                $f('First Language', na_value($child['first_language'] ?? '')),
+                $f('Second Language', na_value($child['second_language'] ?? '')),
+                $f('Born At', na_value($child['born_at'] ?? '')),
+                $f('Child Development Center', na_value($child['cdc_name'] ?? '')),
+                $f('Address', na_value($child['address'] ?? ''), true),
+                $f('CDC Address', na_value($child['cdc_address'] ?? ''), true),
+            ],
+        ],
+        [
+            'title' => 'Guardian Information',
+            'rows' => [
+                $f('Parent / Guardian Name', $guardian_full_name),
+                $f('Relationship to Child', na_value($child['relationship_to_child'] ?? '')),
+                $f('Contact Number', $guardian_contact),
+                $f('Email', na_value($child['guardian_email'] ?? '')),
+                $f('Address', $guardian_address, true),
+            ],
+        ],
+        [
+            'title' => "Mother's Information",
+            'rows' => [
+                $f("Mother's Name", na_value($child['mother_name'] ?? '')),
+                $f('Occupation', na_value($child['mother_occupation'] ?? '')),
+                $f('Address', na_value($child['mother_address'] ?? ''), true),
+                $f('Contact (Home)', na_value($child['mother_contact_home'] ?? '')),
+                $f('Contact (Work)', na_value($child['mother_contact_work'] ?? '')),
+            ],
+        ],
+        [
+            'title' => "Father's Information",
+            'rows' => [
+                $f("Father's Name", na_value($child['father_name'] ?? '')),
+                $f('Occupation', na_value($child['father_occupation'] ?? '')),
+                $f('Address', na_value($child['father_address'] ?? ''), true),
+                $f('Contact (Home)', na_value($child['father_contact_home'] ?? '')),
+                $f('Contact (Work)', na_value($child['father_contact_work'] ?? '')),
+            ],
+        ],
+        [
+            'title' => 'Emergency Contact',
+            'rows' => [
+                $f('Name', na_value($child['emergency_contact_name'] ?? '')),
+                $f('Relationship', na_value($child['emergency_contact_relationship'] ?? '')),
+                $f('Contact Number (Home)', na_value($child['emergency_contact_home'] ?? '')),
+                $f('Contact Number (Work)', na_value($child['emergency_contact_work'] ?? '')),
+            ],
+        ],
+        [
+            'title' => 'Siblings & Prior ECCD Experience',
+            'rows' => [
+                $f('Siblings', na_value($child['siblings_info'] ?? ''), true),
+                $f('Prior ECCD Experience', na_value($child['eccd_experience_info'] ?? ''), true),
+            ],
+        ],
+        [
+            'title' => 'Health Records',
+            'rows' => [
+                $f('Has ECCD Card', yes_no_value($child['has_eccd_card'] ?? 0)),
+                $f('Has Mother & Child Book', yes_no_value($child['has_mother_child_book'] ?? 0)),
+                $f('Other Health Record', na_value($child['has_other_health_record'] ?? ''), true),
+                $f('Vaccine - BCG', na_value($child['vaccine_bcg'] ?? '')),
+                $f('Vaccine - DPT', na_value($child['vaccine_dpt'] ?? '')),
+                $f('Vaccine - OPV', na_value($child['vaccine_opv'] ?? '')),
+                $f('Vaccine - Hepatitis B', na_value($child['vaccine_hepab'] ?? '')),
+                $f('Vaccine - Measles', na_value($child['vaccine_measles'] ?? '')),
+                $f('Vaccine - Others', na_value($child['vaccine_others_name'] ?? '') . ' - ' . na_value($child['vaccine_others_status'] ?? '')),
+            ],
+        ],
+        [
+            'title' => 'Physical Attributes',
+            'rows' => [
+                $f('Physical Deformity', checked_labels_value([
+                    'Hare Lip' => $child['deformity_hare_lip'] ?? 0,
+                    'Cross-Eyed' => $child['deformity_cross_eyed'] ?? 0,
+                    'Deaf' => $child['deformity_deaf'] ?? 0,
+                    'Blind' => $child['deformity_blind'] ?? 0,
+                    'Disabled Leg' => $child['deformity_disabled_leg'] ?? 0,
+                    'Disabled Arm/Hand' => $child['deformity_disabled_arm_hand'] ?? 0,
+                    'Deformity in Fingers/Toes' => $child['deformity_fingers_toes'] ?? 0,
+                ]), true),
+                $f('Problems With', checked_labels_value([
+                    'Behavior' => $child['problem_behavior'] ?? 0,
+                    'Speaking' => $child['problem_speaking'] ?? 0,
+                    'Hearing' => $child['problem_hearing'] ?? 0,
+                    'Vision' => $child['problem_vision'] ?? 0,
+                ]), true),
+                $f('Left Handed', na_value($child['is_left_handed'] ?? '')),
+            ],
+        ],
+        [
+            'title' => 'Home & Learning',
+            'rows' => [
+                $f('Learns at Home With', na_value($child['learns_at_home_with'] ?? ''), true),
+                $f('Plays With Older Siblings', na_value($child['plays_with_older_siblings'] ?? '')),
+                $f('Plays With Younger Siblings', na_value($child['plays_with_younger_siblings'] ?? '')),
+                $f('Plays With Neighbors', na_value($child['plays_with_neighbors'] ?? '')),
+            ],
+        ],
+        [
+            'title' => 'Logistics',
+            'rows' => [
+                $f('Has Meal Before School', na_value($child['has_meal_before_school'] ?? '')),
+                $f('Food Normally Eaten', na_value($child['food_normally_eaten'] ?? '')),
+                $f('Has Baon', na_value($child['has_baon'] ?? '')),
+                $f('Public Transportation Used', na_value($child['public_transport_type'] ?? '')),
+                $f('Travel to DCC (Time)', minutes_value($child['travel_time_to_dcc_minutes'] ?? '')),
+                $f('Travel to DCC (Mode)', na_value($child['travel_mode_to_dcc'] ?? '')),
+                $f('Travel to NCDC (Time)', minutes_value($child['travel_time_to_ncdc_minutes'] ?? '')),
+                $f('Travel to NCDC (Mode)', na_value($child['travel_mode_to_ncdc'] ?? '')),
+                $f('Goes to School With', na_value($child['goes_to_school_with'] ?? ''), true),
+            ],
+        ],
+    ];
+}
+
+function fetch_all_rows($conn, $sql, $child_id)
+{
+    $rows = [];
+    $stmt = mysqli_prepare($conn, $sql);
+    if (!$stmt) {
+        return $rows;
+    }
+    mysqli_stmt_bind_param($stmt, "i", $child_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $rows[] = $row;
+        }
+    }
+    mysqli_stmt_close($stmt);
+    return $rows;
 }
 
 function build_page_url($overrides = [])
@@ -329,42 +536,56 @@ if (!$show_details) {
 
 $child_sql = "
     SELECT
-        c.child_id,
-        c.first_name,
-        c.middle_name,
-        c.last_name,
-        c.birthdate,
-        c.sex,
-        c.address,
-        c.religion,
-        c.guardian_name,
-        c.contact_number,
-        c.access_code,
-        c.cdc_id,
-        d.cdc_name,
-        d.barangay,
-        d.address AS cdc_address,
+        children.*,
+        cdc.cdc_name,
+        cdc.address AS cdc_address,
 
-        g.guardian_id,
-        g.first_name AS guardian_first_name,
-        g.middle_name AS guardian_middle_name,
-        g.last_name AS guardian_last_name,
-        g.relationship_to_child,
-        g.contact_number AS guardian_contact_number,
-        g.email AS guardian_email,
-        g.address AS guardian_address,
+        COALESCE(guardians.first_name, guardian_user.first_name) AS guardian_first_name,
+        guardians.middle_name AS guardian_middle_name,
+        COALESCE(guardians.last_name, guardian_user.last_name) AS guardian_last_name,
+        guardians.relationship_to_child,
+        COALESCE(guardians.contact_number, guardian_user.contact_number) AS guardian_contact_number,
+        COALESCE(guardians.email, guardian_user.email) AS guardian_email,
+        COALESCE(guardians.address, guardian_user.address) AS guardian_address,
 
-        chi.health_info_id,
-        chi.vaccination_card_file_path,
-        chi.allergies,
-        chi.comorbidities,
-        chi.medical_history_file_path
+        child_health_information.born_at,
+        child_health_information.learns_at_home_with,
+        child_health_information.plays_with_older_siblings,
+        child_health_information.plays_with_younger_siblings,
+        child_health_information.plays_with_neighbors,
+        child_health_information.has_meal_before_school,
+        child_health_information.food_normally_eaten,
+        child_health_information.has_baon,
+        child_health_information.travel_time_to_dcc_minutes,
+        child_health_information.travel_mode_to_dcc,
+        child_health_information.travel_time_to_ncdc_minutes,
+        child_health_information.travel_mode_to_ncdc,
+        child_health_information.public_transport_type,
+        child_health_information.goes_to_school_with,
+        child_health_information.has_eccd_card,
+        child_health_information.has_mother_child_book,
+        child_health_information.has_other_health_record,
+        child_health_information.vaccine_bcg,
+        child_health_information.vaccine_dpt,
+        child_health_information.vaccine_opv,
+        child_health_information.vaccine_hepab,
+        child_health_information.vaccine_measles,
+        child_health_information.vaccine_others_name,
+        child_health_information.vaccine_others_status,
+        child_health_information.is_left_handed
 
-    FROM children c
-    INNER JOIN cdc d ON c.cdc_id = d.cdc_id
-    LEFT JOIN guardians g ON c.child_id = g.child_id
-    LEFT JOIN child_health_information chi ON c.child_id = chi.child_id
-    WHERE c.child_id = ? AND c.cdc_id = ? AND c.is_deleted = 0
+    FROM children
+    INNER JOIN cdc
+        ON children.cdc_id = cdc.cdc_id
+    LEFT JOIN parent_child_links
+        ON children.child_id = parent_child_links.child_id
+    LEFT JOIN users AS guardian_user
+        ON parent_child_links.parent_id = guardian_user.user_id
+    LEFT JOIN guardians
+        ON guardian_user.user_id = guardians.user_id
+    LEFT JOIN child_health_information
+        ON children.child_id = child_health_information.child_id
+    WHERE children.child_id = ? AND children.cdc_id = ? AND children.is_deleted = 0
     LIMIT 1
 ";
 
@@ -399,18 +620,86 @@ $age_text = calculate_age_text($child['birthdate']);
 $age_months_now = calculate_age_months($child['birthdate']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_report'])) {
+    $profile_sections = build_profile_sections($child, $child_full_name, $guardian_full_name, $birthdate_display, $age_months_now);
+
+    $snap_anthro = fetch_all_rows($conn, "
+        SELECT record_id, date_recorded, age_months, height, weight, muac, edema_status, edema_grade,
+               muac_status, assessment_type, wfa_status, hfa_status, wflh_status
+        FROM anthropometric_records
+        WHERE child_id = ?
+        ORDER BY date_recorded DESC, record_id DESC
+    ", $child_id);
+
+    $snap_feeding = fetch_all_rows($conn, "
+        SELECT
+            fr.feeding_record_id,
+            fr.feeding_date,
+            fr.attendance,
+            fr.remarks,
+            GROUP_CONCAT(
+                CASE
+                    WHEN fi.food_item_name IS NOT NULL AND fi.food_item_name != '' THEN
+                        CONCAT(
+                            COALESCE(fg.food_group_name, 'Uncategorized'),
+                            ' - ',
+                            fi.food_item_name,
+                            CASE
+                                WHEN fri.measurement_text IS NOT NULL AND fri.measurement_text != '' THEN CONCAT(' (', fri.measurement_text, ')')
+                                WHEN fri.quantity IS NOT NULL THEN CONCAT(' (', CAST(fri.quantity AS CHAR), ')')
+                                ELSE ''
+                            END
+                        )
+                    ELSE NULL
+                END
+                ORDER BY fri.feeding_item_id ASC
+                SEPARATOR '||'
+            ) AS food_details
+        FROM feeding_records fr
+        LEFT JOIN feeding_record_items fri ON fr.feeding_record_id = fri.feeding_record_id
+        LEFT JOIN food_groups fg ON fri.food_group_id = fg.food_group_id
+        LEFT JOIN food_items fi ON fri.food_item_id = fi.food_item_id
+        WHERE fr.child_id = ?
+        GROUP BY fr.feeding_record_id, fr.feeding_date, fr.attendance, fr.remarks
+        ORDER BY fr.feeding_date DESC, fr.feeding_record_id DESC
+    ", $child_id);
+
+    $snap_milk = fetch_all_rows($conn, "
+        SELECT milk_record_id, feeding_date, attendance, milk_type, amount, remarks
+        FROM milk_feeding_records
+        WHERE child_id = ?
+        ORDER BY feeding_date DESC, milk_record_id DESC
+    ", $child_id);
+
+    $snap_deworm = fetch_all_rows($conn, "
+        SELECT deworm_id, deworming_date, attendance, medicine, dosage, remarks
+        FROM deworming_records
+        WHERE child_id = ?
+        ORDER BY deworming_date DESC, deworm_id DESC
+    ", $child_id);
+
     $payload = [
         'report_type'   => 'individual_child',
+        'report_version' => 2,
         'child_id'      => (int) $child['child_id'],
         'child_name'    => $child_full_name,
         'sex'           => safe_value($child['sex']),
+        'birthdate'     => $child['birthdate'],
         'cdc_id'        => (int) $child['cdc_id'],
         'cdc_name'      => safe_value($child['cdc_name']),
         'submitted_by'  => $user_id,
-        'submitted_at'  => date('Y-m-d H:i:s')
+        'submitted_at'  => date('Y-m-d H:i:s'),
+        'profile_sections'    => $profile_sections,
+        'anthropometric_rows' => $snap_anthro,
+        'feeding_rows'        => $snap_feeding,
+        'milk_rows'           => $snap_milk,
+        'deworming_rows'      => $snap_deworm
     ];
 
-    $payload_json = json_encode($payload, JSON_UNESCAPED_UNICODE);
+    $payload_json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR);
+
+    if ($payload_json === false) {
+        $error_message = "Failed to prepare the report data. Please try again.";
+    }
 
     $insert_sql = "
         INSERT INTO submitted_reports (
@@ -427,7 +716,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_report'])) {
     $report_type = 'individual_child';
     $status = 'submitted';
 
-    $stmt_insert = mysqli_prepare($conn, $insert_sql);
+    $stmt_insert = ($payload_json === false) ? false : mysqli_prepare($conn, $insert_sql);
 
     if ($stmt_insert) {
         mysqli_stmt_bind_param(
@@ -448,7 +737,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_report'])) {
         }
 
         mysqli_stmt_close($stmt_insert);
-    } else {
+    } elseif ($payload_json !== false) {
         $error_message = "Failed to prepare report submission.";
     }
 }
@@ -781,127 +1070,55 @@ mysqli_stmt_close($stmt_deworm);
             </div>
         </div>
 
+        <?php
+        $profile_sections = build_profile_sections($child, $child_full_name, $guardian_full_name, $birthdate_display, $age_months_now);
+        foreach ($profile_sections as $section):
+        ?>
         <div class="content-section">
             <div class="section-title-wrap">
-                <h2>Child Profile</h2>
+                <h2><?php echo h($section['title']); ?></h2>
             </div>
 
             <div class="table-wrap">
                 <table class="report-table">
                     <tbody>
+                        <?php
+                        $pending_row = null;
+                        foreach ($section['rows'] as $r):
+                            if (!empty($r['full'])):
+                                if ($pending_row !== null): ?>
                         <tr>
-                            <th>Child Name</th>
-                            <td><?php echo h($child_full_name); ?></td>
-                            <th>Access Code</th>
-                            <td><?php echo h(safe_value($child['access_code'])); ?></td>
+                            <th><?php echo h($pending_row['label']); ?></th>
+                            <td colspan="3"><?php echo nl2br(h($pending_row['value'])); ?></td>
                         </tr>
+                                <?php $pending_row = null; endif; ?>
                         <tr>
-                            <th>Birthdate</th>
-                            <td><?php echo h($birthdate_display); ?></td>
-                            <th>Age in Months</th>
-                            <td><?php echo h($age_months_now); ?></td>
+                            <th><?php echo h($r['label']); ?></th>
+                            <td colspan="3"><?php echo nl2br(h($r['value'])); ?></td>
                         </tr>
+                            <?php elseif ($pending_row === null):
+                                $pending_row = $r;
+                            else: ?>
                         <tr>
-                            <th>Sex</th>
-                            <td><?php echo h(safe_value($child['sex'])); ?></td>
-                            <th>Religion</th>
-                            <td><?php echo h(safe_value($child['religion'])); ?></td>
+                            <th><?php echo h($pending_row['label']); ?></th>
+                            <td><?php echo nl2br(h($pending_row['value'])); ?></td>
+                            <th><?php echo h($r['label']); ?></th>
+                            <td><?php echo nl2br(h($r['value'])); ?></td>
                         </tr>
+                                <?php $pending_row = null;
+                            endif;
+                        endforeach;
+                        if ($pending_row !== null): ?>
                         <tr>
-                            <th>Address</th>
-                            <td colspan="3"><?php echo h(safe_value($child['address'])); ?></td>
+                            <th><?php echo h($pending_row['label']); ?></th>
+                            <td colspan="3"><?php echo nl2br(h($pending_row['value'])); ?></td>
                         </tr>
-                        <tr>
-                            <th>Child Development Center</th>
-                            <td><?php echo h(safe_value($child['cdc_name'])); ?></td>
-                            <th>CDC Address</th>
-                            <td><?php echo h(safe_value($child['cdc_address'])); ?></td>
-                        </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <div class="content-section">
-            <div class="section-title-wrap">
-                <h2>Guardian Information</h2>
-            </div>
-
-            <div class="table-wrap">
-                <table class="report-table">
-                    <tbody>
-                        <tr>
-                            <th>Parent / Guardian Name</th>
-                            <td><?php echo h($guardian_full_name); ?></td>
-                            <th>Relationship to Child</th>
-                            <td><?php echo h(safe_value($child['relationship_to_child'])); ?></td>
-                        </tr>
-                        <tr>
-                            <th>Contact Number</th>
-                            <td><?php echo h(safe_value($child['guardian_contact_number'], safe_value($child['contact_number']))); ?></td>
-                            <th>Email</th>
-                            <td><?php echo h(safe_value($child['guardian_email'])); ?></td>
-                        </tr>
-                        <tr>
-                            <th>Address</th>
-                            <td colspan="3"><?php echo h(safe_value($child['guardian_address'], safe_value($child['address']))); ?></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-      <div class="content-section">
-    <div class="section-title-wrap">
-        <h2>Child Health Information</h2>
-    </div>
-
-    <div class="health-info-panel">
-        <div class="health-info-group">
-            <div class="health-info-group-title">Documents</div>
-
-            <div class="health-info-row">
-                <div class="health-info-label">Vaccination Card File</div>
-                <div class="health-info-value">
-                    <?php if (!empty($child['vaccination_card_file_path'])): ?>
-                        <a href="<?php echo h($child['vaccination_card_file_path']); ?>" target="_blank" class="file-link">
-                            View Vaccination Card
-                        </a>
-                    <?php else: ?>
-                        N/A
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="health-info-row">
-                <div class="health-info-label">Medical History File</div>
-                <div class="health-info-value">
-                    <?php if (!empty($child['medical_history_file_path'])): ?>
-                        <a href="<?php echo h($child['medical_history_file_path']); ?>" target="_blank" class="file-link">
-                            View Medical History File
-                        </a>
-                    <?php else: ?>
-                        N/A
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-
-        <div class="health-info-group">
-            <div class="health-info-group-title">Health Details</div>
-
-            <div class="health-info-row">
-                <div class="health-info-label">Allergies / Allergen</div>
-                <div class="health-info-value"><?php echo h(safe_value($child['allergies'])); ?></div>
-            </div>
-
-            <div class="health-info-row">
-                <div class="health-info-label">Comorbidities</div>
-                <div class="health-info-value"><?php echo h(safe_value($child['comorbidities'])); ?></div>
-            </div>
-        </div>
-    </div>
-</div>
+        <?php endforeach; ?>
 
         <div class="content-section">
             <div class="section-title-wrap">
@@ -960,7 +1177,7 @@ mysqli_stmt_close($stmt_deworm);
                     </div>
                     <div class="status-pill <?php echo h(status_class($latest_record['hfa_status'])); ?>">
                         <span class="pill-label">HFA</span>
-                        <span class="pill-value"><?php echo h(safe_value($latest_record['hfa_status'])); ?></span>
+                        <span class="pill-value"><?php echo h(hfa_display_label(safe_value($latest_record['hfa_status']))); ?></span>
                     </div>
                     <div class="status-pill <?php echo h(status_class($latest_record['wflh_status'])); ?>">
                         <span class="pill-label">WFL/H</span>
@@ -1012,7 +1229,7 @@ mysqli_stmt_close($stmt_deworm);
                                     <td><?php echo h(safe_value($row['edema_grade'], '--')); ?></td>
                                     <td><?php echo h(safe_value($row['muac_status'], '--')); ?></td>
                                     <td><?php echo h(safe_value($row['wfa_status'])); ?></td>
-                                    <td><?php echo h(safe_value($row['hfa_status'])); ?></td>
+                                    <td><?php echo h(hfa_display_label(safe_value($row['hfa_status']))); ?></td>
                                     <td><?php echo h(safe_value($row['wflh_status'])); ?></td>
                                 </tr>
                             <?php endforeach; ?>

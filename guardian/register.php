@@ -1,13 +1,18 @@
 <?php
 include '../config/database.php';
+require_once '../includes/eccd_form1.php';
 
 $message = "";
 $error = "";
 
+/* Form 1 answers (1.A, 1.B, 1.C). Empty on first load. */
+$f1_errors = array();
+$f1 = eccd_f1_empty();
+
 if (isset($_POST['register'])) {
 
     /* ============================
-       GUARDIAN ACCOUNT FIELDS
+       GUARDIAN ACCOUNT FIELDS (system fields, not part of Form 1)
     ============================ */
     $first_name             = trim($_POST['first_name'] ?? '');
     $last_name               = trim($_POST['last_name'] ?? '');
@@ -20,44 +25,16 @@ if (isset($_POST['register'])) {
     $access_code             = trim($_POST['access_code'] ?? '');
 
     /* ============================
-       FORM 1 FIELDS (child-level)
+       FORM 1 - HOME PROFILE
+       (everything on Form 1 is optional)
     ============================ */
-    $is_registered           = trim($_POST['is_registered'] ?? '');
-
-    $first_language_raw      = trim($_POST['first_language'] ?? '');
-    $first_language_other    = trim($_POST['first_language_other'] ?? '');
-    $first_language          = ($first_language_raw === 'Others' && $first_language_other !== '')
-                                    ? $first_language_other
-                                    : $first_language_raw;
-
-    $second_language_raw     = trim($_POST['second_language'] ?? '');
-    $second_language_other   = trim($_POST['second_language_other'] ?? '');
-    $second_language         = ($second_language_raw === 'Others' && $second_language_other !== '')
-                                    ? $second_language_other
-                                    : $second_language_raw;
-
-    $mother_name             = trim($_POST['mother_name'] ?? '');
-    $mother_occupation       = trim($_POST['mother_occupation'] ?? '');
-    $mother_address          = trim($_POST['mother_address'] ?? '');
-    $mother_contact_home     = trim($_POST['mother_contact_home'] ?? '');
-    $mother_contact_work     = trim($_POST['mother_contact_work'] ?? '');
-
-    $father_name             = trim($_POST['father_name'] ?? '');
-    $father_occupation       = trim($_POST['father_occupation'] ?? '');
-    $father_address          = trim($_POST['father_address'] ?? '');
-    $father_contact_home     = trim($_POST['father_contact_home'] ?? '');
-    $father_contact_work     = trim($_POST['father_contact_work'] ?? '');
-
-    $emergency_contact_name          = trim($_POST['emergency_contact_name'] ?? '');
-    $emergency_contact_relationship  = trim($_POST['emergency_contact_relationship'] ?? '');
-    $emergency_contact_home          = trim($_POST['emergency_contact_home'] ?? '');
-    $emergency_contact_work          = trim($_POST['emergency_contact_work'] ?? '');
+    $f1 = eccd_f1_collect($_POST, $f1_errors);
+    // make sure the home_profile column exists BEFORE the transaction starts (ALTER commits implicitly)
+    eccd_f1_storage_ready($conn);
 
     /* ============================
        REQUIRED FIELD VALIDATION
-       (only the fields that were already required before,
-       Form 1 fields below are treated as optional since
-       existing children rows won't have this data yet)
+       (only the guardian account fields are required)
     ============================ */
     if (
         $first_name === '' || $last_name === '' || $relationship_to_child === '' ||
@@ -69,8 +46,8 @@ if (isset($_POST['register'])) {
         $error = "Please enter a valid email address.";
     } elseif ($password !== $confirm_password) {
         $error = "Password and Confirm Password do not match.";
-    } elseif ($is_registered !== '' && !in_array($is_registered, ['Yes', 'No'], true)) {
-        $error = "Invalid value for Registered status.";
+    } elseif (!empty($f1_errors)) {
+        $error = implode(' ', $f1_errors);
     } else {
 
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
@@ -175,65 +152,24 @@ if (isset($_POST['register'])) {
 
                         $link_stmt->close();
 
-                        // 4. Update the existing child record with Form 1 fields
-                        // (child row already exists — created by the CDW — we only
-                        // fill in the additional Form 1 details here, nothing about
-                        // the child's name/sex/birthdate/address is touched)
-                        $is_registered_value = ($is_registered !== '') ? $is_registered : null;
+                        // 4. Save Form 1 (Home Profile) for this child.
+                        //    Skipped only when the guardian left Form 1 completely blank.
+                        if (eccd_f1_has_any($f1)) {
+                            $f1_save_error = '';
+                            if (!eccd_f1_save($conn, $child_id, $f1, $f1_save_error)) {
+                                throw new Exception($f1_save_error);
+                            }
 
-                        $update_child_stmt = $conn->prepare("
-                            UPDATE children SET
-                                first_language = ?,
-                                second_language = ?,
-                                is_registered = ?,
-                                mother_name = ?,
-                                mother_occupation = ?,
-                                mother_address = ?,
-                                mother_contact_home = ?,
-                                mother_contact_work = ?,
-                                father_name = ?,
-                                father_occupation = ?,
-                                father_address = ?,
-                                father_contact_home = ?,
-                                father_contact_work = ?,
-                                emergency_contact_name = ?,
-                                emergency_contact_relationship = ?,
-                                emergency_contact_home = ?,
-                                emergency_contact_work = ?
-                            WHERE child_id = ?
-                        ");
-                        $update_child_stmt->bind_param(
-                            "sssssssssssssssssi",
-                            $first_language,
-                            $second_language,
-                            $is_registered_value,
-                            $mother_name,
-                            $mother_occupation,
-                            $mother_address,
-                            $mother_contact_home,
-                            $mother_contact_work,
-                            $father_name,
-                            $father_occupation,
-                            $father_address,
-                            $father_contact_home,
-                            $father_contact_work,
-                            $emergency_contact_name,
-                            $emergency_contact_relationship,
-                            $emergency_contact_home,
-                            $emergency_contact_work,
-                            $child_id
-                        );
-
-                        if (!$update_child_stmt->execute()) {
-                            throw new Exception("Saving child's Form 1 details failed: " . $update_child_stmt->error);
+                            // keep children.mother_name / father_name etc. in step
+                            eccd_f1_sync_children($conn, $child_id, $f1);
                         }
 
-                        $update_child_stmt->close();
-
-                        // All good — commit everything
+                        // All good - commit everything
                         $conn->commit();
 
                         $message = "Guardian registration successful! You can now login.";
+                        $f1 = eccd_f1_empty();
+                        $_POST = array();
 
                     } catch (Exception $e) {
                         $conn->rollback();
@@ -519,10 +455,9 @@ if (isset($_POST['register'])) {
 
         /* ============================
            PRINT RULES
-           Only the Form 1 sections (Guardian Information
-           through In Case of Emergency, Please Contact) are
-           printed. Page header, account-access system fields,
-           and the print button itself are hidden.
+           Only the Form 1 sections (1.A Father's Profile, 1.B Mother's
+           Profile, 1.C Family Profile) are printed. Page header, the
+           guardian account fields and the print button are hidden.
         ============================= */
         @media print{
             body{
@@ -549,40 +484,51 @@ if (isset($_POST['register'])) {
             }
         }
     </style>
+
+    <?php echo eccd_form_css(); ?>
+    <?php echo eccd_f1_css(); ?>
 </head>
 <body>
 
     <div class="page-wrapper">
 
-                        <div class="page-header">
-                            <div class="page-header-text">
-                                <a href="../login.php" class="back-link">← Back to Login</a>
-                                <h2 class="page-title">Guardian Registration</h2>
-                                <p class="page-subtitle">
-                                    Create a guardian account and link it to the child using the child access code.
-                                    This form follows the official ECCD Council "Form 1 - Registration Form".
-                                </p>
-                            </div>
+        <div class="page-header">
+            <div class="page-header-text">
+                <a href="../login.php" class="back-link">&larr; Back to Login</a>
+                <h2 class="page-title">Guardian Registration</h2>
+                <p class="page-subtitle">
+                    Create a guardian account and link it to the child using the child access code.
+                    The form below is a full copy of the official ECCD Council
+                    &quot;Form 1 &ndash; Home Profile&quot; (1.A Father's Profile, 1.B Mother's Profile, 1.C Family Profile).
+                </p>
+            </div>
 
-                            <button type="button" class="print-form1-btn no-print" onclick="window.print()">
-                                🖨️ Print / Save Form 1
-                            </button>
-                        </div>
+            <button type="button" class="print-form1-btn no-print" onclick="window.print()">
+                &#128424;&#65039; Print / Save Form 1
+            </button>
+        </div>
 
-                <?php if (!empty($error)) { ?>
-                    <div class="message error"><?php echo htmlspecialchars($error); ?></div>
-                <?php } ?>
+        <?php if (!empty($error)) { ?>
+            <div class="message error"><?php echo htmlspecialchars($error); ?></div>
+        <?php } ?>
 
-                <?php if (!empty($message)) { ?>
-                    <div class="message success"><?php echo htmlspecialchars($message); ?></div>
-                <?php } ?>
+        <?php if (!empty($message)) { ?>
+            <div class="message success"><?php echo htmlspecialchars($message); ?></div>
+        <?php } ?>
+
+        <div class="eccd-print-only" style="text-align:center; margin-bottom:14px;">
+            <div style="font-size:14px; font-weight:700;">Early Childhood Care and Development Council</div>
+            <div style="font-size:12px;">FORM 1 &ndash; HOME PROFILE</div>
+        </div>
 
         <form method="POST">
 
             <!-- ============================
-                 GUARDIAN INFORMATION
+                 GUARDIAN ACCOUNT DETAILS
+                 (system fields - not part of Form 1)
             ============================= -->
-            <div class="form-card">
+            <div class="form-card system-field-card">
+                <span class="system-field-tag">SYSTEM FIELD &mdash; not part of Form 1</span>
                 <h3 class="section-title">Guardian Information</h3>
                 <p class="section-subtitle">This will also be your login account.</p>
 
@@ -635,198 +581,18 @@ if (isset($_POST['register'])) {
             </div>
 
             <!-- ============================
-                 FORM 1: CHILD REGISTRATION STATUS
+                 FORM 1.A / 1.B / 1.C  (official Home Profile)
             ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Child Registration Details</h3>
-                
-
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Is the child registered? (Registered: Yes/No)</label>
-                        <select name="is_registered" class="form-select">
-                            <option value="">Select</option>
-                            <option value="Yes" <?php echo (($_POST['is_registered'] ?? '') === 'Yes') ? 'selected' : ''; ?>>Yes</option>
-                            <option value="No" <?php echo (($_POST['is_registered'] ?? '') === 'No') ? 'selected' : ''; ?>>No</option>
-                        </select>
-                    </div>
-
-                    <div class="form-row"></div>
-
-                    <?php
-                    $language_options = ['Tagalog','Bisaya/Cebuano','Ilocano','Bicolano','Hiligaynon/Ilonggo','Waray','Kapampangan','Pangasinan','Chavacano'];
-                    $first_language_selected = $_POST['first_language'] ?? '';
-                    $first_language_other = $_POST['first_language_other'] ?? '';
-                    $second_language_selected = $_POST['second_language'] ?? '';
-                    $second_language_other = $_POST['second_language_other'] ?? '';
-                    ?>
-
-                    <div class="form-row">
-                        <label class="form-label">Child's First Language</label>
-                        <select name="first_language" id="firstLanguage" class="form-select">
-                            <option value="">Select Language</option>
-                            <?php foreach ($language_options as $lang) {
-                                $sel = ($first_language_selected === $lang) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($lang) . "\" $sel>" . htmlspecialchars($lang) . "</option>";
-                            } ?>
-                            <option value="Others" <?php echo ($first_language_selected === 'Others') ? 'selected' : ''; ?>>Others</option>
-                        </select>
-                        <div class="other-field-group" id="firstLanguageOtherGroup">
-                            <input type="text" name="first_language_other" class="form-control"
-                                   placeholder="Please specify"
-                                   value="<?php echo htmlspecialchars($first_language_other); ?>">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Second Language (optional)</label>
-                        <select name="second_language" id="secondLanguage" class="form-select">
-                            <option value="">Select Language</option>
-                            <?php foreach ($language_options as $lang) {
-                                $sel = ($second_language_selected === $lang) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($lang) . "\" $sel>" . htmlspecialchars($lang) . "</option>";
-                            } ?>
-                            <option value="Others" <?php echo ($second_language_selected === 'Others') ? 'selected' : ''; ?>>Others</option>
-                        </select>
-                        <div class="other-field-group" id="secondLanguageOtherGroup">
-                            <input type="text" name="second_language_other" class="form-control"
-                                   placeholder="Please specify"
-                                   value="<?php echo htmlspecialchars($second_language_other); ?>">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 MOTHER'S INFORMATION
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Mother's Information</h3>
-                <p class="section-subtitle">Optional — leave blank if not applicable.</p>
-
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="mother_name" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['mother_name'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Occupation</label>
-                        <input type="text" name="mother_occupation" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['mother_occupation'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row full">
-                        <label class="form-label">Address</label>
-                        <input type="text" name="mother_address" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['mother_address'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Home</label>
-                        <input type="text" name="mother_contact_home" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['mother_contact_home'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Work</label>
-                        <input type="text" name="mother_contact_work" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['mother_contact_work'] ?? ''); ?>">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 FATHER'S INFORMATION
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Father's Information</h3>
-                <p class="section-subtitle">Optional — leave blank if not applicable.</p>
-
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="father_name" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['father_name'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Occupation</label>
-                        <input type="text" name="father_occupation" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['father_occupation'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row full">
-                        <label class="form-label">Address</label>
-                        <input type="text" name="father_address" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['father_address'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Home</label>
-                        <input type="text" name="father_contact_home" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['father_contact_home'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Work</label>
-                        <input type="text" name="father_contact_work" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['father_contact_work'] ?? ''); ?>">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 EMERGENCY CONTACT
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">In Case of Emergency, Please Contact</h3>
-                <p class="section-subtitle">Optional — leave blank if not applicable.</p>
-
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="emergency_contact_name" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['emergency_contact_name'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Relationship</label>
-                        <select name="emergency_contact_relationship" class="form-select">
-                            <option value="">Select Relationship</option>
-                            <?php
-                            $emergency_relationship_selected = $_POST['emergency_contact_relationship'] ?? '';
-                            foreach ($relationship_options as $option) {
-                                $sel = ($emergency_relationship_selected === $option) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($option) . "\" $sel>" . htmlspecialchars($option) . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Home</label>
-                        <input type="text" name="emergency_contact_home" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['emergency_contact_home'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Work</label>
-                        <input type="text" name="emergency_contact_work" class="form-control"
-                               value="<?php echo htmlspecialchars($_POST['emergency_contact_work'] ?? ''); ?>">
-                    </div>
-                </div>
-            </div>
+            <?php echo eccd_f1_render_all($f1); ?>
 
             <!-- ============================
                  SYSTEM-SPECIFIC FIELDS
-                 (not part of the paper Form 1 — needed only
+                 (not part of the paper Form 1 - needed only
                  for linking the account to the child record
                  and for login access)
             ============================= -->
             <div class="form-card system-field-card">
-                <span class="system-field-tag">SYSTEM FIELD — not part of Form 1</span>
+                <span class="system-field-tag">SYSTEM FIELD &mdash; not part of Form 1</span>
                 <h3 class="section-title">Account Access</h3>
 
                 <div class="form-grid">
@@ -858,28 +624,8 @@ if (isset($_POST['register'])) {
 
     </div>
 
-    <script>
-        function setupLanguageOtherToggle(selectId, groupId) {
-            var select = document.getElementById(selectId);
-            var group = document.getElementById(groupId);
-
-            if (!select || !group) return;
-
-            function update() {
-                if (select.value === 'Others') {
-                    group.classList.add('show');
-                } else {
-                    group.classList.remove('show');
-                }
-            }
-
-            select.addEventListener('change', update);
-            update();
-        }
-
-        setupLanguageOtherToggle('firstLanguage', 'firstLanguageOtherGroup');
-        setupLanguageOtherToggle('secondLanguage', 'secondLanguageOtherGroup');
-    </script>
+    <?php echo eccd_form_js(); ?>
+    <?php echo eccd_f1_js(); ?>
 
 </body>
 </html>

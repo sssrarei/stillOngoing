@@ -2,6 +2,7 @@
 include '../includes/auth.php';
 include '../config/database.php';
 include '../includes/nnc_growth_standards.php';
+include '../includes/status_label.php';
 
 if($_SESSION['role_id'] != 2){
     header("Location: ../login.php");
@@ -109,7 +110,7 @@ function status_badge($status){
         $class = 'status-alert';
     }
 
-    return '<span class="status-badge ' . $class . '">' . htmlspecialchars($status) . '</span>';
+    return '<span class="status-badge ' . $class . '">' . htmlspecialchars(statusLabel($status)) . '</span>';
 }
 
 function assessment_type_label($assessment_type){

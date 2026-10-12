@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if($_SESSION['role_id'] != 2){
     header("Location: ../login.php");
@@ -52,8 +53,8 @@ function getShortNutritionLabel($label) {
         'Severely Underweight' => 'S.UW',
         'Overweight' => 'OW',
         'Obese' => 'Obese',
-        'Stunted' => 'ST',
-        'Severely Stunted' => 'S. ST',
+        'Stunted' => 'LH',
+        'Severely Stunted' => 'S. LH',
         'Moderately Wasted' => 'M. W',
         'Severely Wasted' => 'S. W'
     );
@@ -483,7 +484,7 @@ $nutri_chart_counts = array();
 
 foreach ($nutritional_graph_data as $item) {
     $nutri_chart_labels[] = getShortNutritionLabel($item['label']);
-    $nutri_chart_full_labels[] = $item['label'];
+    $nutri_chart_full_labels[] = statusLabel($item['label']);
     $nutri_chart_counts[] = (int)$item['count'];
 }
 
@@ -799,15 +800,15 @@ $is_dark_mode = ($theme_mode === 'dark');
                 </div>
             </div>
 
-            <div class="card clickable-card" data-status="Stunted" onclick="openChildModal('Stunted', 'Stunted')">
-                <div class="card-title title-alert">Stunted</div>
+            <div class="card clickable-card" data-status="Stunted" onclick="openChildModal('Stunted', 'Low Height')">
+                <div class="card-title title-alert">Low Height</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $stunted_count; ?></div>
                 </div>
             </div>
 
-            <div class="card clickable-card" data-status="Severely Stunted" onclick="openChildModal('Severely Stunted', 'Severely Stunted')">
-                <div class="card-title title-alert">Severely Stunted</div>
+            <div class="card clickable-card" data-status="Severely Stunted" onclick="openChildModal('Severely Stunted', 'Severely Low Height')">
+                <div class="card-title title-alert">Severely Low Height</div>
                 <div class="card-body">
                     <div class="card-count"><?php echo $severely_stunted_count; ?></div>
                 </div>

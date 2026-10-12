@@ -2,6 +2,8 @@
 include '../includes/auth.php';
 include '../config/database.php';
 include '../includes/nnc_growth_standards.php';
+require_once '../includes/eccd_form2.php';
+require_once '../includes/eccd_form1.php';
 
 if ($_SESSION['role_id'] != 2) {
     header("Location: ../login.php");
@@ -108,11 +110,29 @@ $relationship_options = ['Mother','Father','Grandmother','Grandfather','Guardian
 $language_options = ['Tagalog','Bisaya/Cebuano','Ilocano','Bicolano','Hiligaynon/Ilonggo','Waray','Kapampangan','Pangasinan','Chavacano'];
 
 /* ============================================================
+   Form 2 health fields that the Child Profile reads from
+   child_health_information (kept in sync on save, and used
+   to pre-fill the form below)
+============================================================ */
+$chi_cols = array(
+    'born_at', 'learns_at_home_with', 'plays_with_older_siblings',
+    'plays_with_younger_siblings', 'plays_with_neighbors',
+    'has_meal_before_school', 'food_normally_eaten', 'has_baon',
+    'travel_time_to_dcc_minutes', 'travel_mode_to_dcc',
+    'travel_time_to_ncdc_minutes', 'travel_mode_to_ncdc',
+    'public_transport_type', 'goes_to_school_with',
+    'has_eccd_card', 'has_mother_child_book', 'has_other_health_record',
+    'vaccine_bcg', 'vaccine_dpt', 'vaccine_opv', 'vaccine_hepab',
+    'vaccine_measles', 'vaccine_others_name', 'vaccine_others_status',
+    'is_left_handed'
+);
+
+/* ============================================================
    HANDLE FORM SUBMISSION
 ============================================================ */
 if (isset($_POST['update'])) {
 
-    /* ---- Child Information ---- */
+    /* ---- Child Information (Form 2 items 1-2) ---- */
     $first_name  = trim($_POST['first_name'] ?? '');
     $middle_name = trim($_POST['middle_name'] ?? '');
     $last_name   = trim($_POST['last_name'] ?? '');
@@ -121,94 +141,18 @@ if (isset($_POST['update'])) {
     $address     = trim($_POST['address'] ?? '');
     $religion    = trim($_POST['religion'] ?? '');
 
-    $birth_order = ($_POST['birth_order'] ?? '') !== '' ? (int) $_POST['birth_order'] : null;
-    $born_at     = blankToNull($_POST['born_at'] ?? '');
-
-    /* ---- Family & Registration Details (Form 1) ---- */
-    $is_registered = blankToNull($_POST['is_registered'] ?? '');
-
-    $first_language_raw   = trim($_POST['first_language'] ?? '');
-    $first_language_other = trim($_POST['first_language_other'] ?? '');
-    $first_language = ($first_language_raw === 'Others' && $first_language_other !== '')
-        ? $first_language_other : blankToNull($first_language_raw);
-
-    $second_language_raw   = trim($_POST['second_language'] ?? '');
-    $second_language_other = trim($_POST['second_language_other'] ?? '');
-    $second_language = ($second_language_raw === 'Others' && $second_language_other !== '')
-        ? $second_language_other : blankToNull($second_language_raw);
-
-    $mother_name         = blankToNull($_POST['mother_name'] ?? '');
-    $mother_occupation   = blankToNull($_POST['mother_occupation'] ?? '');
-    $mother_address      = blankToNull($_POST['mother_address'] ?? '');
-    $mother_contact_home = blankToNull($_POST['mother_contact_home'] ?? '');
-    $mother_contact_work = blankToNull($_POST['mother_contact_work'] ?? '');
-
-    $father_name         = blankToNull($_POST['father_name'] ?? '');
-    $father_occupation   = blankToNull($_POST['father_occupation'] ?? '');
-    $father_address      = blankToNull($_POST['father_address'] ?? '');
-    $father_contact_home = blankToNull($_POST['father_contact_home'] ?? '');
-    $father_contact_work = blankToNull($_POST['father_contact_work'] ?? '');
-
-    $emergency_contact_name         = blankToNull($_POST['emergency_contact_name'] ?? '');
-    $emergency_contact_relationship = blankToNull($_POST['emergency_contact_relationship'] ?? '');
-    $emergency_contact_home         = blankToNull($_POST['emergency_contact_home'] ?? '');
-    $emergency_contact_work         = blankToNull($_POST['emergency_contact_work'] ?? '');
-
     /* ---- Growth Measurements (not stored on children; see below) ---- */
     $height_cm = ($_POST['height_cm'] ?? '') !== '' ? (float) $_POST['height_cm'] : null;
     $weight_kg = ($_POST['weight_kg'] ?? '') !== '' ? (float) $_POST['weight_kg'] : null;
 
-    /* ---- Health Records (Form 2) ---- */
-    $has_eccd_card          = isset($_POST['has_eccd_card']) ? 1 : 0;
-    $has_mother_child_book  = isset($_POST['has_mother_child_book']) ? 1 : 0;
-    $has_other_health_record = blankToNull($_POST['has_other_health_record'] ?? '');
+    /* ---- Form 2 items 3-16 (read + validated in includes/eccd_form2.php) ---- */
+    $form_errors = array();
+    $f2 = eccd_f2_collect($_POST, $form_errors);
 
-    $vaccine_bcg      = blankToNull($_POST['vaccine_bcg'] ?? '');
-    $vaccine_dpt      = blankToNull($_POST['vaccine_dpt'] ?? '');
-    $vaccine_opv      = blankToNull($_POST['vaccine_opv'] ?? '');
-    $vaccine_hepab    = blankToNull($_POST['vaccine_hepab'] ?? '');
-    $vaccine_measles  = blankToNull($_POST['vaccine_measles'] ?? '');
-    $vaccine_others_name   = blankToNull($_POST['vaccine_others_name'] ?? '');
-    $vaccine_others_status = blankToNull($_POST['vaccine_others_status'] ?? '');
-
-    /* ---- Physical Attributes ---- */
-    $deformity_hare_lip          = isset($_POST['deformity_hare_lip']) ? 1 : 0;
-    $deformity_cross_eyed        = isset($_POST['deformity_cross_eyed']) ? 1 : 0;
-    $deformity_deaf              = isset($_POST['deformity_deaf']) ? 1 : 0;
-    $deformity_blind             = isset($_POST['deformity_blind']) ? 1 : 0;
-    $deformity_disabled_leg      = isset($_POST['deformity_disabled_leg']) ? 1 : 0;
-    $deformity_disabled_arm_hand = isset($_POST['deformity_disabled_arm_hand']) ? 1 : 0;
-    $deformity_fingers_toes      = isset($_POST['deformity_fingers_toes']) ? 1 : 0;
-
-    $problem_behavior = isset($_POST['problem_behavior']) ? 1 : 0;
-    $problem_speaking = isset($_POST['problem_speaking']) ? 1 : 0;
-    $problem_hearing  = isset($_POST['problem_hearing']) ? 1 : 0;
-    $problem_vision   = isset($_POST['problem_vision']) ? 1 : 0;
-
-    $is_left_handed = blankToNull($_POST['is_left_handed'] ?? '');
-
-    /* ---- Siblings & Prior ECCD Experience (free text) ---- */
-    $siblings_info = blankToNull($_POST['siblings_info'] ?? '');
-    $eccd_experience_info = blankToNull($_POST['eccd_experience_info'] ?? '');
-
-    /* ---- Other Performance Related Inputs ---- */
-    $learns_at_home_with = checkboxListToString($_POST['learns_at_home_with'] ?? []);
-    $plays_with_older_siblings   = blankToNull($_POST['plays_with_older_siblings'] ?? '');
-    $plays_with_younger_siblings = blankToNull($_POST['plays_with_younger_siblings'] ?? '');
-    $plays_with_neighbors         = blankToNull($_POST['plays_with_neighbors'] ?? '');
-
-    /* ---- Logistics ---- */
-    $has_meal_before_school = blankToNull($_POST['has_meal_before_school'] ?? '');
-    $food_normally_eaten    = checkboxListToString($_POST['food_normally_eaten'] ?? []);
-    $has_baon               = blankToNull($_POST['has_baon'] ?? '');
-
-    $travel_time_to_dcc_minutes = ($_POST['travel_time_to_dcc_minutes'] ?? '') !== '' ? (int) $_POST['travel_time_to_dcc_minutes'] : null;
-    $travel_mode_to_dcc          = blankToNull($_POST['travel_mode_to_dcc'] ?? '');
-    $travel_time_to_ncdc_minutes = ($_POST['travel_time_to_ncdc_minutes'] ?? '') !== '' ? (int) $_POST['travel_time_to_ncdc_minutes'] : null;
-    $travel_mode_to_ncdc          = blankToNull($_POST['travel_mode_to_ncdc'] ?? '');
-
-    $public_transport_type = checkboxListToString($_POST['public_transport_type'] ?? []);
-    $goes_to_school_with    = checkboxListToString($_POST['goes_to_school_with'] ?? []);
+    /* ---- Form 1 - Home Profile (1.A, 1.B, 1.C) ---- */
+    $f1 = eccd_f1_collect($_POST, $form_errors);
+    // make sure the home_profile column exists BEFORE the transaction starts (ALTER commits implicitly)
+    $f1_ready = eccd_f1_storage_ready($conn);
 
     /* ---- Health info (existing feature, unchanged) ---- */
     $allergies      = trim($_POST['allergies'] ?? '');
@@ -218,6 +162,10 @@ if (isset($_POST['update'])) {
 
     if (empty($first_name) || empty($last_name) || empty($birthdate) || empty($sex)) {
         $error = "Please fill in all required child information fields.";
+    } elseif (!in_array($sex, array('Male', 'Female'), true)) {
+        $error = "Please choose Male or Female for Sex.";
+    } elseif (!empty($form_errors)) {
+        $error = implode(' ', $form_errors);
     } else {
 
         $conn->begin_transaction();
@@ -245,63 +193,45 @@ if (isset($_POST['update'])) {
             /* ----------------------------------------------
                2. Update the children record (all Form 1 + Form 2 fields)
             ---------------------------------------------- */
-            $update_sql = "
-                UPDATE children SET
-                    first_name = ?, middle_name = ?, last_name = ?, birthdate = ?, sex = ?, address = ?, religion = ?,
-                    birth_order = ?, born_at = ?,
-                    is_registered = ?, first_language = ?, second_language = ?,
-                    mother_name = ?, mother_occupation = ?, mother_address = ?, mother_contact_home = ?, mother_contact_work = ?,
-                    father_name = ?, father_occupation = ?, father_address = ?, father_contact_home = ?, father_contact_work = ?,
-                    emergency_contact_name = ?, emergency_contact_relationship = ?, emergency_contact_home = ?, emergency_contact_work = ?,
-                    has_eccd_card = ?, has_mother_child_book = ?, has_other_health_record = ?,
-                    vaccine_bcg = ?, vaccine_dpt = ?, vaccine_opv = ?, vaccine_hepab = ?, vaccine_measles = ?,
-                    vaccine_others_name = ?, vaccine_others_status = ?,
-                    deformity_hare_lip = ?, deformity_cross_eyed = ?, deformity_deaf = ?, deformity_blind = ?,
-                    deformity_disabled_leg = ?, deformity_disabled_arm_hand = ?, deformity_fingers_toes = ?,
-                    problem_behavior = ?, problem_speaking = ?, problem_hearing = ?, problem_vision = ?,
-                    is_left_handed = ?,
-                    learns_at_home_with = ?, plays_with_older_siblings = ?, plays_with_younger_siblings = ?, plays_with_neighbors = ?,
-                    has_meal_before_school = ?, food_normally_eaten = ?, has_baon = ?,
-                    travel_time_to_dcc_minutes = ?, travel_mode_to_dcc = ?,
-                    travel_time_to_ncdc_minutes = ?, travel_mode_to_ncdc = ?,
-                    public_transport_type = ?, goes_to_school_with = ?,
-                    siblings_info = ?, eccd_experience_info = ?
-                WHERE child_id = ? AND cdc_id = ?
-            ";
+            $base = array(
+                'first_name'  => array('s', $first_name),
+                'middle_name' => array('s', $middle_name),
+                'last_name'   => array('s', $last_name),
+                'birthdate'   => array('s', $birthdate),
+                'sex'         => array('s', $sex),
+                'address'     => array('s', $address),
+                'religion'    => array('s', $religion),
+            );
+            list($col_names, $col_types, $col_values) = eccd_f2_build_set($f2, $base);
+
+            $set_sql = implode(', ', array_map(function ($c) { return "`$c` = ?"; }, $col_names));
+            $update_sql = "UPDATE children SET $set_sql WHERE child_id = ? AND cdc_id = ?";
 
             $update_stmt = $conn->prepare($update_sql);
             if (!$update_stmt) {
                 throw new Exception("Failed to prepare child update: " . $conn->error);
             }
 
-            $update_stmt->bind_param(
-                "sssssssissssssssssssssssssiissssssssiiiiiiiiiiissssssssisisssssii",
-                $first_name, $middle_name, $last_name, $birthdate, $sex, $address, $religion,
-                $birth_order, $born_at,
-                $is_registered, $first_language, $second_language,
-                $mother_name, $mother_occupation, $mother_address, $mother_contact_home, $mother_contact_work,
-                $father_name, $father_occupation, $father_address, $father_contact_home, $father_contact_work,
-                $emergency_contact_name, $emergency_contact_relationship, $emergency_contact_home, $emergency_contact_work,
-                $has_eccd_card, $has_mother_child_book, $has_other_health_record,
-                $vaccine_bcg, $vaccine_dpt, $vaccine_opv, $vaccine_hepab, $vaccine_measles,
-                $vaccine_others_name, $vaccine_others_status,
-                $deformity_hare_lip, $deformity_cross_eyed, $deformity_deaf, $deformity_blind,
-                $deformity_disabled_leg, $deformity_disabled_arm_hand, $deformity_fingers_toes,
-                $problem_behavior, $problem_speaking, $problem_hearing, $problem_vision,
-                $is_left_handed,
-                $learns_at_home_with, $plays_with_older_siblings, $plays_with_younger_siblings, $plays_with_neighbors,
-                $has_meal_before_school, $food_normally_eaten, $has_baon,
-                $travel_time_to_dcc_minutes, $travel_mode_to_dcc,
-                $travel_time_to_ncdc_minutes, $travel_mode_to_ncdc,
-                $public_transport_type, $goes_to_school_with,
-                $siblings_info, $eccd_experience_info,
-                $child_id, $active_cdc_id
-            );
+            $col_types .= 'ii';
+            $col_values[] = $child_id;
+            $col_values[] = $active_cdc_id;
+            $update_stmt->bind_param($col_types, ...$col_values);
 
             if (!$update_stmt->execute()) {
                 throw new Exception("Failed to update child profile: " . $update_stmt->error);
             }
             $update_stmt->close();
+
+            /* ----------------------------------------------
+               2b. Save Form 1 - Home Profile (children.home_profile)
+            ---------------------------------------------- */
+            $f1_error = '';
+            if (!eccd_f1_save($conn, $child_id, $f1, $f1_error)) {
+                throw new Exception($f1_error);
+            }
+            if (eccd_f1_has_any($f1)) {
+                eccd_f1_sync_children($conn, $child_id, $f1);
+            }
 
             /* ----------------------------------------------
                Siblings and Prior ECCD Experience are now saved
@@ -405,6 +335,32 @@ if (isset($_POST['update'])) {
                 $health_insert_stmt->close();
             }
 
+            /* ----------------------------------------------
+               6b. Sync Form 2 health fields into
+                   child_health_information (the table the
+                   Child Profile reads from)
+            ---------------------------------------------- */
+            $chi_types_map = eccd_f2_columns();
+            $chi_sets = array();
+            $chi_types = '';
+            $chi_vals = array();
+            foreach ($chi_cols as $col) {
+                $chi_sets[] = "`$col` = ?";
+                $chi_types .= $chi_types_map[$col];
+                $chi_vals[] = array_key_exists($col, $f2) ? $f2[$col] : null;
+            }
+            $chi_sync_stmt = $conn->prepare("UPDATE child_health_information SET " . implode(', ', $chi_sets) . " WHERE child_id = ?");
+            if (!$chi_sync_stmt) {
+                throw new Exception("Failed to prepare health record sync: " . $conn->error);
+            }
+            $chi_types .= 'i';
+            $chi_vals[] = $child_id;
+            $chi_sync_stmt->bind_param($chi_types, ...$chi_vals);
+            if (!$chi_sync_stmt->execute()) {
+                throw new Exception("Failed to sync health records: " . $chi_sync_stmt->error);
+            }
+            $chi_sync_stmt->close();
+
             $conn->commit();
             $success = "Child information updated successfully!";
 
@@ -433,22 +389,36 @@ if (isset($_POST['update'])) {
 }
 
 /* ============================================================
-   Determine current dropdown state for First/Second Language
-   (so we can pre-select "Others" + fill the specify box when
-   the saved value isn't one of the standard options)
+   Values shown in the form (Form 1 comes from children.home_profile).
+   After a failed save we show what the user typed, not the old row.
 ============================================================ */
-$current_first_language = $child['first_language'] ?? '';
-$first_language_is_other = ($current_first_language !== '' && !in_array($current_first_language, $language_options, true));
-$first_language_select_value = $first_language_is_other ? 'Others' : $current_first_language;
+if (!isset($f1)) {
+    $f1 = eccd_f1_load($conn, $child_id);
+}
+if (!empty($success)) {
+    $f1 = eccd_f1_load($conn, $child_id);
+}
 
-$current_second_language = $child['second_language'] ?? '';
-$second_language_is_other = ($current_second_language !== '' && !in_array($current_second_language, $language_options, true));
-$second_language_select_value = $second_language_is_other ? 'Others' : $current_second_language;
-
-$learns_checked = stringToCheckedArray($child['learns_at_home_with'] ?? '');
-$food_checked = stringToCheckedArray($child['food_normally_eaten'] ?? '');
-$transport_checked = stringToCheckedArray($child['public_transport_type'] ?? '');
-$goeswith_checked = stringToCheckedArray($child['goes_to_school_with'] ?? '');
+$form_values = $child;
+if ($health) {
+    foreach ($chi_cols as $col) {
+        if (isset($health[$col])) {
+            $form_values[$col] = $health[$col];
+        }
+    }
+}
+if (isset($f2) && !empty($error)) {
+    foreach ($f2 as $k => $v) {
+        $form_values[$k] = $v;
+    }
+    $form_values['first_name']  = $first_name;
+    $form_values['middle_name'] = $middle_name;
+    $form_values['last_name']   = $last_name;
+    $form_values['birthdate']   = $birthdate;
+    $form_values['sex']         = $sex;
+    $form_values['address']     = $address;
+    $form_values['religion']    = $religion;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -693,6 +663,8 @@ $goeswith_checked = stringToCheckedArray($child['goes_to_school_with'] ?? '');
             }
         }
     </style>
+    <?php echo eccd_f2_css(); ?>
+    <?php echo eccd_f1_css(); ?>
 </head>
 <body>
 
@@ -717,561 +689,16 @@ $goeswith_checked = stringToCheckedArray($child['goes_to_school_with'] ?? '');
 
         <form method="POST" enctype="multipart/form-data">
 
-            <!-- ============================
-                 CHILD INFORMATION
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Child Information</h3>
+            <?php
+            /* FORM 2 - Children's Profile (items 1-16) */
+            echo eccd_f2_render($form_values, array('show_growth' => true,
+                'growth_note' => 'Optional. Updates the child\'s baseline height/weight. Leave blank to skip. Follow-up check-ups are logged in Anthropometric Data.'));
 
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">First Name</label>
-                        <input type="text" name="first_name" class="form-control" value="<?php echo htmlspecialchars($child['first_name']); ?>" required>
-                    </div>
+            /* FORM 1 - Home Profile (1.A Father, 1.B Mother, 1.C Family) */
+            echo eccd_f1_render_all($f1);
+            ?>
 
-                    <div class="form-row">
-                        <label class="form-label">Middle Name</label>
-                        <input type="text" name="middle_name" class="form-control" value="<?php echo htmlspecialchars($child['middle_name'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" name="last_name" class="form-control" value="<?php echo htmlspecialchars($child['last_name']); ?>" required>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Birthdate</label>
-                        <input type="date" name="birthdate" class="form-control" value="<?php echo htmlspecialchars($child['birthdate']); ?>" required>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Sex</label>
-                        <select name="sex" class="form-select" required>
-                            <option value="Male" <?php if ($child['sex'] == 'Male') echo 'selected'; ?>>Male</option>
-                            <option value="Female" <?php if ($child['sex'] == 'Female') echo 'selected'; ?>>Female</option>
-                        </select>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Address</label>
-                        <input type="text" name="address" class="form-control" value="<?php echo htmlspecialchars($child['address'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Religion</label>
-                        <select name="religion" class="form-select">
-                            <option value="">-- Select Religion --</option>
-                            <?php
-                            $religion_options = ['Roman Catholic','Christian','Islam','Iglesia ni Cristo','Seventh-day Adventist',"Jehovah's Witnesses",'Baptist','Methodist','Born Again Christian','Others'];
-                            foreach ($religion_options as $opt) {
-                                $sel = ($child['religion'] === $opt) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Birth Order</label>
-                        <input type="number" min="1" name="birth_order" class="form-control" value="<?php echo htmlspecialchars($child['birth_order'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Born at</label>
-                        <select name="born_at" class="form-select">
-                            <option value="">-- Select --</option>
-                            <?php foreach (['Hospital','Health Center','Home'] as $opt) {
-                                $sel = (($child['born_at'] ?? '') === $opt) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                            } ?>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 FAMILY & REGISTRATION DETAILS (FORM 1)
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Family &amp; Registration Details (Form 1)</h3>
-                <p class="section-subtitle">Originally submitted by the guardian — correct here if needed.</p>
-
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Registered (Yes/No)</label>
-                        <select name="is_registered" class="form-select">
-                            <option value="">-- Select --</option>
-                            <option value="Yes" <?php echo (($child['is_registered'] ?? '') === 'Yes') ? 'selected' : ''; ?>>Yes</option>
-                            <option value="No" <?php echo (($child['is_registered'] ?? '') === 'No') ? 'selected' : ''; ?>>No</option>
-                        </select>
-                    </div>
-
-                    <div class="form-row"></div>
-
-                    <div class="form-row">
-                        <label class="form-label">First Language</label>
-                        <select name="first_language" id="firstLanguage" class="form-select">
-                            <option value="">Select Language</option>
-                            <?php foreach ($language_options as $lang) {
-                                $sel = ($first_language_select_value === $lang) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($lang) . "\" $sel>" . htmlspecialchars($lang) . "</option>";
-                            } ?>
-                            <option value="Others" <?php echo ($first_language_select_value === 'Others') ? 'selected' : ''; ?>>Others</option>
-                        </select>
-                        <div class="other-field-group <?php echo $first_language_is_other ? 'show' : ''; ?>" id="firstLanguageOtherGroup">
-                            <input type="text" name="first_language_other" class="form-control" placeholder="Please specify"
-                                   value="<?php echo $first_language_is_other ? htmlspecialchars($current_first_language) : ''; ?>">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Second Language</label>
-                        <select name="second_language" id="secondLanguage" class="form-select">
-                            <option value="">Select Language</option>
-                            <?php foreach ($language_options as $lang) {
-                                $sel = ($second_language_select_value === $lang) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($lang) . "\" $sel>" . htmlspecialchars($lang) . "</option>";
-                            } ?>
-                            <option value="Others" <?php echo ($second_language_select_value === 'Others') ? 'selected' : ''; ?>>Others</option>
-                        </select>
-                        <div class="other-field-group <?php echo $second_language_is_other ? 'show' : ''; ?>" id="secondLanguageOtherGroup">
-                            <input type="text" name="second_language_other" class="form-control" placeholder="Please specify"
-                                   value="<?php echo $second_language_is_other ? htmlspecialchars($current_second_language) : ''; ?>">
-                        </div>
-                    </div>
-                </div>
-
-                <p class="subgroup-title">Mother's Information</p>
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="mother_name" class="form-control" value="<?php echo htmlspecialchars($child['mother_name'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Occupation</label>
-                        <input type="text" name="mother_occupation" class="form-control" value="<?php echo htmlspecialchars($child['mother_occupation'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row" style="grid-column:1 / -1;">
-                        <label class="form-label">Address</label>
-                        <input type="text" name="mother_address" class="form-control" value="<?php echo htmlspecialchars($child['mother_address'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Home</label>
-                        <input type="text" name="mother_contact_home" class="form-control" value="<?php echo htmlspecialchars($child['mother_contact_home'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Work</label>
-                        <input type="text" name="mother_contact_work" class="form-control" value="<?php echo htmlspecialchars($child['mother_contact_work'] ?? ''); ?>">
-                    </div>
-                </div>
-
-                <p class="subgroup-title">Father's Information</p>
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="father_name" class="form-control" value="<?php echo htmlspecialchars($child['father_name'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Occupation</label>
-                        <input type="text" name="father_occupation" class="form-control" value="<?php echo htmlspecialchars($child['father_occupation'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row" style="grid-column:1 / -1;">
-                        <label class="form-label">Address</label>
-                        <input type="text" name="father_address" class="form-control" value="<?php echo htmlspecialchars($child['father_address'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Home</label>
-                        <input type="text" name="father_contact_home" class="form-control" value="<?php echo htmlspecialchars($child['father_contact_home'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Work</label>
-                        <input type="text" name="father_contact_work" class="form-control" value="<?php echo htmlspecialchars($child['father_contact_work'] ?? ''); ?>">
-                    </div>
-                </div>
-
-                <p class="subgroup-title">In Case of Emergency, Please Contact</p>
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="emergency_contact_name" class="form-control" value="<?php echo htmlspecialchars($child['emergency_contact_name'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Relationship</label>
-                        <select name="emergency_contact_relationship" class="form-select">
-                            <option value="">Select Relationship</option>
-                            <?php foreach ($relationship_options as $opt) {
-                                $sel = (($child['emergency_contact_relationship'] ?? '') === $opt) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                            } ?>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Home</label>
-                        <input type="text" name="emergency_contact_home" class="form-control" value="<?php echo htmlspecialchars($child['emergency_contact_home'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Contact Number - Work</label>
-                        <input type="text" name="emergency_contact_work" class="form-control" value="<?php echo htmlspecialchars($child['emergency_contact_work'] ?? ''); ?>">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 GROWTH MEASUREMENTS
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Add New Growth Measurement</h3>
-                <p class="section-subtitle">Optional. Leave blank to skip — this will NOT overwrite existing growth history, it adds a new follow-up record.</p>
-
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Height (cm)</label>
-                        <input type="number" step="0.01" min="0" name="height_cm" class="form-control">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Weight (kg)</label>
-                        <input type="number" step="0.01" min="0" name="weight_kg" class="form-control">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 HEALTH RECORDS
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Health Records</h3>
-
-                <div class="form-row">
-                    <label class="form-label">Does the Child have:</label>
-                    <div class="checkbox-grid">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="has_eccd_card" name="has_eccd_card" <?php echo !empty($child['has_eccd_card']) ? 'checked' : ''; ?>>
-                            <label for="has_eccd_card">ECCD Card</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="has_mother_child_book" name="has_mother_child_book" <?php echo !empty($child['has_mother_child_book']) ? 'checked' : ''; ?>>
-                            <label for="has_mother_child_book">Mother & Child Book</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <label class="form-label">Others, please specify</label>
-                    <input type="text" name="has_other_health_record" class="form-control" value="<?php echo htmlspecialchars($child['has_other_health_record'] ?? ''); ?>">
-                </div>
-
-                <p class="subgroup-title">Vaccination and Other Health Data</p>
-                <div class="form-grid">
-                    <?php
-                    $vaccine_fields = [
-                        'vaccine_bcg' => 'BCG',
-                        'vaccine_dpt' => 'DPT',
-                        'vaccine_opv' => 'Oral Polio',
-                        'vaccine_hepab' => 'Hepa B',
-                        'vaccine_measles' => 'Measles',
-                    ];
-                    foreach ($vaccine_fields as $field => $label) {
-                    ?>
-                        <div class="form-row">
-                            <label class="form-label"><?php echo htmlspecialchars($label); ?></label>
-                            <select name="<?php echo $field; ?>" class="form-select">
-                                <option value="">-- Select --</option>
-                                <?php foreach (['Yes','No',"Don't Know"] as $opt) {
-                                    $sel = (($child[$field] ?? '') === $opt) ? 'selected' : '';
-                                    echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                                } ?>
-                            </select>
-                        </div>
-                    <?php } ?>
-
-                    <div class="form-row">
-                        <label class="form-label">Others (specify vaccine)</label>
-                        <input type="text" name="vaccine_others_name" class="form-control" value="<?php echo htmlspecialchars($child['vaccine_others_name'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Others — Status</label>
-                        <select name="vaccine_others_status" class="form-select">
-                            <option value="">-- Select --</option>
-                            <?php foreach (['Yes','No',"Don't Know"] as $opt) {
-                                $sel = (($child['vaccine_others_status'] ?? '') === $opt) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                            } ?>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 PHYSICAL ATTRIBUTES
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Physical Attributes</h3>
-
-                <p class="subgroup-title">Physical Deformity</p>
-                <div class="checkbox-grid">
-                    <?php
-                    $deformity_fields = [
-                        'deformity_hare_lip' => 'Hare Lip',
-                        'deformity_cross_eyed' => 'Cross-Eyed (Duling or Banlag)',
-                        'deformity_deaf' => 'Deaf',
-                        'deformity_blind' => 'Blind',
-                        'deformity_disabled_leg' => 'Disabled Leg',
-                        'deformity_disabled_arm_hand' => 'Disabled Arm/Hand',
-                        'deformity_fingers_toes' => 'Deformity in Fingers/Toes',
-                    ];
-                    foreach ($deformity_fields as $field => $label) {
-                        $checked = !empty($child[$field]) ? 'checked' : '';
-                    ?>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="<?php echo $field; ?>" name="<?php echo $field; ?>" <?php echo $checked; ?>>
-                            <label for="<?php echo $field; ?>"><?php echo htmlspecialchars($label); ?></label>
-                        </div>
-                    <?php } ?>
-                </div>
-
-                <p class="subgroup-title">Problems with</p>
-                <div class="checkbox-grid">
-                    <?php
-                    $problem_fields = [
-                        'problem_behavior' => 'Behavior',
-                        'problem_speaking' => 'Speaking',
-                        'problem_hearing' => 'Hearing',
-                        'problem_vision' => 'Vision',
-                    ];
-                    foreach ($problem_fields as $field => $label) {
-                        $checked = !empty($child[$field]) ? 'checked' : '';
-                    ?>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="<?php echo $field; ?>" name="<?php echo $field; ?>" <?php echo $checked; ?>>
-                            <label for="<?php echo $field; ?>"><?php echo htmlspecialchars($label); ?></label>
-                        </div>
-                    <?php } ?>
-                </div>
-
-                <div class="form-row" style="margin-top:16px;">
-                    <label class="form-label">Left Handed</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="is_left_handed" value="Yes" <?php echo (($child['is_left_handed'] ?? '') === 'Yes') ? 'checked' : ''; ?>> Yes</label>
-                        <label><input type="radio" name="is_left_handed" value="No" <?php echo (($child['is_left_handed'] ?? '') === 'No') ? 'checked' : ''; ?>> No</label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 SIBLINGS
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Siblings</h3>
-                <p class="section-subtitle">List each sibling's age, sex, and education status. Leave blank if none.</p>
-                <textarea name="siblings_info" class="form-control" rows="4" placeholder="e.g. Age 8, Male, In School&#10;Age 5, Female, Out of School"><?php echo htmlspecialchars($child['siblings_info'] ?? ''); ?></textarea>
-            </div>
-
-            <!-- ============================
-                 PRIOR ECCD EXPERIENCE
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Prior Early Childhood Experience</h3>
-                <p class="section-subtitle">List what the child attended per level (Nursery/Kindergarten/Preparatory). Leave blank if none.</p>
-                <textarea name="eccd_experience_info" class="form-control" rows="4" placeholder="e.g. Nursery: Private Day Care&#10;Kindergarten: Public Pre-School"><?php echo htmlspecialchars($child['eccd_experience_info'] ?? ''); ?></textarea>
-            </div>
-
-            <!-- ============================
-                 OTHER PERFORMANCE RELATED INPUTS
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Other Performance Related Inputs</h3>
-
-                <div class="form-row">
-                    <label class="form-label">Learns at Home with</label>
-                    <div class="checkbox-grid">
-                        <?php
-                        $learns_options = ['Nobody', 'Siblings', 'Househelp/Maid', 'Tutor', 'Mother/Father/Both', 'Relatives', 'Others'];
-                        foreach ($learns_options as $opt) {
-                            $cb_id = 'learns_' . preg_replace('/[^a-z0-9]/i', '', $opt);
-                            $checked = in_array($opt, $learns_checked, true) ? 'checked' : '';
-                        ?>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="<?php echo $cb_id; ?>" name="learns_at_home_with[]" value="<?php echo htmlspecialchars($opt); ?>" <?php echo $checked; ?>>
-                                <label for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($opt); ?></label>
-                            </div>
-                        <?php } ?>
-                    </div>
-                </div>
-
-                <div class="form-grid" style="margin-top:6px;">
-                    <?php
-                    $plays_fields = [
-                        'plays_with_older_siblings' => 'Play/Interacts with Older Siblings',
-                        'plays_with_younger_siblings' => 'Play/Interacts with Younger Siblings',
-                        'plays_with_neighbors' => 'Play/Interacts with Neighbors of Same Age',
-                    ];
-                    foreach ($plays_fields as $field => $label) {
-                    ?>
-                        <div class="form-row">
-                            <label class="form-label"><?php echo htmlspecialchars($label); ?></label>
-                            <select name="<?php echo $field; ?>" class="form-select">
-                                <option value="">-- Select --</option>
-                                <?php foreach (['Always','Sometimes','Rarely','Never'] as $opt) {
-                                    $sel = (($child[$field] ?? '') === $opt) ? 'selected' : '';
-                                    echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                                } ?>
-                            </select>
-                        </div>
-                    <?php } ?>
-                </div>
-            </div>
-
-            <!-- ============================
-                 LOGISTICS
-            ============================= -->
-            <div class="form-card">
-                <h3 class="section-title">Logistics</h3>
-
-                <div class="form-row">
-                    <label class="form-label">Has Meal Before Going to School</label>
-                    <select name="has_meal_before_school" class="form-select">
-                        <option value="">-- Select --</option>
-                        <?php foreach (['Always','Most of the time','Sometimes','Rarely','Never'] as $opt) {
-                            $sel = (($child['has_meal_before_school'] ?? '') === $opt) ? 'selected' : '';
-                            echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                        } ?>
-                    </select>
-                </div>
-
-                <div class="form-row">
-                    <label class="form-label">Food Normally Eaten by Child</label>
-                    <div class="checkbox-grid">
-                        <?php
-                        $food_options = ['Vegetable', 'Pork', 'Chicken', 'Beef', 'Fish', 'Rice', 'Noodle Soup', 'Bread', 'Fruits', 'Cereals', 'Fruit Juice', 'Milk'];
-                        foreach ($food_options as $opt) {
-                            $cb_id = 'food_' . preg_replace('/[^a-z0-9]/i', '', $opt);
-                            $checked = in_array($opt, $food_checked, true) ? 'checked' : '';
-                        ?>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="<?php echo $cb_id; ?>" name="food_normally_eaten[]" value="<?php echo htmlspecialchars($opt); ?>" <?php echo $checked; ?>>
-                                <label for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($opt); ?></label>
-                            </div>
-                        <?php } ?>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <label class="form-label">Has Baon</label>
-                    <select name="has_baon" class="form-select">
-                        <option value="">-- Select --</option>
-                        <?php foreach (['Money','Food','Both','None',"Don't Know"] as $opt) {
-                            $sel = (($child['has_baon'] ?? '') === $opt) ? 'selected' : '';
-                            echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                        } ?>
-                    </select>
-                </div>
-
-                <p class="subgroup-title">Travel Time from Home to DCC</p>
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Minutes</label>
-                        <input type="number" min="0" name="travel_time_to_dcc_minutes" class="form-control" value="<?php echo htmlspecialchars($child['travel_time_to_dcc_minutes'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Mode</label>
-                        <select name="travel_mode_to_dcc" class="form-select">
-                            <option value="">-- Select --</option>
-                            <?php foreach (['Walking','Private Vehicle','Public Transportation'] as $opt) {
-                                $sel = (($child['travel_mode_to_dcc'] ?? '') === $opt) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                            } ?>
-                        </select>
-                    </div>
-                </div>
-
-                <p class="subgroup-title">Travel Time from Home to NCDC</p>
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Minutes</label>
-                        <input type="number" min="0" name="travel_time_to_ncdc_minutes" class="form-control" value="<?php echo htmlspecialchars($child['travel_time_to_ncdc_minutes'] ?? ''); ?>">
-                    </div>
-                    <div class="form-row">
-                        <label class="form-label">Mode</label>
-                        <select name="travel_mode_to_ncdc" class="form-select">
-                            <option value="">-- Select --</option>
-                            <?php foreach (['Walking','Private Vehicle','Public Transportation'] as $opt) {
-                                $sel = (($child['travel_mode_to_ncdc'] ?? '') === $opt) ? 'selected' : '';
-                                echo "<option value=\"" . htmlspecialchars($opt) . "\" $sel>" . htmlspecialchars($opt) . "</option>";
-                            } ?>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <label class="form-label">Public Transportation (if applicable)</label>
-                    <div class="checkbox-grid">
-                        <?php
-                        $transport_options = ['School bus', 'Jeep', 'Bus', 'Banca', 'Calesa', 'Tricycle', 'Pedicab', 'Habal-Habal', 'Others'];
-                        foreach ($transport_options as $opt) {
-                            $cb_id = 'transport_' . preg_replace('/[^a-z0-9]/i', '', $opt);
-                            $checked = in_array($opt, $transport_checked, true) ? 'checked' : '';
-                        ?>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="<?php echo $cb_id; ?>" name="public_transport_type[]" value="<?php echo htmlspecialchars($opt); ?>" <?php echo $checked; ?>>
-                                <label for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($opt); ?></label>
-                            </div>
-                        <?php } ?>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <label class="form-label">Goes to School with</label>
-                    <div class="checkbox-grid">
-                        <?php
-                        $school_with_options = ['Mother', 'Father', 'Both Parents', 'Siblings', 'Relatives', 'Grandparents', 'Maid', 'None'];
-                        foreach ($school_with_options as $opt) {
-                            $cb_id = 'goeswith_' . preg_replace('/[^a-z0-9]/i', '', $opt);
-                            $checked = in_array($opt, $goeswith_checked, true) ? 'checked' : '';
-                        ?>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="<?php echo $cb_id; ?>" name="goes_to_school_with[]" value="<?php echo htmlspecialchars($opt); ?>" <?php echo $checked; ?>>
-                                <label for="<?php echo $cb_id; ?>"><?php echo htmlspecialchars($opt); ?></label>
-                            </div>
-                        <?php } ?>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ============================
-                 CHILD HEALTH INFORMATION (existing feature)
-            ============================= -->
-            <div class="form-card">
-                <h4 class="sub-section-title" style="margin-top:0; border-top:none; padding-top:0;">Child Health Information</h4>
-
-                <div class="form-grid">
-                    <div class="form-row">
-                        <label class="form-label">Vaccination Card</label>
-                        <input type="file" name="vaccination_card" class="form-file">
-                        <?php if (!empty($health['vaccination_card_file_path'])) { ?>
-                            <div class="section-subtitle">Current file: <?php echo htmlspecialchars($health['vaccination_card_file_path']); ?></div>
-                        <?php } ?>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Medical History</label>
-                        <input type="file" name="medical_history_file" class="form-file">
-                        <?php if (!empty($health['medical_history_file_path'])) { ?>
-                            <div class="section-subtitle">Current file: <?php echo htmlspecialchars($health['medical_history_file_path']); ?></div>
-                        <?php } ?>
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Allergies</label>
-                        <input type="text" name="allergies" class="form-control" value="<?php echo htmlspecialchars($health['allergies'] ?? ''); ?>">
-                    </div>
-
-                    <div class="form-row">
-                        <label class="form-label">Comorbidities</label>
-                        <input type="text" name="comorbidities" class="form-control" value="<?php echo htmlspecialchars($health['comorbidities'] ?? ''); ?>">
-                    </div>
-                </div>
-            </div>
+           
 
             <div class="form-actions">
                 <button type="button" class="btn btn-cancel" onclick="window.location.href='child_profile.php?child_id=<?php echo $child_id; ?>'">Cancel</button>
@@ -1294,25 +721,9 @@ function toggleSidebar() {
     }
 }
 
-function setupLanguageOtherToggle(selectId, groupId) {
-    var select = document.getElementById(selectId);
-    var group = document.getElementById(groupId);
-    if (!select || !group) return;
-
-    function update() {
-        if (select.value === 'Others') {
-            group.classList.add('show');
-        } else {
-            group.classList.remove('show');
-        }
-    }
-
-    select.addEventListener('change', update);
-}
-
-setupLanguageOtherToggle('firstLanguage', 'firstLanguageOtherGroup');
-setupLanguageOtherToggle('secondLanguage', 'secondLanguageOtherGroup');
 </script>
+<?php echo eccd_f2_js(); ?>
+<?php echo eccd_f1_js(); ?>
 
 </body>
 </html>

@@ -4,6 +4,7 @@ ini_set('display_errors', 1);
 
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if($_SESSION['role_id'] != 3){
     header("Location: ../login.php");
@@ -817,7 +818,7 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
                             <span class="info-label">Latest Nutritional Status</span>
                             <div class="info-value">
                                 <span class="status-pill <?php echo $latest_status_class; ?>">
-                                    <?php echo htmlspecialchars($latest_status); ?>
+                                    <?php echo htmlspecialchars(statusLabel($latest_status)); ?>
                                 </span>
                             </div>
                         </div>
@@ -833,7 +834,7 @@ $official_original_status = $official_guidance && !empty($official_guidance['ori
                     <?php if($official_guidance) { ?>
                         <div class="guidance-meta">
                             <span class="guidance-badge source-status">
-                                Official Status: <?php echo htmlspecialchars($official_original_status); ?>
+                                Official Status: <?php echo htmlspecialchars(statusLabel($official_original_status)); ?>
                             </span>
 
                             <span class="guidance-badge category">

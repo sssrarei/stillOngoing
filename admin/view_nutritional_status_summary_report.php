@@ -1,6 +1,7 @@
 <?php
 include '../includes/auth.php';
 include '../config/database.php';
+include '../includes/status_label.php';
 
 if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
     header("Location: ../login.php");
@@ -593,7 +594,7 @@ if ($status === 'submitted') {
 
                 <div class="summary-item">
                     <div class="summary-label">Highest Label</div>
-                    <div class="summary-value"><?php echo h($highest_label); ?></div>
+                    <div class="summary-value"><?php echo h(statusLabel($highest_label)); ?></div>
                 </div>
 
                 <div class="summary-item">
@@ -633,11 +634,11 @@ if ($status === 'submitted') {
                     <div class="status-summary-value status-alert"><?php echo h($obese); ?> (<?php echo h($obese_pct); ?>%)</div>
                 </div>
                 <div class="status-summary-card">
-                    <div class="status-summary-title">Stunted</div>
+                    <div class="status-summary-title">Low Height</div>
                     <div class="status-summary-value status-alert"><?php echo h($stunted); ?> (<?php echo h($stunted_pct); ?>%)</div>
                 </div>
                 <div class="status-summary-card">
-                    <div class="status-summary-title">Severely Stunted</div>
+                    <div class="status-summary-title">Severely Low Height</div>
                     <div class="status-summary-value status-alert"><?php echo h($severely_stunted); ?> (<?php echo h($severely_stunted_pct); ?>%)</div>
                 </div>
                 <div class="status-summary-card">
